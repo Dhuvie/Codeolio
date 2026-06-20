@@ -74,19 +74,21 @@ function NeuralMatrix() {
       // Make it spin at exactly 1.4x the original slow speed
       vel[i] = (4.0 / Math.pow(radius, 1.5)) * 0.084; 
 
-      // Brighter Colors
+      // Brighter Colors & Larger Sizes for Mobile (to compensate for no Bloom)
+      const sizeMultiplier = isMobile ? 1.8 : 1.0;
+      
       const isPhotonRing = radius < 7.0;
       if (isPhotonRing) {
         const mixVal = Math.random();
         cols[i * 3] = 1.0; 
         cols[i * 3 + 1] = mixVal > 0.5 ? 1.0 : 0.8; 
         cols[i * 3 + 2] = mixVal > 0.8 ? 0.8 : 0.2; 
-        szs[i] = Math.random() * 6.0 + 4.0; // Larger glow nodes
+        szs[i] = (Math.random() * 6.0 + 4.0) * sizeMultiplier; // Larger glow nodes
       } else {
         cols[i * 3] = 1.0; 
         cols[i * 3 + 1] = 0.4 + Math.random() * 0.4; 
         cols[i * 3 + 2] = 0.0;  
-        szs[i] = Math.random() * 4.0 + 1.5; 
+        szs[i] = (Math.random() * 4.0 + 1.5) * sizeMultiplier; 
       }
     }
     
@@ -202,15 +204,23 @@ function NeuralMatrix() {
     
     let lineIndex = 0;
 
-    // Slowly tilt the entire accretion disk over time
-    pointsRef.current.rotation.x = Math.sin(time * 0.1) * 0.1 + 0.2;
-    pointsRef.current.rotation.z = Math.cos(time * 0.1) * 0.1;
-    linesRef.current.rotation.x = pointsRef.current.rotation.x;
-    linesRef.current.rotation.z = pointsRef.current.rotation.z;
-
-    // Add exactly 1.4x the original global spin to the entire group
-    pointsRef.current.rotation.y = time * 0.021;
-    linesRef.current.rotation.y = time * 0.021;
+    if (isMobile) {
+      // Mobile: Lock flat (edge-on) and spin.
+      pointsRef.current.rotation.x = 0;
+      pointsRef.current.rotation.z = 0;
+      pointsRef.current.rotation.y = time * 0.035;
+      linesRef.current.rotation.x = 0;
+      linesRef.current.rotation.z = 0;
+      linesRef.current.rotation.y = time * 0.035;
+    } else {
+      // Desktop: Slowly tilt the entire accretion disk over time
+      pointsRef.current.rotation.x = Math.sin(time * 0.1) * 0.1 + 0.2;
+      pointsRef.current.rotation.z = Math.cos(time * 0.1) * 0.1;
+      pointsRef.current.rotation.y = time * 0.021;
+      linesRef.current.rotation.x = pointsRef.current.rotation.x;
+      linesRef.current.rotation.z = pointsRef.current.rotation.z;
+      linesRef.current.rotation.y = pointsRef.current.rotation.y;
+    }
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const i3 = i * 3;
@@ -327,61 +337,53 @@ function NeuralMatrix() {
     lineColAttr.needsUpdate = true;
     lineGeometry.setDrawRange(0, lineIndex);
     
-    // Scroll Parallax Camera - The Seamless Wormhole Orbit
-    const scrollY = window.scrollY || document.documentElement.scrollTop;
-    const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    const scrollPerc = scrollY / maxScroll;
-    
-    // Instead of linear movement (which cuts when loop wraps 1 -> 0),
-    // we use a 360-degree orbit so scrollPerc 0 and 1 resolve to the exact same position!
-    const orbitAngle = scrollPerc * Math.PI * 2;
-    
-    // Target normal orbit
-    const targetOrbitX = Math.sin(orbitAngle) * 25;
-    const targetOrbitZ = Math.cos(orbitAngle) * 25;
-    const targetOrbitY = 4 + Math.cos(orbitAngle * 2) * 4; // Bobs between 0 and 8
-
-    // VORTEX DIVE MATH (Hidden Cave)
-    let diveFactor = 0;
-    const achSection = document.getElementById("achievements");
-
-    if (achSection) {
-       const rect = achSection.getBoundingClientRect();
-       const windowHeight = window.innerHeight;
-       
-       let fadeIn = (windowHeight - rect.top) / (windowHeight * 0.2); 
-       
-       // Fade out starts ONLY when Achievements is completely off screen (rect.bottom <= 0)
-       let fadeOut = (rect.bottom + windowHeight * 0.5) / (windowHeight * 0.5);
-       
-       diveFactor = Math.min(1.0, Math.max(0.0, fadeIn));
-       diveFactor = Math.min(diveFactor, Math.max(0.0, fadeOut));
-       diveFactor = Math.pow(diveFactor, 1.2); 
+    if (isMobile) {
+      // Mobile: Fixed camera to prevent scroll lag. Looking straight at the edge.
+      camera.position.x = THREE.MathUtils.lerp(camera.position.x, 0, 0.1);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0, 0.1);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 28, 0.1);
+      camera.lookAt(0, 0, 0);
+    } else {
+      // Desktop: Scroll Parallax Camera - The Seamless Wormhole Orbit
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const scrollPerc = scrollY / maxScroll;
+      
+      const orbitAngle = scrollPerc * Math.PI * 2;
+      const targetOrbitX = Math.sin(orbitAngle) * 25;
+      const targetOrbitZ = Math.cos(orbitAngle) * 25;
+      const targetOrbitY = 4 + Math.cos(orbitAngle * 2) * 4;
+  
+      let diveFactor = 0;
+      const achSection = document.getElementById("achievements");
+  
+      if (achSection) {
+         const rect = achSection.getBoundingClientRect();
+         const windowHeight = window.innerHeight;
+         let fadeIn = (windowHeight - rect.top) / (windowHeight * 0.2); 
+         let fadeOut = (rect.bottom + windowHeight * 0.5) / (windowHeight * 0.5);
+         diveFactor = Math.min(1.0, Math.max(0.0, fadeIn));
+         diveFactor = Math.min(diveFactor, Math.max(0.0, fadeOut));
+         diveFactor = Math.pow(diveFactor, 1.2); 
+      }
+  
+      diveTarget.current = THREE.MathUtils.lerp(diveTarget.current, diveFactor, 0.08);
+      const arcHeight = Math.sin(diveTarget.current * Math.PI) * 12.0;
+  
+      camera.position.x = THREE.MathUtils.lerp(targetOrbitX, 0.0, diveTarget.current);
+      camera.position.y = THREE.MathUtils.lerp(targetOrbitY, 0.1, diveTarget.current) + arcHeight;
+      camera.position.z = THREE.MathUtils.lerp(targetOrbitZ, 0.1, diveTarget.current);
+  
+      const baseLookAtY = THREE.MathUtils.lerp(0, -2.0, diveTarget.current);
+      const cavePanX = targetMouse.current.x * 2.5 * diveTarget.current;
+      const cavePanY = targetMouse.current.y * 1.5 * diveTarget.current;
+  
+      camera.lookAt(cavePanX, baseLookAtY + cavePanY, 0);
     }
-
-    // Smoothly track dive target
-    diveTarget.current = THREE.MathUtils.lerp(diveTarget.current, diveFactor, 0.08);
-
-    // Arc over the disk during transition so it doesn't slice through the camera
-    const arcHeight = Math.sin(diveTarget.current * Math.PI) * 12.0;
-
-    // Apply Dive interpolation
-    camera.position.x = THREE.MathUtils.lerp(targetOrbitX, 0.0, diveTarget.current);
-    camera.position.y = THREE.MathUtils.lerp(targetOrbitY, 0.1, diveTarget.current) + arcHeight;
-    camera.position.z = THREE.MathUtils.lerp(targetOrbitZ, 0.1, diveTarget.current);
-
-    // Look at origin, but tilt down slightly when in the cave to frame pure darkness
-    const baseLookAtY = THREE.MathUtils.lerp(0, -2.0, diveTarget.current);
-    
-    // Add immersive mouse panning ONLY when inside the cave
-    const cavePanX = targetMouse.current.x * 2.5 * diveTarget.current;
-    const cavePanY = targetMouse.current.y * 1.5 * diveTarget.current;
-
-    camera.lookAt(cavePanX, baseLookAtY + cavePanY, 0);
   });
 
   return (
-    <group>
+    <group rotation-z={isMobile ? Math.PI / 2 : 0}>
       <points ref={pointsRef}>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" count={PARTICLE_COUNT} array={positions} itemSize={3} args={[positions, 3]} />
@@ -397,96 +399,7 @@ function NeuralMatrix() {
   );
 }
 
-const MobileScrollTunnel = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const targetScroll = useRef(0);
-  const currentScroll = useRef(0);
-
-  useEffect(() => {
-    // We run the event listener on window but calculate based on document height
-    const handleScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-      targetScroll.current = scrollY / maxScroll;
-    };
-    
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    
-    let animationFrameId: number;
-    const loop = () => {
-       // Super smooth lerp for the CSS variables
-       currentScroll.current += (targetScroll.current - currentScroll.current) * 0.08; 
-       if (containerRef.current) {
-          containerRef.current.style.setProperty('--scroll', currentScroll.current.toString());
-       }
-       animationFrameId = requestAnimationFrame(loop);
-    };
-    loop();
-
-    return () => {
-       window.removeEventListener("scroll", handleScroll);
-       cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
-  return (
-    <div 
-      className="fixed inset-0 w-full h-full bg-[#050505] overflow-hidden pointer-events-none" 
-      style={{ zIndex: 0, perspective: '800px' }}
-      ref={containerRef}
-    >
-      {/* Deep Space Void Base */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0d001a] via-[#050505] to-[#000000] opacity-100" />
-      
-      {/* Dynamic 3D Neon Tunnel */}
-      <div 
-        className="absolute top-1/2 left-1/2 w-full h-full"
-        style={{
-          transformStyle: 'preserve-3d',
-          // Tilt it flat and move the camera "forward" and "up" as we scroll
-          transform: 'translate(-50%, -50%) rotateX(75deg) translateY(calc(var(--scroll) * -800px)) translateZ(calc(var(--scroll) * 500px))',
-        }}
-      >
-         {Array.from({ length: 25 }).map((_, i) => (
-           <div 
-             key={i}
-             className="absolute top-1/2 left-1/2 rounded-full mix-blend-screen"
-             style={{
-                width: `${300 + i * 150}px`,
-                height: `${300 + i * 150}px`,
-                marginTop: `-${(300 + i * 150) / 2}px`,
-                marginLeft: `-${(300 + i * 150) / 2}px`,
-                // Alternating neon borders for a cyber-matrix effect
-                borderTop: '3px solid rgba(160, 50, 255, 0.8)',
-                borderRight: '3px solid rgba(50, 150, 255, 0.2)',
-                borderBottom: '3px solid rgba(160, 50, 255, 0.2)',
-                borderLeft: '3px solid rgba(50, 150, 255, 0.8)',
-                boxShadow: '0 0 40px rgba(160, 50, 255, 0.4), inset 0 0 40px rgba(50, 150, 255, 0.4)',
-                // Twisting rings: each ring rotates in alternating directions based on scroll!
-                transform: `translateZ(${i * -200 + 400}px) rotateZ(calc(var(--scroll) * ${i % 2 === 0 ? 360 : -360}deg))`,
-                opacity: Math.max(0, 1 - (i / 22)),
-             }}
-           />
-         ))}
-      </div>
-
-      {/* Center Core that reacts to scroll depth */}
-      <div 
-        className="absolute top-1/2 left-1/2 w-[250px] h-[250px] rounded-full blur-[80px]"
-        style={{
-           background: 'radial-gradient(circle, rgba(160,50,255,0.7) 0%, rgba(50,150,255,0.3) 50%, rgba(0,0,0,0) 100%)',
-           transform: 'translate(-50%, -50%) scale(calc(1 + var(--scroll) * 1.5))',
-        }}
-      />
-    </div>
-  );
-};
-
 export default function GlobalCanvas() {
-  if (isMobile) {
-    return <MobileScrollTunnel />;
-  }
-
   return (
     <div 
       className="fixed inset-0 w-full h-full pointer-events-none" 
