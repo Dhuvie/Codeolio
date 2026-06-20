@@ -403,37 +403,74 @@ function NeuralMatrix() {
   );
 }
 
+const getShapes = () => {
+  // Shape 0: Grid (8x8)
+  const grid = [];
+  for(let i=0; i<64; i++) {
+     const r = Math.floor(i/8);
+     const c = i%8;
+     grid.push({ x: (c-3.5)*22, y: (r-3.5)*22, r: 45 });
+  }
+
+  // Shape 1: Diamond (About / Experience)
+  const diamond = [];
+  for(let i=0; i<16; i++) diamond.push({ x: 0 - (40*i/15), y: -60 + (60*i/15), r: 50 });
+  for(let i=0; i<16; i++) diamond.push({ x: -40 + (40*i/15), y: 0 + (60*i/15), r: -50 });
+  for(let i=0; i<16; i++) diamond.push({ x: 0 + (40*i/15), y: 60 - (60*i/15), r: -50 });
+  for(let i=0; i<16; i++) diamond.push({ x: 40 - (40*i/15), y: 0 - (60*i/15), r: 50 });
+
+  // Shape 2: Code Brackets < > (Projects)
+  const brackets = [];
+  for(let i=0; i<16; i++) brackets.push({ x: -40 + (-30*i/15), y: -40 + (40*i/15), r: -45 });
+  for(let i=0; i<16; i++) brackets.push({ x: -70 + (30*i/15), y: 0 + (40*i/15), r: 45 });
+  for(let i=0; i<16; i++) brackets.push({ x: 40 + (30*i/15), y: -40 + (40*i/15), r: 45 });
+  for(let i=0; i<16; i++) brackets.push({ x: 70 + (-30*i/15), y: 0 + (40*i/15), r: -45 });
+
+  // Shape 3: Crown (Achievements / Skills)
+  const crown = [];
+  for(let i=0; i<16; i++) crown.push({ x: -50 + (100*i/15), y: 40, r: 0 }); // base
+  for(let i=0; i<8; i++) crown.push({ x: -50 + (10*i/7), y: 40 + (-60*i/7), r: 80 }); // left up
+  for(let i=0; i<8; i++) crown.push({ x: -40 + (25*i/7), y: -20 + (40*i/7), r: -45 }); // left down
+  for(let i=0; i<8; i++) crown.push({ x: -15 + (15*i/7), y: 20 + (-70*i/7), r: 75 }); // center up
+  for(let i=0; i<8; i++) crown.push({ x: 0 + (15*i/7), y: -50 + (70*i/7), r: -75 }); // center down
+  for(let i=0; i<8; i++) crown.push({ x: 15 + (25*i/7), y: 20 + (-40*i/7), r: 45 }); // right up
+  for(let i=0; i<8; i++) crown.push({ x: 40 + (10*i/7), y: -20 + (60*i/7), r: -80 }); // right down
+
+  // Shape 4: Mobile Phone (Contact)
+  const phone = [];
+  for(let i=0; i<12; i++) phone.push({ x: -30 + (60*i/11), y: -60, r: 0 }); // top
+  for(let i=0; i<18; i++) phone.push({ x: 30, y: -60 + (120*i/17), r: 90 }); // right
+  for(let i=0; i<12; i++) phone.push({ x: 30 - (60*i/11), y: 60, r: 0 }); // bottom
+  for(let i=0; i<18; i++) phone.push({ x: -30, y: 60 - (120*i/17), r: 90 }); // left
+  for(let i=0; i<4; i++) phone.push({ x: -6 + (12*i/3), y: 45, r: 0 }); // home button notch
+
+  return [grid, diamond, brackets, crown, phone];
+};
+
 const MobileAnimeGrid = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Pre-calculate the 64 geometric shards so we do zero math inside the scroll loop
+  // Pre-calculate all geometric points and exploded chaos vectors so the GPU has zero math to do during scroll
   const shards = useMemo(() => {
+    const allShapes = getShapes();
     const items = [];
     for (let i = 0; i < 64; i++) {
+      // Stagger logic based on distance from center of the initial grid
       const row = Math.floor(i / 8);
       const col = i % 8;
-      
-      // Assembled State: A perfect 8x8 grid in the center
-      const ax = (col - 3.5) * 22; // 22px spacing
-      const ay = (row - 3.5) * 22;
-      const ar = 45; // All tilted diagonally
-
-      // Disassembled State: Chaotic outward explosion
-      const angle = Math.atan2(ay, ax);
-      const explodeDist = 150 + Math.random() * 250; 
-      const dx = Math.cos(angle) * explodeDist + (Math.random() - 0.5) * 150;
-      const dy = Math.sin(angle) * explodeDist + (Math.random() - 0.5) * 150;
-      const dz = (Math.random() - 0.5) * 500; // Massive depth
-      const dr = ar + (Math.random() - 0.5) * 1080; // Wild spinning
-      
-      // Stagger Logic: Outer pieces explode first, center pieces explode last (like peeling an onion)
       const distFromCenter = Math.sqrt(Math.pow(col - 3.5, 2) + Math.pow(row - 3.5, 2));
-      const delay = (1 - distFromCenter / 5) * 0.6; // 0.0 to 0.6
+      const delay = (1 - distFromCenter / 5); // 0.0 to 1.0 (Outer edge is 0, Center is 1)
 
-      // Colors matching the portfolio theme
+      // Random explosion vectors
+      const rx = (Math.random() - 0.5) * 2;
+      const ry = (Math.random() - 0.5) * 2;
+      const rz = (Math.random() - 0.5) * 2;
+      const rRot = (Math.random() - 0.5) * 1080;
+      
+      const positions = allShapes.map(shape => shape[i]);
       const isOrange = Math.random() > 0.4;
 
-      items.push({ ax, ay, ar, dx, dy, dz, dr, delay, isOrange });
+      items.push({ positions, delay, rx, ry, rz, rRot, isOrange });
     }
     return items;
   }, []);
@@ -441,9 +478,14 @@ const MobileAnimeGrid = () => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY || document.documentElement.scrollTop;
-      // We want the entire disassembly to finish exactly when they leave the Hero section
-      const explodeZone = window.innerHeight * 1.3;
-      const heroPerc = Math.min(1, Math.max(0, scrollY / explodeZone));
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      
+      // We have 5 shapes, so 4 transitions spanning the whole page
+      const numTransitions = 4;
+      const rawPerc = Math.min(1, Math.max(0, scrollY / maxScroll));
+      const scaledPerc = rawPerc * numTransitions;
+      const segment = Math.min(numTransitions - 1, Math.floor(scaledPerc));
+      const progress = scaledPerc - segment; // 0.0 to 1.0 within the current transition segment
       
       if (!containerRef.current) return;
       const children = containerRef.current.children;
@@ -452,30 +494,62 @@ const MobileAnimeGrid = () => {
         const s = shards[i];
         const el = children[i] as HTMLElement;
         
-        const staggerStart = s.delay; 
-        const staggerEnd = Math.min(1.0, staggerStart + 0.4); 
+        const shape1 = s.positions[segment];
+        const shape2 = s.positions[segment + 1];
         
-        // Local progress mapped between 0 and 1 for this specific shard
-        let localPerc = (heroPerc - staggerStart) / (staggerEnd - staggerStart);
-        localPerc = Math.min(1, Math.max(0, localPerc));
+        // Stagger timelines: Outer edges explode first, assemble first.
+        const explodeStart = s.delay * 0.15; // 0.0 to 0.15
+        const explodeEnd = explodeStart + 0.3; // 0.3 to 0.45
+        const assembleStart = 0.5 + s.delay * 0.15; // 0.5 to 0.65
+        const assembleEnd = assembleStart + 0.3; // 0.8 to 0.95
         
-        // Custom Anime.js style Cubic Ease In Out
-        const ease = localPerc < 0.5 
-          ? 4 * localPerc * localPerc * localPerc 
-          : 1 - Math.pow(-2 * localPerc + 2, 3) / 2;
+        let tx = 0, ty = 0, tz = 0, tr = 0, op = 1;
 
-        const currentX = s.ax + (s.dx - s.ax) * ease;
-        const currentY = s.ay + (s.dy - s.ay) * ease;
-        const currentRot = s.ar + (s.dr - s.ar) * ease;
-        const currentZ = s.dz * ease;
+        if (progress < explodeStart) {
+            // Stable Assembled State 1
+            tx = shape1.x; ty = shape1.y; tz = 0; tr = shape1.r;
+        } else if (progress < explodeEnd) {
+            // Exploding into chaos!
+            let local = (progress - explodeStart) / (explodeEnd - explodeStart);
+            let ease = local * local * local; // Cubic ease in
+            tx = shape1.x + s.rx * 300 * ease;
+            ty = shape1.y + s.ry * 300 * ease;
+            tz = s.rz * 400 * ease;
+            tr = shape1.r + s.rRot * ease;
+            op = 1 - (ease * 0.85); // Fade heavily during chaos
+        } else if (progress < assembleStart) {
+            // Suspended in deep space mid-air
+            tx = shape1.x + s.rx * 300;
+            ty = shape1.y + s.ry * 300;
+            tz = s.rz * 400;
+            tr = shape1.r + s.rRot;
+            op = 0.15;
+        } else if (progress < assembleEnd) {
+            // Magnetizing into State 2!
+            let local = (progress - assembleStart) / (assembleEnd - assembleStart);
+            let ease = 1 - Math.pow(1 - local, 3); // Cubic ease out
+            
+            const chaosX = shape2.x + s.rx * 300;
+            const chaosY = shape2.y + s.ry * 300;
+            const chaosZ = s.rz * 400;
+            const chaosR = shape2.r + s.rRot;
+            
+            tx = chaosX + (shape2.x - chaosX) * ease;
+            ty = chaosY + (shape2.y - chaosY) * ease;
+            tz = chaosZ + (0 - chaosZ) * ease;
+            tr = chaosR + (shape2.r - chaosR) * ease;
+            op = 0.15 + (ease * 0.85);
+        } else {
+            // Stable Assembled State 2
+            tx = shape2.x; ty = shape2.y; tz = 0; tr = shape2.r;
+        }
 
-        el.style.transform = `translate3d(${currentX}px, ${currentY}px, ${currentZ}px) rotate(${currentRot}deg)`;
-        el.style.opacity = `${1 - (ease * 0.95)}`; // Fade out almost entirely when fully exploded
+        el.style.transform = `translate3d(${tx}px, ${ty}px, ${tz}px) rotate(${tr}deg)`;
+        el.style.opacity = op.toFixed(2);
       }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    // Trigger once to assemble correctly on load
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, [shards]);
@@ -498,7 +572,7 @@ const MobileAnimeGrid = () => {
       {/* The 3D Matrix Container */}
       <div 
         ref={containerRef}
-        className="absolute top-[45%] left-1/2" // Slightly higher than center to sit perfectly behind Hero text
+        className="absolute top-[45%] left-1/2" // Slightly higher than center
         style={{ transformStyle: 'preserve-3d' }}
       >
         {shards.map((s, i) => (
@@ -514,8 +588,7 @@ const MobileAnimeGrid = () => {
               boxShadow: s.isOrange ? '0 0 10px rgba(240,160,0,0.8)' : '0 0 8px rgba(240,232,208,0.5)',
               borderRadius: '2px',
               willChange: 'transform, opacity',
-              // Initial state gets overridden by handleScroll immediately, but good for SSR
-              transform: `translate3d(${s.ax}px, ${s.ay}px, 0px) rotate(${s.ar}deg)`,
+              transform: `translate3d(${s.positions[0].x}px, ${s.positions[0].y}px, 0px) rotate(${s.positions[0].r}deg)`,
             }}
           />
         ))}
