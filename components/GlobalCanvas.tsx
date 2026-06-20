@@ -141,11 +141,12 @@ function NeuralMatrix() {
     };
 
     window.addEventListener("mousemove", handleMove);
-    window.addEventListener("touchmove", handleMove, { passive: true });
-    window.addEventListener("touchstart", (e) => {
-      handleMove(e);
-      // Removed handleClick() so scrolling on mobile doesn't trigger massive ripples
-    }, { passive: true });
+    if (!isMobile) {
+      window.addEventListener("touchmove", handleMove, { passive: true });
+      window.addEventListener("touchstart", (e) => {
+        handleMove(e);
+      }, { passive: true });
+    }
     const handlePointerDown = (e: PointerEvent) => {
       if (e.pointerType === "mouse") {
         handleClick();
@@ -155,8 +156,10 @@ function NeuralMatrix() {
 
     return () => {
       window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("touchmove", handleMove);
-      window.removeEventListener("touchstart", handleMove);
+      if (!isMobile) {
+        window.removeEventListener("touchmove", handleMove);
+        window.removeEventListener("touchstart", handleMove);
+      }
       window.removeEventListener("pointerdown", handlePointerDown);
     };
   }, []);
@@ -230,47 +233,49 @@ function NeuralMatrix() {
       // -----------------------------------------
       // MOUSE INTERACTION (Mini Gravity Well)
       // -----------------------------------------
-      // We must account for group rotation when calculating distance to mouse.
-      // Easiest hack: transform local pos to world, check distance, apply local force.
-      const worldPos = new THREE.Vector3(posArray[i3], posArray[i3+1], posArray[i3+2]);
-      worldPos.applyEuler(pointsRef.current.rotation);
-      
-      const dx = globalMouse.current.x - worldPos.x;
-      const dy = globalMouse.current.y - worldPos.y;
-      const dz = globalMouse.current.z - worldPos.z;
-      const distToMouseSq = dx * dx + dy * dy + dz * dz;
-      
-      // Increased interaction radius from 6.0 to 12.0
-      if (distToMouseSq < 144.0) { 
-        const distToMouse = Math.sqrt(distToMouseSq);
-        const force = (12.0 - distToMouse) / 12.0;
+      if (!isMobile) {
+        // We must account for group rotation when calculating distance to mouse.
+        // Easiest hack: transform local pos to world, check distance, apply local force.
+        const worldPos = new THREE.Vector3(posArray[i3], posArray[i3+1], posArray[i3+2]);
+        worldPos.applyEuler(pointsRef.current.rotation);
         
-        // Create a whirlpool effect by taking the cross product
-        const toMouse = new THREE.Vector3(dx, dy, dz).normalize();
-        const up = new THREE.Vector3(0, 1, 0);
-        const tangent = new THREE.Vector3().crossVectors(toMouse, up).normalize();
+        const dx = globalMouse.current.x - worldPos.x;
+        const dy = globalMouse.current.y - worldPos.y;
+        const dz = globalMouse.current.z - worldPos.z;
+        const distToMouseSq = dx * dx + dy * dy + dz * dz;
         
-        // Inverse transform forces back to local space
-        const localToMouse = toMouse.clone().applyEuler(new THREE.Euler(-pointsRef.current.rotation.x, -pointsRef.current.rotation.y, -pointsRef.current.rotation.z));
-        const localTangent = tangent.clone().applyEuler(new THREE.Euler(-pointsRef.current.rotation.x, -pointsRef.current.rotation.y, -pointsRef.current.rotation.z));
+        // Increased interaction radius from 6.0 to 12.0
+        if (distToMouseSq < 144.0) { 
+          const distToMouse = Math.sqrt(distToMouseSq);
+          const force = (12.0 - distToMouse) / 12.0;
+          
+          // Create a whirlpool effect by taking the cross product
+          const toMouse = new THREE.Vector3(dx, dy, dz).normalize();
+          const up = new THREE.Vector3(0, 1, 0);
+          const tangent = new THREE.Vector3().crossVectors(toMouse, up).normalize();
+          
+          // Inverse transform forces back to local space
+          const localToMouse = toMouse.clone().applyEuler(new THREE.Euler(-pointsRef.current.rotation.x, -pointsRef.current.rotation.y, -pointsRef.current.rotation.z));
+          const localTangent = tangent.clone().applyEuler(new THREE.Euler(-pointsRef.current.rotation.x, -pointsRef.current.rotation.y, -pointsRef.current.rotation.z));
+          
+          // Pull particles in (Gravity) AND swirl them around (Vortex)
+          posArray[i3] += (localToMouse.x * 0.8 + localTangent.x * 2.5) * force;
+          posArray[i3 + 1] += (localToMouse.y * 0.8 + localTangent.y * 2.5) * force;
+          posArray[i3 + 2] += (localToMouse.z * 0.8 + localTangent.z * 2.5) * force;
+        }
         
-        // Pull particles in (Gravity) AND swirl them around (Vortex)
-        posArray[i3] += (localToMouse.x * 0.8 + localTangent.x * 2.5) * force;
-        posArray[i3 + 1] += (localToMouse.y * 0.8 + localTangent.y * 2.5) * force;
-        posArray[i3 + 2] += (localToMouse.z * 0.8 + localTangent.z * 2.5) * force;
-      }
-      
-      // Click Wave Interaction - Smooth Cosine Ripple from Click Origin
-      if (clickWave.current.active) {
-        const dxClick = clickWave.current.origin.x - worldPos.x;
-        const dzClick = clickWave.current.origin.z - worldPos.z;
-        const distToClick = Math.sqrt(dxClick * dxClick + dzClick * dzClick);
-        const waveDist = Math.abs(distToClick - clickWave.current.radius);
-        
-        if (waveDist < 3.5) {
-           // Smooth bell curve displacement (1.0 at wave center, 0.0 at wave edge)
-           const rippleIntensity = (Math.cos((waveDist / 3.5) * Math.PI) + 1.0) * 0.5;
-           posArray[i3 + 1] += rippleIntensity * 2.5; // Smoothly lift them up
+        // Click Wave Interaction - Smooth Cosine Ripple from Click Origin
+        if (clickWave.current.active) {
+          const dxClick = clickWave.current.origin.x - worldPos.x;
+          const dzClick = clickWave.current.origin.z - worldPos.z;
+          const distToClick = Math.sqrt(dxClick * dxClick + dzClick * dzClick);
+          const waveDist = Math.abs(distToClick - clickWave.current.radius);
+          
+          if (waveDist < 3.5) {
+             // Smooth bell curve displacement (1.0 at wave center, 0.0 at wave edge)
+             const rippleIntensity = (Math.cos((waveDist / 3.5) * Math.PI) + 1.0) * 0.5;
+             posArray[i3 + 1] += rippleIntensity * 2.5; // Smoothly lift them up
+          }
         }
       }
 
