@@ -7,8 +7,8 @@ import * as THREE from "three";
 import { prefersReducedMotion } from "@/lib/animations";
 
 const isMobile = typeof window !== "undefined" ? window.innerWidth < 768 : false;
-const PARTICLE_COUNT = isMobile ? 200 : 600; // Drop particle count by 3x on mobile for performance
-const MAX_DISTANCE = isMobile ? 8.5 : 5.5; // Increase connection distance on mobile so it still looks dense
+const PARTICLE_COUNT = isMobile ? 120 : 600; // Drastically drop particle count on mobile for maximum physics performance
+const MAX_DISTANCE = isMobile ? 12.0 : 5.5; // Huge connection distance on mobile so it still forms a cohesive web
 const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 
 // Custom shader for ultra-premium glowing data nodes
@@ -410,12 +410,7 @@ export default function GlobalCanvas() {
         dpr={isMobile ? 1 : [1, 1.5]} // Force 1x resolution on mobile to save GPU
       >
         <NeuralMatrix />
-        {isMobile ? (
-          <EffectComposer>
-            <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={4.0} mipmapBlur={false} resolutionScale={0.5} />
-            <Vignette eskil={false} offset={0.1} darkness={1.1} />
-          </EffectComposer>
-        ) : (
+        {!isMobile && (
           <EffectComposer>
             <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={4.0} mipmapBlur />
             <ChromaticAberration offset={new THREE.Vector2(0.002, 0.002)} />
