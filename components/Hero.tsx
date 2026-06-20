@@ -137,15 +137,22 @@ export default function Hero() {
     >
       {/* BACKGROUND WRAPPER (fades out completely to avoid any hard horizontal line when scrolling) */}
       <div ref={bgRef} className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-        {/* Grid dot background */}
-        <div className="absolute inset-0 grid-dots opacity-20 pointer-events-none" />
+        {/* Grid dot background - Hidden on mobile because rendering a full-screen alpha texture over WebGL destroys mobile GPU fill-rate */}
+        <div className="hidden md:block absolute inset-0 grid-dots opacity-20 pointer-events-none" />
 
-        {/* Cinematic left-to-right vignette */}
+        {/* Cinematic left-to-right vignette (Lighter/Simpler on mobile) */}
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none hidden md:block"
           style={{
             background:
               "linear-gradient(108deg, rgba(13,11,8,0.94) 0%, rgba(13,11,8,0.78) 32%, rgba(13,11,8,0.28) 62%, rgba(13,11,8,0.08) 100%)",
+          }}
+        />
+        {/* Simpler, faster gradient for mobile to keep text readable without lagging WebGL */}
+        <div
+          className="absolute inset-0 pointer-events-none md:hidden"
+          style={{
+            background: "linear-gradient(180deg, rgba(13,11,8,0.85) 0%, rgba(13,11,8,0.4) 40%, rgba(13,11,8,0) 100%)",
           }}
         />
       </div>

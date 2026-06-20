@@ -205,13 +205,17 @@ function NeuralMatrix() {
     let lineIndex = 0;
 
     if (isMobile) {
-      // Mobile: Lock flat (edge-on) and spin.
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const scrollPerc = scrollY / maxScroll;
+
+      // Mobile: Lock flat (edge-on) and spin. Twist the pillar based on scroll depth!
       pointsRef.current.rotation.x = 0;
       pointsRef.current.rotation.z = 0;
-      pointsRef.current.rotation.y = time * 0.035;
+      pointsRef.current.rotation.y = time * 0.035 + scrollPerc * Math.PI * 4;
       linesRef.current.rotation.x = 0;
       linesRef.current.rotation.z = 0;
-      linesRef.current.rotation.y = time * 0.035;
+      linesRef.current.rotation.y = time * 0.035 + scrollPerc * Math.PI * 4;
     } else {
       // Desktop: Slowly tilt the entire accretion disk over time
       pointsRef.current.rotation.x = Math.sin(time * 0.1) * 0.1 + 0.2;
