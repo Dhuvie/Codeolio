@@ -403,7 +403,79 @@ function NeuralMatrix() {
   );
 }
 
+const MobileScrollWave = () => {
+  const pathRef = useRef<SVGPathElement>(null);
+
+  useEffect(() => {
+    if (!pathRef.current) return;
+    const pathLength = pathRef.current.getTotalLength();
+    pathRef.current.style.strokeDasharray = `${pathLength}`;
+    pathRef.current.style.strokeDashoffset = `${pathLength}`;
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const scrollPerc = scrollY / maxScroll;
+      
+      // Draw the line as we scroll down, but keep a trail so it looks like a comet or a growing root
+      const drawLength = pathLength * scrollPerc;
+      pathRef.current!.style.strokeDashoffset = `${pathLength - drawLength}`;
+    };
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // Trigger once on mount
+    handleScroll();
+    
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <div className="fixed inset-0 w-full h-full bg-[#050505] overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
+      {/* Deep Space Background - Constant */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0a0014] via-[#050505] to-[#000000] opacity-100" />
+      
+      {/* Constant Breathing Glow in Background */}
+      <div 
+        className="absolute top-1/2 left-1/2 w-[300px] h-[300px] rounded-full blur-[100px]"
+        style={{
+           background: 'radial-gradient(circle, rgba(160,50,255,0.2) 0%, rgba(50,150,255,0.05) 50%, rgba(0,0,0,0) 100%)',
+           transform: 'translate(-50%, -50%)',
+        }}
+      />
+
+      {/* The Scroll-Drawing Wave Line */}
+      <div className="absolute inset-0 w-full h-full opacity-80">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
+          <path 
+            ref={pathRef}
+            d="M 50,0 
+               C 120,15 -20,30 50,50 
+               C 120,70 -20,85 50,100"
+            fill="none" 
+            stroke="url(#wave-gradient)" 
+            strokeWidth="1.5" 
+            vectorEffect="non-scaling-stroke"
+            strokeLinecap="round"
+            style={{ filter: 'drop-shadow(0 0 12px rgba(160,50,255,1))' }}
+          />
+          <defs>
+            <linearGradient id="wave-gradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(50,150,255,0.5)" />
+              <stop offset="50%" stopColor="rgba(160,50,255,1)" />
+              <stop offset="100%" stopColor="rgba(255,50,150,0.8)" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  );
+};
+
 export default function GlobalCanvas() {
+  if (isMobile) {
+    return <MobileScrollWave />;
+  }
+
   return (
     <div 
       className="fixed inset-0 w-full h-full pointer-events-none" 
@@ -413,17 +485,15 @@ export default function GlobalCanvas() {
       <Canvas
         camera={{ position: [0, 0, 15], fov: 45 }}
         gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
-        dpr={isMobile ? 1 : [1, 1.5]} // Force 1x resolution on mobile to save GPU
+        dpr={[1, 1.5]}
       >
         <NeuralMatrix />
-        {!isMobile && (
-          <EffectComposer>
-            <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={4.0} mipmapBlur />
-            <ChromaticAberration offset={new THREE.Vector2(0.002, 0.002)} />
-            <Noise opacity={0.03} />
-            <Vignette eskil={false} offset={0.1} darkness={1.1} />
-          </EffectComposer>
-        )}
+        <EffectComposer>
+          <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={4.0} mipmapBlur />
+          <ChromaticAberration offset={new THREE.Vector2(0.002, 0.002)} />
+          <Noise opacity={0.03} />
+          <Vignette eskil={false} offset={0.1} darkness={1.1} />
+        </EffectComposer>
       </Canvas>
     </div>
   );
