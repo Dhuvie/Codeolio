@@ -403,152 +403,122 @@ function NeuralMatrix() {
   );
 }
 
-const MobileScrollWave = () => {
-  const path1Ref = useRef<SVGPathElement>(null);
-  const path2Ref = useRef<SVGPathElement>(null);
-  const path3Ref = useRef<SVGPathElement>(null);
-  const coreRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const paths = [path1Ref.current, path2Ref.current, path3Ref.current];
-    const lengths = paths.map(p => p?.getTotalLength() || 0);
-
-    paths.forEach((p, i) => {
-      if (p) {
-        p.style.strokeDasharray = `${lengths[i]}`;
-        p.style.strokeDashoffset = `${lengths[i]}`;
-      }
-    });
-
-    const handleScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-      const scrollPerc = Math.min(1, Math.max(0, scrollY / maxScroll)); // Clamp between 0 and 1
+const MobileAnimeGrid = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Pre-calculate the 64 geometric shards so we do zero math inside the scroll loop
+  const shards = useMemo(() => {
+    const items = [];
+    for (let i = 0; i < 64; i++) {
+      const row = Math.floor(i / 8);
+      const col = i % 8;
       
-      // Draw slowly as we scroll down (1x speed) so it acts as a site-wide progress bar
-      paths.forEach((p, i) => {
-        if (p) {
-          const drawLength = lengths[i] * scrollPerc;
-          p.style.strokeDashoffset = `${lengths[i] - drawLength}`;
-        }
-      });
+      // Assembled State: A perfect 8x8 grid in the center
+      const ax = (col - 3.5) * 22; // 22px spacing
+      const ay = (row - 3.5) * 22;
+      const ar = 45; // All tilted diagonally
 
-      // Ignite the core artifact when we reach the very bottom!
-      if (coreRef.current) {
-        if (scrollPerc > 0.95) {
-          coreRef.current.style.opacity = "1";
-          coreRef.current.style.transform = "translate(-50%, -50%) scale(1)";
-        } else {
-          coreRef.current.style.opacity = "0";
-          coreRef.current.style.transform = "translate(-50%, -50%) scale(0.5)";
-        }
-      }
-    };
-    
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    // Trigger once on mount
-    handleScroll();
-    
-    return () => window.removeEventListener("scroll", handleScroll);
+      // Disassembled State: Chaotic outward explosion
+      const angle = Math.atan2(ay, ax);
+      const explodeDist = 150 + Math.random() * 250; 
+      const dx = Math.cos(angle) * explodeDist + (Math.random() - 0.5) * 150;
+      const dy = Math.sin(angle) * explodeDist + (Math.random() - 0.5) * 150;
+      const dz = (Math.random() - 0.5) * 500; // Massive depth
+      const dr = ar + (Math.random() - 0.5) * 1080; // Wild spinning
+      
+      // Stagger Logic: Outer pieces explode first, center pieces explode last (like peeling an onion)
+      const distFromCenter = Math.sqrt(Math.pow(col - 3.5, 2) + Math.pow(row - 3.5, 2));
+      const delay = (1 - distFromCenter / 5) * 0.6; // 0.0 to 0.6
+
+      // Colors matching the portfolio theme
+      const isOrange = Math.random() > 0.4;
+
+      items.push({ ax, ay, ar, dx, dy, dz, dr, delay, isOrange });
+    }
+    return items;
   }, []);
 
-  return (
-    <div className="fixed inset-0 w-full h-full bg-[#050505] overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
-      {/* Deep Space Background - Constant */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0a0014] via-[#050505] to-[#000000] opacity-100" />
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      // We want the entire disassembly to finish exactly when they leave the Hero section
+      const explodeZone = window.innerHeight * 1.3;
+      const heroPerc = Math.min(1, Math.max(0, scrollY / explodeZone));
       
-      {/* Constant Breathing Glow in Background */}
+      if (!containerRef.current) return;
+      const children = containerRef.current.children;
+      
+      for (let i = 0; i < 64; i++) {
+        const s = shards[i];
+        const el = children[i] as HTMLElement;
+        
+        const staggerStart = s.delay; 
+        const staggerEnd = Math.min(1.0, staggerStart + 0.4); 
+        
+        // Local progress mapped between 0 and 1 for this specific shard
+        let localPerc = (heroPerc - staggerStart) / (staggerEnd - staggerStart);
+        localPerc = Math.min(1, Math.max(0, localPerc));
+        
+        // Custom Anime.js style Cubic Ease In Out
+        const ease = localPerc < 0.5 
+          ? 4 * localPerc * localPerc * localPerc 
+          : 1 - Math.pow(-2 * localPerc + 2, 3) / 2;
+
+        const currentX = s.ax + (s.dx - s.ax) * ease;
+        const currentY = s.ay + (s.dy - s.ay) * ease;
+        const currentRot = s.ar + (s.dr - s.ar) * ease;
+        const currentZ = s.dz * ease;
+
+        el.style.transform = `translate3d(${currentX}px, ${currentY}px, ${currentZ}px) rotate(${currentRot}deg)`;
+        el.style.opacity = `${1 - (ease * 0.95)}`; // Fade out almost entirely when fully exploded
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // Trigger once to assemble correctly on load
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [shards]);
+
+  return (
+    <div className="fixed inset-0 w-full h-full bg-[#0d0b08] overflow-hidden pointer-events-none" style={{ zIndex: 0, perspective: '1000px' }}>
+      
+      {/* Background Vignette */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1a1205] via-[#0d0b08] to-[#050300] opacity-100" />
+
+      {/* Constant Breathing Background Core */}
       <div 
-        className="absolute top-1/2 left-1/2 w-[300px] h-[300px] rounded-full blur-[100px]"
+        className="absolute top-1/2 left-1/2 w-[250px] h-[250px] rounded-full blur-[80px]"
         style={{
-           background: 'radial-gradient(circle, rgba(160,50,255,0.2) 0%, rgba(50,150,255,0.05) 50%, rgba(0,0,0,0) 100%)',
+           background: 'radial-gradient(circle, rgba(240,160,0,0.12) 0%, rgba(122,81,0,0.05) 50%, rgba(0,0,0,0) 100%)',
            transform: 'translate(-50%, -50%)',
         }}
       />
 
-      {/* The Assembled Core Glow (Ignites at the end) */}
+      {/* The 3D Matrix Container */}
       <div 
-        ref={coreRef}
-        className="absolute mix-blend-screen transition-all duration-700 ease-out"
-        style={{
-           left: '50%',
-           top: '90%', // Y=90 is the exact center of the diamond
-           width: '150px',
-           height: '150px',
-           transform: 'translate(-50%, -50%) scale(0)',
-           background: 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(160,50,255,0.6) 20%, rgba(50,150,255,0.2) 50%, rgba(0,0,0,0) 100%)',
-           opacity: 0,
-           filter: 'blur(2px)',
-        }}
-      />
-
-      {/* The Scroll-Drawing Assembly Lines */}
-      <div className="absolute inset-0 w-full h-full opacity-90">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
-          
-          {/* Left Stream - Cyan */}
-          <path 
-            ref={path1Ref}
-            d="M 20,0 
-               C -10,25 70,45 25,65 
-               C 10,75 35,82 50,85 
-               L 35,90 L 50,95 L 50,85"
-            fill="none" 
-            stroke="url(#gradient-1)" 
-            strokeWidth="1.0" 
-            vectorEffect="non-scaling-stroke"
-            strokeLinejoin="round"
-            style={{ filter: 'drop-shadow(0 0 6px rgba(50,150,255,0.8))' }}
+        ref={containerRef}
+        className="absolute top-[45%] left-1/2" // Slightly higher than center to sit perfectly behind Hero text
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        {shards.map((s, i) => (
+          <div 
+            key={i}
+            className="absolute"
+            style={{
+              width: '14px',
+              height: '3px',
+              marginLeft: '-7px',
+              marginTop: '-1.5px',
+              backgroundColor: s.isOrange ? '#f0a000' : '#f0e8d0',
+              boxShadow: s.isOrange ? '0 0 10px rgba(240,160,0,0.8)' : '0 0 8px rgba(240,232,208,0.5)',
+              borderRadius: '2px',
+              willChange: 'transform, opacity',
+              // Initial state gets overridden by handleScroll immediately, but good for SSR
+              transform: `translate3d(${s.ax}px, ${s.ay}px, 0px) rotate(${s.ar}deg)`,
+            }}
           />
-          
-          {/* Center Stream - Purple */}
-          <path 
-            ref={path2Ref}
-            d="M 50,0 
-               C 80,25 20,45 50,65 
-               C 65,75 50,80 50,85 
-               L 50,95"
-            fill="none" 
-            stroke="url(#gradient-2)" 
-            strokeWidth="1.5" 
-            vectorEffect="non-scaling-stroke"
-            strokeLinejoin="round"
-            style={{ filter: 'drop-shadow(0 0 10px rgba(160,50,255,1))' }}
-          />
-
-          {/* Right Stream - Pink */}
-          <path 
-            ref={path3Ref}
-            d="M 80,0 
-               C 110,25 30,45 75,65 
-               C 90,75 65,82 50,85 
-               L 65,90 L 50,95 L 50,85"
-            fill="none" 
-            stroke="url(#gradient-3)" 
-            strokeWidth="1.0" 
-            vectorEffect="non-scaling-stroke"
-            strokeLinejoin="round"
-            style={{ filter: 'drop-shadow(0 0 6px rgba(255,50,150,0.8))' }}
-          />
-
-          <defs>
-            <linearGradient id="gradient-1" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(50,150,255,0.1)" />
-              <stop offset="80%" stopColor="rgba(50,150,255,0.8)" />
-              <stop offset="100%" stopColor="rgba(50,150,255,1)" />
-            </linearGradient>
-            <linearGradient id="gradient-2" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(160,50,255,0.1)" />
-              <stop offset="80%" stopColor="rgba(160,50,255,0.8)" />
-              <stop offset="100%" stopColor="rgba(160,50,255,1)" />
-            </linearGradient>
-            <linearGradient id="gradient-3" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(255,50,150,0.1)" />
-              <stop offset="80%" stopColor="rgba(255,50,150,0.8)" />
-              <stop offset="100%" stopColor="rgba(255,50,150,1)" />
-            </linearGradient>
-          </defs>
-        </svg>
+        ))}
       </div>
     </div>
   );
@@ -556,7 +526,7 @@ const MobileScrollWave = () => {
 
 export default function GlobalCanvas() {
   if (isMobile) {
-    return <MobileScrollWave />;
+    return <MobileAnimeGrid />;
   }
 
   return (
