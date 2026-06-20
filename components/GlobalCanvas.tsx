@@ -462,15 +462,61 @@ const getShapes = () => {
      cert.push({ x: 20 + Math.cos(a)*10, y: 20 + Math.sin(a)*10, r: 0 }); // Seal
   }
 
-  // Shape 5: Mobile Phone (Contact)
-  const phone = [];
-  for(let i=0; i<12; i++) phone.push({ x: -30 + (60*i/11), y: -60, r: 0 }); // top
-  for(let i=0; i<18; i++) phone.push({ x: 30, y: -60 + (120*i/17), r: 90 }); // right
-  for(let i=0; i<12; i++) phone.push({ x: 30 - (60*i/11), y: 60, r: 0 }); // bottom
-  for(let i=0; i<18; i++) phone.push({ x: -30, y: 60 - (120*i/17), r: 90 }); // left
-  for(let i=0; i<4; i++) phone.push({ x: -6 + (12*i/3), y: 45, r: 0 }); // home button notch
+  // Shape 5: Atom (Skills)
+  const atom = [];
+  // Orbit 1 (Horizontal)
+  for(let i=0; i<16; i++) {
+     const a = (i/16)*Math.PI*2;
+     const tangent = Math.atan2(Math.cos(a)*15, -Math.sin(a)*40);
+     atom.push({ x: Math.cos(a)*40, y: Math.sin(a)*15, r: tangent*180/Math.PI });
+  }
+  // Orbit 2 (Tilted 60 deg)
+  for(let i=0; i<16; i++) {
+     const a = (i/16)*Math.PI*2;
+     const x0 = Math.cos(a)*40;
+     const y0 = Math.sin(a)*15;
+     const x = x0*Math.cos(Math.PI/3) - y0*Math.sin(Math.PI/3);
+     const y = x0*Math.sin(Math.PI/3) + y0*Math.cos(Math.PI/3);
+     const tangent = Math.atan2(Math.cos(a)*15, -Math.sin(a)*40);
+     atom.push({ x, y, r: (tangent + Math.PI/3)*180/Math.PI });
+  }
+  // Orbit 3 (Tilted -60 deg)
+  for(let i=0; i<16; i++) {
+     const a = (i/16)*Math.PI*2;
+     const x0 = Math.cos(a)*40;
+     const y0 = Math.sin(a)*15;
+     const x = x0*Math.cos(-Math.PI/3) - y0*Math.sin(-Math.PI/3);
+     const y = x0*Math.sin(-Math.PI/3) + y0*Math.cos(-Math.PI/3);
+     const tangent = Math.atan2(Math.cos(a)*15, -Math.sin(a)*40);
+     atom.push({ x, y, r: (tangent - Math.PI/3)*180/Math.PI });
+  }
+  // Core
+  for(let i=0; i<16; i++) {
+     const a = (i/16)*Math.PI*2;
+     atom.push({ x: Math.cos(a)*8, y: Math.sin(a)*8, r: (a*180/Math.PI)+90 });
+  }
 
-  return [grid, question, brackets, crown, cert, phone];
+  // Shape 6: Classic Telephone Handset (Contact)
+  const phone = [];
+  for(let i=0; i<8; i++) phone.push({ x: -15 + (30*i/7), y: -10, r: 0 }); // top grip
+  for(let i=0; i<4; i++) phone.push({ x: 15 + (10*i/3), y: -10 - (15*i/3), r: 45 }); // right stem inner
+  for(let i=0; i<4; i++) phone.push({ x: 25 + (20*i/3), y: -25 + (10*i/3), r: -30 }); // right ear top
+  for(let i=0; i<10; i++) {
+     const a = -0.5 + (Math.PI/2 * i/9);
+     phone.push({ x: 35 + Math.cos(a)*18, y: 0 + Math.sin(a)*18, r: a*180/Math.PI + 90 }); // right arc
+  }
+  for(let i=0; i<4; i++) phone.push({ x: 40 - (20*i/3), y: 15 - (10*i/3), r: 45 }); // right stem outer
+  for(let i=0; i<8; i++) phone.push({ x: 20 - (40*i/7), y: 5, r: 0 }); // bottom grip
+  for(let i=0; i<4; i++) phone.push({ x: -20 - (20*i/3), y: 5 + (10*i/3), r: -45 }); // left stem outer
+  for(let i=0; i<10; i++) {
+     const a = (Math.PI - 0.5) - (Math.PI/2 * i/9); 
+     phone.push({ x: -35 + Math.cos(a)*18, y: 0 + Math.sin(a)*18, r: a*180/Math.PI + 90 }); // left arc
+  }
+  for(let i=0; i<4; i++) phone.push({ x: -45 + (20*i/3), y: -15 - (10*i/3), r: 30 }); // left ear top
+  for(let i=0; i<4; i++) phone.push({ x: -25 + (10*i/3), y: -25 + (15*i/3), r: -45 }); // left stem inner
+  for(let i=0; i<4; i++) phone.push({ x: (i%2===0 ? -5 : 5), y: 15 + (12*i), r: -45 }); // cord hanging down
+
+  return [grid, question, brackets, crown, cert, atom, phone];
 };
 
 const MobileAnimeGrid = () => {
@@ -506,8 +552,8 @@ const MobileAnimeGrid = () => {
       const scrollY = window.scrollY || document.documentElement.scrollTop;
       const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       
-      // We have 6 shapes, so 5 transitions spanning the whole page
-      const numTransitions = 5;
+      // We have 7 shapes, so 6 transitions spanning the whole page
+      const numTransitions = 6;
       const rawPerc = Math.min(1, Math.max(0, scrollY / maxScroll));
       const scaledPerc = rawPerc * numTransitions;
       const segment = Math.min(numTransitions - 1, Math.floor(scaledPerc));
