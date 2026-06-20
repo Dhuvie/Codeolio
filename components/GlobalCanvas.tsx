@@ -412,12 +412,27 @@ const getShapes = () => {
      grid.push({ x: (c-3.5)*22, y: (r-3.5)*22, r: 45 });
   }
 
-  // Shape 1: Diamond (About / Experience)
-  const diamond = [];
-  for(let i=0; i<16; i++) diamond.push({ x: 0 - (40*i/15), y: -60 + (60*i/15), r: 50 });
-  for(let i=0; i<16; i++) diamond.push({ x: -40 + (40*i/15), y: 0 + (60*i/15), r: -50 });
-  for(let i=0; i<16; i++) diamond.push({ x: 0 + (40*i/15), y: 60 - (60*i/15), r: -50 });
-  for(let i=0; i<16; i++) diamond.push({ x: 40 - (40*i/15), y: 0 - (60*i/15), r: 50 });
+  // Shape 1: Question Mark (?) (About / Experience)
+  const question = [];
+  // Dot at (0, 35) (8 points)
+  for(let i=0; i<8; i++) {
+     const a = (i/8)*Math.PI*2;
+     question.push({ x: Math.cos(a)*6, y: 35 + Math.sin(a)*6, r: 0 });
+  }
+  // Stem from (0, 15) to (0, -10) (16 points)
+  for(let i=0; i<16; i++) {
+     question.push({ x: 0, y: 15 - (25*i/15), r: 0 });
+  }
+  // Curve from (0,-10) to (20, -30) (10 points)
+  for(let i=0; i<10; i++) {
+     const a = Math.PI + (Math.PI/2 * i/9);
+     question.push({ x: 20 + Math.cos(a)*20, y: -10 + Math.sin(a)*20, r: 45 });
+  }
+  // Top Arc from (20, -30) to (-20, -30) (30 points)
+  for(let i=0; i<30; i++) {
+     const a = 0 - (Math.PI * i/29);
+     question.push({ x: Math.cos(a)*20, y: -30 + Math.sin(a)*20, r: 0 });
+  }
 
   // Shape 2: Code Brackets < > (Projects)
   const brackets = [];
@@ -426,7 +441,7 @@ const getShapes = () => {
   for(let i=0; i<16; i++) brackets.push({ x: 40 + (30*i/15), y: -40 + (40*i/15), r: 45 });
   for(let i=0; i<16; i++) brackets.push({ x: 70 + (-30*i/15), y: 0 + (40*i/15), r: -45 });
 
-  // Shape 3: Crown (Achievements / Skills)
+  // Shape 3: Crown (Achievements)
   const crown = [];
   for(let i=0; i<16; i++) crown.push({ x: -50 + (100*i/15), y: 40, r: 0 }); // base
   for(let i=0; i<8; i++) crown.push({ x: -50 + (10*i/7), y: 40 + (-60*i/7), r: 80 }); // left up
@@ -436,7 +451,18 @@ const getShapes = () => {
   for(let i=0; i<8; i++) crown.push({ x: 15 + (25*i/7), y: 20 + (-40*i/7), r: 45 }); // right up
   for(let i=0; i<8; i++) crown.push({ x: 40 + (10*i/7), y: -20 + (60*i/7), r: -80 }); // right down
 
-  // Shape 4: Mobile Phone (Contact)
+  // Shape 4: Certificate (Certifications)
+  const cert = [];
+  for(let i=0; i<16; i++) cert.push({ x: -35 + (70*i/15), y: -45, r: 0 }); // Top
+  for(let i=0; i<12; i++) cert.push({ x: 35, y: -45 + (75*i/11), r: 90 }); // Right
+  for(let i=0; i<16; i++) cert.push({ x: 35 - (70*i/15), y: 30, r: 0 }); // Bottom
+  for(let i=0; i<12; i++) cert.push({ x: -35, y: 30 - (75*i/11), r: 90 }); // Left
+  for(let i=0; i<8; i++) {
+     const a = (i/8)*Math.PI*2;
+     cert.push({ x: 20 + Math.cos(a)*10, y: 20 + Math.sin(a)*10, r: 0 }); // Seal
+  }
+
+  // Shape 5: Mobile Phone (Contact)
   const phone = [];
   for(let i=0; i<12; i++) phone.push({ x: -30 + (60*i/11), y: -60, r: 0 }); // top
   for(let i=0; i<18; i++) phone.push({ x: 30, y: -60 + (120*i/17), r: 90 }); // right
@@ -444,7 +470,7 @@ const getShapes = () => {
   for(let i=0; i<18; i++) phone.push({ x: -30, y: 60 - (120*i/17), r: 90 }); // left
   for(let i=0; i<4; i++) phone.push({ x: -6 + (12*i/3), y: 45, r: 0 }); // home button notch
 
-  return [grid, diamond, brackets, crown, phone];
+  return [grid, question, brackets, crown, cert, phone];
 };
 
 const MobileAnimeGrid = () => {
@@ -480,8 +506,8 @@ const MobileAnimeGrid = () => {
       const scrollY = window.scrollY || document.documentElement.scrollTop;
       const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       
-      // We have 5 shapes, so 4 transitions spanning the whole page
-      const numTransitions = 4;
+      // We have 6 shapes, so 5 transitions spanning the whole page
+      const numTransitions = 5;
       const rawPerc = Math.min(1, Math.max(0, scrollY / maxScroll));
       const scaledPerc = rawPerc * numTransitions;
       const segment = Math.min(numTransitions - 1, Math.floor(scaledPerc));

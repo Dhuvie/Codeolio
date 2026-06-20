@@ -44,7 +44,7 @@ export default function Certifications() {
     <section 
       id="certifications" 
       ref={containerRef}
-      className="relative w-full min-h-[900px] bg-[#020202] overflow-hidden z-10 cursor-crosshair border-y border-white/5"
+      className="relative w-full min-h-[900px] bg-transparent md:bg-[#020202] overflow-hidden z-10 cursor-crosshair border-y border-white/5"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
