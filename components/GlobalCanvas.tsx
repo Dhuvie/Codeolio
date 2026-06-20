@@ -397,7 +397,96 @@ function NeuralMatrix() {
   );
 }
 
+const MobileScrollTunnel = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const targetScroll = useRef(0);
+  const currentScroll = useRef(0);
+
+  useEffect(() => {
+    // We run the event listener on window but calculate based on document height
+    const handleScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      targetScroll.current = scrollY / maxScroll;
+    };
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    
+    let animationFrameId: number;
+    const loop = () => {
+       // Super smooth lerp for the CSS variables
+       currentScroll.current += (targetScroll.current - currentScroll.current) * 0.08; 
+       if (containerRef.current) {
+          containerRef.current.style.setProperty('--scroll', currentScroll.current.toString());
+       }
+       animationFrameId = requestAnimationFrame(loop);
+    };
+    loop();
+
+    return () => {
+       window.removeEventListener("scroll", handleScroll);
+       cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    <div 
+      className="fixed inset-0 w-full h-full bg-[#050505] overflow-hidden pointer-events-none" 
+      style={{ zIndex: 0, perspective: '800px' }}
+      ref={containerRef}
+    >
+      {/* Deep Space Void Base */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0d001a] via-[#050505] to-[#000000] opacity-100" />
+      
+      {/* Dynamic 3D Neon Tunnel */}
+      <div 
+        className="absolute top-1/2 left-1/2 w-full h-full"
+        style={{
+          transformStyle: 'preserve-3d',
+          // Tilt it flat and move the camera "forward" and "up" as we scroll
+          transform: 'translate(-50%, -50%) rotateX(75deg) translateY(calc(var(--scroll) * -800px)) translateZ(calc(var(--scroll) * 500px))',
+        }}
+      >
+         {Array.from({ length: 25 }).map((_, i) => (
+           <div 
+             key={i}
+             className="absolute top-1/2 left-1/2 rounded-full mix-blend-screen"
+             style={{
+                width: `${300 + i * 150}px`,
+                height: `${300 + i * 150}px`,
+                marginTop: `-${(300 + i * 150) / 2}px`,
+                marginLeft: `-${(300 + i * 150) / 2}px`,
+                // Alternating neon borders for a cyber-matrix effect
+                borderTop: '3px solid rgba(160, 50, 255, 0.8)',
+                borderRight: '3px solid rgba(50, 150, 255, 0.2)',
+                borderBottom: '3px solid rgba(160, 50, 255, 0.2)',
+                borderLeft: '3px solid rgba(50, 150, 255, 0.8)',
+                boxShadow: '0 0 40px rgba(160, 50, 255, 0.4), inset 0 0 40px rgba(50, 150, 255, 0.4)',
+                // Twisting rings: each ring rotates in alternating directions based on scroll!
+                transform: `translateZ(${i * -200 + 400}px) rotateZ(calc(var(--scroll) * ${i % 2 === 0 ? 360 : -360}deg))`,
+                opacity: Math.max(0, 1 - (i / 22)),
+             }}
+           />
+         ))}
+      </div>
+
+      {/* Center Core that reacts to scroll depth */}
+      <div 
+        className="absolute top-1/2 left-1/2 w-[250px] h-[250px] rounded-full blur-[80px]"
+        style={{
+           background: 'radial-gradient(circle, rgba(160,50,255,0.7) 0%, rgba(50,150,255,0.3) 50%, rgba(0,0,0,0) 100%)',
+           transform: 'translate(-50%, -50%) scale(calc(1 + var(--scroll) * 1.5))',
+        }}
+      />
+    </div>
+  );
+};
+
 export default function GlobalCanvas() {
+  if (isMobile) {
+    return <MobileScrollTunnel />;
+  }
+
   return (
     <div 
       className="fixed inset-0 w-full h-full pointer-events-none" 
