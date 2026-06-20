@@ -143,7 +143,7 @@ function NeuralMatrix() {
     window.addEventListener("touchmove", handleMove, { passive: true });
     window.addEventListener("touchstart", (e) => {
       handleMove(e);
-      handleClick();
+      // Removed handleClick() so scrolling on mobile doesn't trigger massive ripples
     }, { passive: true });
     window.addEventListener("click", handleClick);
 
