@@ -6,8 +6,9 @@ import { EffectComposer, Bloom, ChromaticAberration, Vignette, Noise } from "@re
 import * as THREE from "three";
 import { prefersReducedMotion } from "@/lib/animations";
 
-const PARTICLE_COUNT = 600; // Optimal density for fluid 60FPS
-const MAX_DISTANCE = 5.5; // Increased web distance to retain visual density
+const isMobile = typeof window !== "undefined" ? window.innerWidth < 768 : false;
+const PARTICLE_COUNT = isMobile ? 200 : 600; // Drop particle count by 3x on mobile for performance
+const MAX_DISTANCE = isMobile ? 8.5 : 5.5; // Increase connection distance on mobile so it still looks dense
 const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 
 // Custom shader for ultra-premium glowing data nodes
@@ -70,8 +71,8 @@ function NeuralMatrix() {
       angs[i] = angle;
       rds[i] = radius;
 
-      // Make it spin majestic and slow
-      vel[i] = (4.0 / Math.pow(radius, 1.5)) * 0.06; 
+      // Make it spin at exactly 1.4x the original slow speed
+      vel[i] = (4.0 / Math.pow(radius, 1.5)) * 0.084; 
 
       // Brighter Colors
       const isPhotonRing = radius < 7.0;
@@ -145,13 +146,18 @@ function NeuralMatrix() {
       handleMove(e);
       // Removed handleClick() so scrolling on mobile doesn't trigger massive ripples
     }, { passive: true });
-    window.addEventListener("click", handleClick);
+    const handlePointerDown = (e: PointerEvent) => {
+      if (e.pointerType === "mouse") {
+        handleClick();
+      }
+    };
+    window.addEventListener("pointerdown", handlePointerDown);
 
     return () => {
       window.removeEventListener("mousemove", handleMove);
       window.removeEventListener("touchmove", handleMove);
       window.removeEventListener("touchstart", handleMove);
-      window.removeEventListener("click", handleClick);
+      window.removeEventListener("pointerdown", handlePointerDown);
     };
   }, []);
 
@@ -199,9 +205,9 @@ function NeuralMatrix() {
     linesRef.current.rotation.x = pointsRef.current.rotation.x;
     linesRef.current.rotation.z = pointsRef.current.rotation.z;
 
-    // Add a majestic, slow global spin to the entire group
-    pointsRef.current.rotation.y = time * 0.015;
-    linesRef.current.rotation.y = time * 0.015;
+    // Add exactly 1.4x the original global spin to the entire group
+    pointsRef.current.rotation.y = time * 0.021;
+    linesRef.current.rotation.y = time * 0.021;
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const i3 = i * 3;
@@ -396,15 +402,22 @@ export default function GlobalCanvas() {
       <Canvas
         camera={{ position: [0, 0, 15], fov: 45 }}
         gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
-        dpr={[1, 1.5]}
+        dpr={isMobile ? 1 : [1, 1.5]} // Force 1x resolution on mobile to save GPU
       >
         <NeuralMatrix />
-        <EffectComposer>
-          <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={4.0} mipmapBlur />
-          <ChromaticAberration offset={new THREE.Vector2(0.002, 0.002)} />
-          <Noise opacity={0.03} />
-          <Vignette eskil={false} offset={0.1} darkness={1.1} />
-        </EffectComposer>
+        {isMobile ? (
+          <EffectComposer>
+            <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={4.0} mipmapBlur={false} resolutionScale={0.5} />
+            <Vignette eskil={false} offset={0.1} darkness={1.1} />
+          </EffectComposer>
+        ) : (
+          <EffectComposer>
+            <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={4.0} mipmapBlur />
+            <ChromaticAberration offset={new THREE.Vector2(0.002, 0.002)} />
+            <Noise opacity={0.03} />
+            <Vignette eskil={false} offset={0.1} darkness={1.1} />
+          </EffectComposer>
+        )}
       </Canvas>
     </div>
   );
