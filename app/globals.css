@@ -346,7 +346,13 @@ h1, h2, h3, h4 {
 }
 
 .glow-breathe {
-  animation: glow-breathe 3s ease-in-out infinite;
+  /* Disabled on mobile by default to save massive GPU rasterization costs */
+}
+
+@media (min-width: 768px) {
+  .glow-breathe {
+    animation: glow-breathe 3s ease-in-out infinite;
+  }
 }
 
 /* Shimmer across a surface */
@@ -451,7 +457,12 @@ h1, h2, h3, h4 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-shift 5s ease infinite;
+}
+
+@media (min-width: 768px) {
+  .gradient-text-animated {
+    animation: gradient-shift 5s ease infinite;
+  }
 }
 
 /* Float up-down */

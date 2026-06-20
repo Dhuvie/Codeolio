@@ -249,8 +249,7 @@ export default function Hero() {
               <TextDecoder text="Baj" className="block" />
               {/* "a" -- glowing gradient green, the hidden "ai" easter egg */}
               <span
-                className="char inline-block gradient-text-animated"
-                style={{ filter: "drop-shadow(0 0 18px rgba(240,160,0,0.8)) drop-shadow(0 0 40px rgba(240,160,0,0.4))" }}
+                className="char inline-block gradient-text-animated md:drop-shadow-[0_0_18px_rgba(240,160,0,0.8)] md:drop-shadow-[0_0_40px_rgba(240,160,0,0.4)]"
               >a</span>
               <TextDecoder text="j" className="block text-ink" />
             </div>

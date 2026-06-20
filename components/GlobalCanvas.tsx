@@ -417,8 +417,11 @@ const MobileScrollWave = () => {
       const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       const scrollPerc = scrollY / maxScroll;
       
-      // Draw the line as we scroll down, but keep a trail so it looks like a comet or a growing root
-      const drawLength = pathLength * scrollPerc;
+      // Draw the line down the screen 5 times faster than the scroll speed
+      // The % 1.0 makes it loop endlessly, so a new line shoots down when the previous one hits the bottom!
+      const loops = 5;
+      const progress = (scrollPerc * loops) % 1.0;
+      const drawLength = pathLength * progress;
       pathRef.current!.style.strokeDashoffset = `${pathLength - drawLength}`;
     };
     
