@@ -404,25 +404,45 @@ function NeuralMatrix() {
 }
 
 const MobileScrollWave = () => {
-  const pathRef = useRef<SVGPathElement>(null);
+  const path1Ref = useRef<SVGPathElement>(null);
+  const path2Ref = useRef<SVGPathElement>(null);
+  const path3Ref = useRef<SVGPathElement>(null);
+  const coreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!pathRef.current) return;
-    const pathLength = pathRef.current.getTotalLength();
-    pathRef.current.style.strokeDasharray = `${pathLength}`;
-    pathRef.current.style.strokeDashoffset = `${pathLength}`;
+    const paths = [path1Ref.current, path2Ref.current, path3Ref.current];
+    const lengths = paths.map(p => p?.getTotalLength() || 0);
+
+    paths.forEach((p, i) => {
+      if (p) {
+        p.style.strokeDasharray = `${lengths[i]}`;
+        p.style.strokeDashoffset = `${lengths[i]}`;
+      }
+    });
 
     const handleScroll = () => {
       const scrollY = window.scrollY || document.documentElement.scrollTop;
       const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-      const scrollPerc = scrollY / maxScroll;
+      const scrollPerc = Math.min(1, Math.max(0, scrollY / maxScroll)); // Clamp between 0 and 1
       
-      // Draw the line down the screen 5 times faster than the scroll speed
-      // The % 1.0 makes it loop endlessly, so a new line shoots down when the previous one hits the bottom!
-      const loops = 5;
-      const progress = (scrollPerc * loops) % 1.0;
-      const drawLength = pathLength * progress;
-      pathRef.current!.style.strokeDashoffset = `${pathLength - drawLength}`;
+      // Draw slowly as we scroll down (1x speed) so it acts as a site-wide progress bar
+      paths.forEach((p, i) => {
+        if (p) {
+          const drawLength = lengths[i] * scrollPerc;
+          p.style.strokeDashoffset = `${lengths[i] - drawLength}`;
+        }
+      });
+
+      // Ignite the core artifact when we reach the very bottom!
+      if (coreRef.current) {
+        if (scrollPerc > 0.95) {
+          coreRef.current.style.opacity = "1";
+          coreRef.current.style.transform = "translate(-50%, -50%) scale(1)";
+        } else {
+          coreRef.current.style.opacity = "0";
+          coreRef.current.style.transform = "translate(-50%, -50%) scale(0.5)";
+        }
+      }
     };
     
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -446,26 +466,86 @@ const MobileScrollWave = () => {
         }}
       />
 
-      {/* The Scroll-Drawing Wave Line */}
-      <div className="absolute inset-0 w-full h-full opacity-80">
+      {/* The Assembled Core Glow (Ignites at the end) */}
+      <div 
+        ref={coreRef}
+        className="absolute mix-blend-screen transition-all duration-700 ease-out"
+        style={{
+           left: '50%',
+           top: '90%', // Y=90 is the exact center of the diamond
+           width: '150px',
+           height: '150px',
+           transform: 'translate(-50%, -50%) scale(0)',
+           background: 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(160,50,255,0.6) 20%, rgba(50,150,255,0.2) 50%, rgba(0,0,0,0) 100%)',
+           opacity: 0,
+           filter: 'blur(2px)',
+        }}
+      />
+
+      {/* The Scroll-Drawing Assembly Lines */}
+      <div className="absolute inset-0 w-full h-full opacity-90">
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
+          
+          {/* Left Stream - Cyan */}
           <path 
-            ref={pathRef}
-            d="M 50,0 
-               C 120,15 -20,30 50,50 
-               C 120,70 -20,85 50,100"
+            ref={path1Ref}
+            d="M 20,0 
+               C -10,25 70,45 25,65 
+               C 10,75 35,82 50,85 
+               L 35,90 L 50,95 L 50,85"
             fill="none" 
-            stroke="url(#wave-gradient)" 
+            stroke="url(#gradient-1)" 
+            strokeWidth="1.0" 
+            vectorEffect="non-scaling-stroke"
+            strokeLinejoin="round"
+            style={{ filter: 'drop-shadow(0 0 6px rgba(50,150,255,0.8))' }}
+          />
+          
+          {/* Center Stream - Purple */}
+          <path 
+            ref={path2Ref}
+            d="M 50,0 
+               C 80,25 20,45 50,65 
+               C 65,75 50,80 50,85 
+               L 50,95"
+            fill="none" 
+            stroke="url(#gradient-2)" 
             strokeWidth="1.5" 
             vectorEffect="non-scaling-stroke"
-            strokeLinecap="round"
-            style={{ filter: 'drop-shadow(0 0 12px rgba(160,50,255,1))' }}
+            strokeLinejoin="round"
+            style={{ filter: 'drop-shadow(0 0 10px rgba(160,50,255,1))' }}
           />
+
+          {/* Right Stream - Pink */}
+          <path 
+            ref={path3Ref}
+            d="M 80,0 
+               C 110,25 30,45 75,65 
+               C 90,75 65,82 50,85 
+               L 65,90 L 50,95 L 50,85"
+            fill="none" 
+            stroke="url(#gradient-3)" 
+            strokeWidth="1.0" 
+            vectorEffect="non-scaling-stroke"
+            strokeLinejoin="round"
+            style={{ filter: 'drop-shadow(0 0 6px rgba(255,50,150,0.8))' }}
+          />
+
           <defs>
-            <linearGradient id="wave-gradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(50,150,255,0.5)" />
-              <stop offset="50%" stopColor="rgba(160,50,255,1)" />
-              <stop offset="100%" stopColor="rgba(255,50,150,0.8)" />
+            <linearGradient id="gradient-1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(50,150,255,0.1)" />
+              <stop offset="80%" stopColor="rgba(50,150,255,0.8)" />
+              <stop offset="100%" stopColor="rgba(50,150,255,1)" />
+            </linearGradient>
+            <linearGradient id="gradient-2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(160,50,255,0.1)" />
+              <stop offset="80%" stopColor="rgba(160,50,255,0.8)" />
+              <stop offset="100%" stopColor="rgba(160,50,255,1)" />
+            </linearGradient>
+            <linearGradient id="gradient-3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(255,50,150,0.1)" />
+              <stop offset="80%" stopColor="rgba(255,50,150,0.8)" />
+              <stop offset="100%" stopColor="rgba(255,50,150,1)" />
             </linearGradient>
           </defs>
         </svg>
