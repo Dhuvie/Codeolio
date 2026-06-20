@@ -53,7 +53,6 @@ export default function Experience() {
           {EXPERIENCES.map((exp, i) => (
             <div key={i} className="flex flex-col lg:flex-row gap-12 lg:gap-24 relative">
               
-              {/* Left Side: Sticky Title */}
               <div className="lg:w-5/12 relative">
                 <div className="lg:sticky lg:top-40 flex flex-col items-start">
                   <h3 className="font-display font-black text-5xl md:text-7xl text-white uppercase tracking-tighter leading-none">
@@ -69,7 +68,6 @@ export default function Experience() {
                 </div>
               </div>
 
-              {/* Right Side: Scrolling Content */}
               <div className="lg:w-7/12 flex flex-col gap-8">
                 <div className="flex flex-col gap-6">
                   {exp.bullets.map((bullet, idx) => (

@@ -26,12 +26,10 @@ export default function Certifications() {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      // Update the darkness mask (transparent hole at cursor)
       const maskStr = `radial-gradient(circle 400px at ${x}px ${y}px, transparent 0%, black 100%)`;
       darkMaskRef.current.style.maskImage = maskStr;
       darkMaskRef.current.style.webkitMaskImage = maskStr;
 
-      // Update the glowing amber spotlight
       spotlightRef.current.style.background = `radial-gradient(circle 400px at ${x}px ${y}px, rgba(240, 160, 0, 0.15) 0%, rgba(240, 160, 0, 0.05) 40%, transparent 100%)`;
     };
 
@@ -48,7 +46,6 @@ export default function Certifications() {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      {/* Background Grid Pattern - only visible when illuminated */}
       <div 
         className="absolute inset-0 z-0 opacity-20 pointer-events-none"
         style={{
@@ -57,10 +54,8 @@ export default function Certifications() {
         }}
       />
 
-      {/* The Actual Content (Credentials) */}
       <div className="relative z-10 w-full h-full section-container py-32 pointer-events-none">
         
-        {/* Hidden Header */}
         <div className="mb-24 text-center">
           <p className="font-mono text-sm text-signal tracking-[0.5em] uppercase mb-4">
             {"// Verified Credentials"}
@@ -73,7 +68,6 @@ export default function Certifications() {
           </p>
         </div>
 
-        {/* Scattered Layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-16">
           {CERTIFICATIONS.map((cert, i) => (
             <div 
@@ -101,8 +95,6 @@ export default function Certifications() {
         </div>
       </div>
 
-      {/* The Darkness Mask */}
-      {/* Covers the entire section in solid black, but punches a transparent hole at the mouse position */}
       <div 
         ref={darkMaskRef}
         className={`hidden lg:block absolute inset-0 bg-[#020202] z-20 pointer-events-none transition-opacity duration-700 ${isHovering ? "opacity-100" : "opacity-100"}`}
@@ -112,7 +104,6 @@ export default function Certifications() {
         }}
       />
 
-      {/* The Spotlight Glow */}
       <div 
         ref={spotlightRef}
         className={`hidden lg:block absolute inset-0 pointer-events-none z-30 transition-opacity duration-300 mix-blend-screen ${isHovering ? "opacity-100" : "opacity-0"}`}

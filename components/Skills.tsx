@@ -148,7 +148,6 @@ export default function Skills() {
         <p className="section-label" data-cursor-magnetic>Skills</p>
         <SplitTextReveal text="Technical toolkit." className="font-display font-semibold text-4xl md:text-5xl lg:text-6xl mb-16" />
 
-        {/* MOBILE VIEW: Pure static vertical list */}
         <div className="flex flex-col gap-6 lg:hidden mt-8">
           {SKILL_GROUPS.map((group, i) => (
             <div key={i} className="border-l-2 border-signal/20 pl-4 py-1 relative">
@@ -165,10 +164,8 @@ export default function Skills() {
           ))}
         </div>
 
-        {/* DESKTOP VIEW: CYBER-OS WINDOW */}
         <div className="hidden lg:block cyber-window-skills relative w-full border border-signal/20 bg-[#050505] rounded-lg overflow-hidden shadow-[0_0_50px_rgba(240,160,0,0.05)]">
           
-          {/* OS Header */}
           <div className="h-10 bg-signal/10 border-b border-signal/20 flex items-center justify-between px-4">
             <div className="flex gap-2">
               <div className="w-3 h-3 rounded-full bg-red-500/50" />
@@ -183,7 +180,6 @@ export default function Skills() {
 
           <div className="flex flex-col md:grid md:grid-cols-12 min-h-[450px]">
             
-            {/* Left Pane: File Explorer */}
             <div className="md:col-span-4 border-b md:border-b-0 md:border-r border-signal/20 bg-[#080808] p-4 flex flex-row flex-wrap md:flex-col gap-2 items-center md:items-stretch">
               <span className="w-full md:w-auto font-mono text-[10px] md:text-xs text-muted mb-2 md:mb-4 uppercase tracking-widest">Directory Listing</span>
               {SKILL_GROUPS.map((group, i) => {
@@ -209,7 +205,6 @@ export default function Skills() {
               })}
             </div>
 
-            {/* Right Pane: Terminal Readout */}
             <div className="md:col-span-8 bg-[#030303] p-4 md:p-10 relative overflow-hidden group flex-1">
               <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] opacity-20 pointer-events-none z-20" />
               

@@ -2,10 +2,6 @@ import type { Metadata } from "next";
 import { Space_Grotesk, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-/* ===================================================
-   FONT LOADING — Space Grotesk (display), IBM Plex Sans (body),
-   IBM Plex Mono (utility/mono)
-   =================================================== */
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
@@ -27,9 +23,6 @@ const ibmPlexMono = IBM_Plex_Mono({
   weight: ["300", "400", "500"],
 });
 
-/* ===================================================
-   SEO METADATA
-   =================================================== */
 export const metadata: Metadata = {
   title: "Dhruv Narayan Bajaj — Full-Stack Engineer, AI/ML Builder, Systems Programmer",
   description:
@@ -79,7 +72,6 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable} antialiased`}
     >
       <body className="min-h-screen bg-bg text-ink relative">
-        {/* CRT scanline overlay — very subtle, gives depth */}
         <div className="scanlines" aria-hidden="true" />
         <CustomCursor />
         <NoiseOverlay />

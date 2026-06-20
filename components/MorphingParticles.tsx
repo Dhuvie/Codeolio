@@ -4,13 +4,11 @@ import { useRef, useEffect } from "react";
 import { ScrollTrigger } from "@/lib/gsap-register";
 import { prefersReducedMotion } from "@/lib/animations";
 
-// ─── Config ───────────────────────────────────────────────────────────────────
 const N          = 2400;   // particle count
 const SPRING     = 0.055;  // attraction strength
 const DAMPING    = 0.80;   // velocity decay
 const MAX_SPEED  = 14;     // cap to prevent explosion
 
-// ─── Pixel font (5 × 7) ───────────────────────────────────────────────────────
 const GLYPHS: Record<string, number[][]> = {
   D: [[1,1,1,0,0],[1,0,0,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,1,0],[1,1,1,0,0]],
   N: [[1,0,0,0,1],[1,1,0,0,1],[1,0,1,0,1],[1,0,0,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1]],
@@ -19,17 +17,14 @@ const GLYPHS: Record<string, number[][]> = {
 
 type Pt = [number, number];
 
-// ─── Shape generators ─────────────────────────────────────────────────────────
 
 function rng() { return Math.random(); }
 function jitter(v: number, r = 3) { return v + (rng() - 0.5) * r; }
 
-/** Scatter randomly across viewport */
 function shapeScatter(n: number, W: number, H: number): Pt[] {
   return Array.from({ length: n }, () => [rng() * W, rng() * H]);
 }
 
-/** "DNB" in large pixel font — identity */
 function shapeDNB(n: number, W: number, H: number): Pt[] {
   const scale = Math.min(W, H) * 0.065;
   const cx = W / 2, cy = H / 2;
@@ -58,7 +53,6 @@ function shapeDNB(n: number, W: number, H: number): Pt[] {
   return pts;
 }
 
-/** Layered neural network — AI/ML */
 function shapeNeural(n: number, W: number, H: number): Pt[] {
   const layers = [4, 8, 8, 4];
   const cx = W / 2, cy = H / 2;
@@ -87,7 +81,6 @@ function shapeNeural(n: number, W: number, H: number): Pt[] {
   return pts.slice(0, n);
 }
 
-/** DNA double helix — technical depth */
 function shapeHelix(n: number, W: number, H: number): Pt[] {
   const cx = W / 2, cy = H / 2;
   const R  = Math.min(W, H) * 0.22;
@@ -107,7 +100,6 @@ function shapeHelix(n: number, W: number, H: number): Pt[] {
   return pts;
 }
 
-/** Wireframe globe — full-stack, global reach */
 function shapeGlobe(n: number, W: number, H: number): Pt[] {
   const cx = W / 2, cy = H / 2;
   const R  = Math.min(W, H) * 0.28;
@@ -140,7 +132,6 @@ function shapeGlobe(n: number, W: number, H: number): Pt[] {
   return pts.slice(0, n);
 }
 
-/** Lemniscate of Bernoulli (∞) — infinite learning */
 function shapeLemniscate(n: number, W: number, H: number): Pt[] {
   const cx = W / 2, cy = H / 2;
   const a  = Math.min(W, H) * 0.30;
@@ -152,7 +143,6 @@ function shapeLemniscate(n: number, W: number, H: number): Pt[] {
   });
 }
 
-/** Starburst radial — everything converging / exploding outward */
 function shapeStarburst(n: number, W: number, H: number): Pt[] {
   const cx = W / 2, cy = H / 2;
   const spokes = 24;
@@ -172,7 +162,6 @@ function shapeStarburst(n: number, W: number, H: number): Pt[] {
   return pts.slice(0, n);
 }
 
-// ─── Shapes ordered by scroll progress ───────────────────────────────────────
 const STAGES: {
   label: string;
   at: number;                                    // scroll progress
@@ -187,7 +176,6 @@ const STAGES: {
   { label: "IN MOTION",       at: 0.90, gen: shapeStarburst    },
 ];
 
-// ─── Component ────────────────────────────────────────────────────────────────
 export default function MorphingParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelRef  = useRef<HTMLDivElement>(null);
@@ -208,7 +196,6 @@ export default function MorphingParticles() {
     let labelTarget  = 0;
     let labelText    = "";
 
-    // ── Particle arrays (flat Float32 for perf) ─────────────────────────────
     const px  = new Float32Array(N);
     const py  = new Float32Array(N);
     const pvx = new Float32Array(N);
@@ -228,7 +215,6 @@ export default function MorphingParticles() {
     };
 
     const setTargets = (pts: Pt[]) => {
-      // Shuffle target assignment to avoid spatial bias
       const idx = Array.from({ length: N }, (_, i) => i);
       for (let i = idx.length - 1; i > 0; i--) {
         const j = Math.floor(rng() * (i + 1));
@@ -240,7 +226,6 @@ export default function MorphingParticles() {
       }
     };
 
-    // ── Resize ───────────────────────────────────────────────────────────────
     const resize = () => {
       W = canvas.width  = window.innerWidth;
       H = canvas.height = window.innerHeight;
@@ -249,7 +234,6 @@ export default function MorphingParticles() {
     resize();
     window.addEventListener("resize", resize);
 
-    // ── ScrollTrigger ────────────────────────────────────────────────────────
     const st = ScrollTrigger.create({
       trigger: document.documentElement,
       start: "top top",
@@ -257,9 +241,7 @@ export default function MorphingParticles() {
       onUpdate: (s) => { scrollProg = s.progress; },
     });
 
-    // ── Render loop ───────────────────────────────────────────────────────────
     const render = () => {
-      // Which stage?
       let stage = 0;
       for (let i = STAGES.length - 1; i >= 0; i--) {
         if (scrollProg >= STAGES[i].at) { stage = i; break; }
@@ -270,27 +252,22 @@ export default function MorphingParticles() {
         const pts = STAGES[stage].gen(N, W, H);
         setTargets(pts);
 
-        // Update label
         labelText   = STAGES[stage].label;
         labelTarget = labelText ? 1 : 0;
       }
 
-      // Fade label in/out
       labelOpacity += (labelTarget - labelOpacity) * 0.06;
       if (labelEl) {
         labelEl.textContent = labelText;
         labelEl.style.opacity = String(Math.max(0, labelOpacity));
       }
 
-      // ── Trail fill ──────────────────────────────────────────────────────
       ctx.fillStyle = "rgba(13,17,23,0.18)";
       ctx.fillRect(0, 0, W, H);
 
-      // ── Update + draw particles ──────────────────────────────────────────
       ctx.shadowBlur = 0;
 
       for (let i = 0; i < N; i++) {
-        // Spring toward target
         const dx = tx[i] - px[i];
         const dy = ty[i] - py[i];
         pvx[i] += dx * SPRING;
@@ -298,7 +275,6 @@ export default function MorphingParticles() {
         pvx[i] *= DAMPING;
         pvy[i] *= DAMPING;
 
-        // Speed clamp
         const spd = Math.hypot(pvx[i], pvy[i]);
         if (spd > MAX_SPEED) {
           pvx[i] = (pvx[i] / spd) * MAX_SPEED;
@@ -308,7 +284,6 @@ export default function MorphingParticles() {
         px[i] += pvx[i];
         py[i] += pvy[i];
 
-        // Color: brighter when moving fast
         const brightness = Math.min(1, spd / 6);
         const r = Math.round(57  + brightness * 198);
         const g = Math.round(255);
@@ -323,7 +298,6 @@ export default function MorphingParticles() {
         ctx.fill();
       }
 
-      // ── Connect nearby particles (when mostly settled) ───────────────────
       if (stage > 0) {
         const maxDist = 28;
         const step    = Math.ceil(N / 300); // sample subset for perf
@@ -365,7 +339,6 @@ export default function MorphingParticles() {
         style={{ zIndex: 0 }}
         aria-hidden="true"
       />
-      {/* Stage label — bottom-center */}
       <div
         ref={labelRef}
         className="fixed bottom-8 left-1/2 -translate-x-1/2 pointer-events-none font-util text-xs tracking-[0.3em] uppercase text-signal"

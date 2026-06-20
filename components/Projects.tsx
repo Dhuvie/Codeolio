@@ -59,9 +59,7 @@ export default function Projects() {
 
     const panels = panelContainerRef.current;
     
-    // Create GSAP context for safe cleanup
     const ctx = gsap.context(() => {
-      // Small timeout to ensure DOM layout is complete before calculating width
       setTimeout(() => {
         const totalWidth = panels.scrollWidth - window.innerWidth;
         if (totalWidth > 0) {
@@ -87,7 +85,6 @@ export default function Projects() {
   return (
     <section ref={sectionRef} id="projects" className="relative overflow-hidden py-24 border-y border-signal/10 z-10">
       
-      {/* Section header */}
       <div className="section-container pb-12 relative z-20">
         <p className="font-mono text-sm text-signal tracking-[0.5em] uppercase mb-4" data-cursor-magnetic>
           {"// Featured Projects"}
@@ -98,7 +95,6 @@ export default function Projects() {
         </p>
       </div>
 
-      {/* Horizontal scrolling panel (desktop GSAP) / Flex scroll (mobile) */}
       <div className="w-full relative z-20">
         <div 
           ref={panelContainerRef}
@@ -120,18 +116,15 @@ export default function Projects() {
               data-cursor-text="VIEW"
             >
               <SpotlightCard className="h-full p-8 md:p-10 flex flex-col bg-[#111] border border-white/10 rounded-2xl">
-                {/* Gradient accent top bar */}
                 <div
                   className="absolute top-0 left-0 right-0 h-[2px] transition-all duration-500 opacity-50 group-hover:opacity-100"
                   style={{ background: "linear-gradient(to right, rgba(240,160,0,0.8), transparent)" }}
                 />
 
-                {/* Number tag */}
                 <span className="font-mono text-sm text-white/20 mb-6 block tracking-[0.3em]">
                   {String(PROJECTS.indexOf(project) + 1).padStart(2, "0")} /
                 </span>
 
-                {/* Title row */}
                 <div className="flex items-start justify-between mb-8">
                   <div>
                     <h3 className="font-display font-black text-3xl lg:text-5xl text-white group-hover:text-signal transition-colors duration-300 tracking-tighter">
@@ -149,12 +142,10 @@ export default function Projects() {
                   </div>
                 </div>
 
-                {/* Description */}
                 <p className="text-white/60 text-lg leading-relaxed flex-grow mb-8 font-sans">
                   {project.description}
                 </p>
 
-                {/* Tech pills */}
                 <div className="flex flex-wrap gap-3 mt-auto pt-6 border-t border-white/10">
                   {project.tech.map((t) => (
                     <span key={t} className="font-mono text-[11px] uppercase text-signal/80 tracking-widest border border-signal/20 rounded-full px-4 py-2 bg-signal/5">

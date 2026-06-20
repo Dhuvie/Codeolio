@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap-register";
 
-// ASCII cycling frames -- igloo.inc inspired
 const FRAMES = [
   "---===+++= ",
   "----===+++ ",
@@ -18,7 +17,6 @@ const FRAMES = [
   "---===+++= ",
 ];
 
-// Boot log messages — system initializing feel
 const BOOT_LINES = [
   "sys.init → kernel.v3",
   "loading modules...",
@@ -28,9 +26,6 @@ const BOOT_LINES = [
   "portfolio.ready",
 ];
 
-// Pre-compute rosette positions at module level with fixed 4-decimal precision.
-// This eliminates the hydration mismatch caused by Node.js vs V8 floating-point
-// differences at the 17th decimal place (e.g. 38.51470842750398 vs ...399).
 const N_PETALS = 30;
 const RING_R = 76;
 const RING_CX = 100;
@@ -59,7 +54,6 @@ function RosetteRing({ pct }: { pct: number }) {
           strokeWidth="0.8"
         />
       ))}
-      {/* Track ring */}
       <circle
         cx={RING_CX}
         cy={RING_CY}
@@ -68,7 +62,6 @@ function RosetteRing({ pct }: { pct: number }) {
         stroke="rgba(240,160,0,0.07)"
         strokeWidth="2"
       />
-      {/* Progress arc */}
       <circle
         cx={RING_CX}
         cy={RING_CY}
@@ -87,7 +80,6 @@ function RosetteRing({ pct }: { pct: number }) {
 }
 
 export default function Preloader() {
-  // "hidden" keeps the DOM mounted but invisible — prevents removeChild crash
   const [hidden, setHidden] = useState(false);
   const [skipRender, setSkipRender] = useState(false);
   const [frameIdx, setFrameIdx] = useState(0);
@@ -113,7 +105,6 @@ export default function Preloader() {
       },
     });
 
-    // Progress object for GSAP to animate
     const progressObj = { val: 0, frame: 0, line: 0 };
 
     tl.to(progressObj, {
@@ -143,24 +134,19 @@ export default function Preloader() {
       }
     }, 0);
 
-    // Phase 1: Fade out boot log + ring
     tl.to(bootRef.current, { opacity: 0, y: -10, duration: 0.3, ease: "power2.in" }, 2.8);
     tl.to(ringRef.current, { opacity: 0, scale: 0.92, duration: 0.45, ease: "power2.in" }, 3.1);
 
-    // Phase 2: Reveal name with glitch
     tl.fromTo(nameRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" }, 3.3);
 
-    // Glitch flicker on name
     tl.to(nameRef.current, { skewX: 4, scaleX: 1.02, duration: 0.05 }, 3.5);
     tl.to(nameRef.current, { skewX: -2, scaleX: 0.98, duration: 0.05 }, 3.55);
     tl.to(nameRef.current, { skewX: 3, scaleX: 1.01, x: 3, duration: 0.04 }, 3.6);
     tl.to(nameRef.current, { skewX: 0, scaleX: 1, x: 0, duration: 0.06 }, 3.64);
 
-    // Phase 3: Signal line + subtitle
     tl.fromTo(lineRef.current, { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: 0.6, ease: "expo.out" }, 3.65);
     tl.fromTo(subtitleRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 3.95);
 
-    // Phase 4: Exit — slide up
     tl.to(containerRef.current, { yPercent: -100, duration: 0.75, ease: "expo.inOut" }, 5.2);
 
     return () => {
@@ -168,7 +154,6 @@ export default function Preloader() {
     };
   }, []);
 
-  // On repeat visits, don't render at all (safe — no GSAP running)
   if (skipRender) return null;
 
   return (
@@ -181,7 +166,6 @@ export default function Preloader() {
         pointerEvents: hidden ? "none" : undefined,
       }}
     >
-      {/* Boot log — igloo.inc terminal style */}
       <div
         ref={bootRef}
         className="absolute top-8 left-8 md:left-12 font-mono text-[10px] text-signal/40 space-y-1"
@@ -201,7 +185,6 @@ export default function Preloader() {
         ))}
       </div>
 
-      {/* ASCII cycling -- igloo.inc */}
       <div
         className="font-mono font-bold text-sm mb-8"
         style={{
@@ -213,7 +196,6 @@ export default function Preloader() {
         {FRAMES[frameIdx]}
       </div>
 
-      {/* Ornate rosette + percentage -- persepolis.getty.edu */}
       <div ref={ringRef} className="relative flex items-center justify-center mb-8">
         <div style={{ animation: "spin 16s linear infinite" }}>
           <RosetteRing pct={pct} />
@@ -226,7 +208,6 @@ export default function Preloader() {
         </div>
       </div>
 
-      {/* Name */}
       <div
         ref={nameRef}
         className="font-display font-bold text-ink tracking-tighter leading-none mb-5"
@@ -235,14 +216,12 @@ export default function Preloader() {
         dhruv
       </div>
 
-      {/* Signal line */}
       <div
         ref={lineRef}
         className="w-32 bg-signal mb-5"
         style={{ height: "1.5px", transform: "scaleX(0)", boxShadow: "0 0 12px rgba(240,160,0,0.5)" }}
       />
 
-      {/* Subtitle */}
       <div
         ref={subtitleRef}
         className="font-mono text-[10px] text-muted tracking-[0.5em] uppercase"
@@ -251,7 +230,6 @@ export default function Preloader() {
         developer . builder . engineer
       </div>
 
-      {/* Inline animation for boot lines */}
       <style jsx>{`
         @keyframes fadeSlideIn {
           from {

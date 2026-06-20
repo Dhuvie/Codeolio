@@ -74,14 +74,12 @@ function LedgerBlock({ ach, index }: { ach: typeof ACHIEVEMENTS[0], index: numbe
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Blockchain connector line */}
       {index !== ACHIEVEMENTS.length - 1 && (
         <div className="hidden md:block absolute top-1/2 left-full w-8 h-[2px] bg-signal/20 z-0 -translate-y-1/2 group-hover:bg-signal/60 transition-colors" />
       )}
 
       <div className={`relative border border-signal/20 bg-[#080808] p-5 rounded z-10 transition-all duration-300 ${isHovered ? 'md:border-signal/80 md:shadow-[0_0_20px_rgba(240,160,0,0.15)] md:bg-[#0c0a06] md:-translate-y-1' : ''}`}>
         
-        {/* Block Header */}
         <div className="flex items-center justify-between border-b border-signal/10 pb-3 mb-4">
           <div className="flex flex-col">
             <span className="font-mono text-[10px] text-signal/40 tracking-widest uppercase">Block Height</span>
@@ -92,7 +90,6 @@ function LedgerBlock({ ach, index }: { ach: typeof ACHIEVEMENTS[0], index: numbe
           </span>
         </div>
 
-        {/* Desktop: Encrypted / Decrypted Content */}
         <div className="hidden md:flex min-h-[140px] flex-col justify-center">
           {!isHovered ? (
             <div className="flex flex-col gap-2">
@@ -121,7 +118,6 @@ function LedgerBlock({ ach, index }: { ach: typeof ACHIEVEMENTS[0], index: numbe
           )}
         </div>
 
-        {/* Mobile: ALWAYS Decrypted */}
         <div className="flex md:hidden flex-col justify-center pt-2">
           <div className="flex flex-col h-full">
             <span className="font-mono text-sm text-signal font-bold mb-1 uppercase tracking-widest">
@@ -138,7 +134,6 @@ function LedgerBlock({ ach, index }: { ach: typeof ACHIEVEMENTS[0], index: numbe
           </div>
         </div>
 
-        {/* Scanlines overlay inside the block */}
         <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] opacity-10 pointer-events-none rounded" />
       </div>
     </div>
@@ -155,7 +150,6 @@ export default function Achievements() {
 
 
 
-    // Horizontal scroll entrance animation
     const blocks = scrollContainerRef.current?.querySelectorAll(".flex-shrink-0");
     blocks?.forEach((block, i) => {
       gsap.fromTo(block, 
@@ -197,7 +191,6 @@ export default function Achievements() {
         <p className="section-label" data-cursor-magnetic>Verified Ledger</p>
         <SplitTextReveal text="Competition blocks." className="font-display font-semibold text-4xl md:text-5xl lg:text-6xl mb-16" />
 
-        {/* Cave Exploration Hint */}
         <div className={`cave-hint fixed top-1/2 right-0 md:right-4 -translate-y-1/2 flex items-center gap-3 bg-black/80 border border-signal/30 p-2 md:p-3 rounded-l-full md:rounded-full pointer-events-none z-50 shadow-[0_0_15px_rgba(240,160,0,0.2)] transition-all duration-700 ease-out ${showHint ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
           <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-signal/50 flex items-center justify-center text-signal font-mono text-xs md:text-sm animate-pulse">
             i
@@ -207,9 +200,7 @@ export default function Achievements() {
           </span>
         </div>
 
-        {/* Cryptographic Ledger Blocks */}
         <div className="relative w-full overflow-hidden">
-          {/* Subtle gradient edges to hint at scroll */}
           <div className="absolute top-0 bottom-0 left-0 w-8 bg-gradient-to-r from-bg to-transparent z-20 pointer-events-none" />
           <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-bg to-transparent z-20 pointer-events-none" />
           

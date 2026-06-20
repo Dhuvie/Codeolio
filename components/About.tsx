@@ -23,14 +23,12 @@ export default function About() {
     const items = sectionRef.current.querySelectorAll(".about-item");
     const st = createStaggerEntrance(sectionRef.current, items, { stagger: 0.1 });
 
-    // Magnetic Stats
     const statsElements = sectionRef.current.querySelectorAll(".stat-card-pulse");
     const magneticCleanups: (() => void)[] = [];
     statsElements.forEach(el => {
       magneticCleanups.push(createMagneticEffect(el as HTMLElement, 0.2));
     });
 
-    // Kinetic Background Animation
     const kineticText = sectionRef.current.querySelector(".kinetic-text-about");
     let kineticST: ScrollTrigger | undefined;
     if (kineticText) {
@@ -43,7 +41,6 @@ export default function About() {
       });
     }
 
-    // Animate stat counters
     const counterST = ScrollTrigger.create({
       trigger: sectionRef.current,
       start: "top 70%",
@@ -54,7 +51,6 @@ export default function About() {
           const el = statRefs.current[i];
           if (!el) return;
           if (stat.decimals) {
-            // Special case for CGPA (8.87)
             const obj = { val: 0 };
             gsap.to(obj, {
               val: 8.87,
@@ -80,10 +76,8 @@ export default function About() {
 
   return (
     <section ref={sectionRef} id="about" className="relative overflow-hidden">
-      {/* Subtle background orbs */}
       <FloatingOrbs count={3} />
 
-      {/* Kinetic Typography Background */}
       <div 
         className="absolute top-1/3 left-0 w-full whitespace-nowrap opacity-[0.02] pointer-events-none z-0 overflow-hidden font-display font-black uppercase tracking-tighter select-none"
         style={{ fontSize: "20vw", lineHeight: 0.8, color: "transparent", WebkitTextStroke: "2px var(--signal)" }}
@@ -97,7 +91,6 @@ export default function About() {
         <p className="section-label">About</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-          {/* Bio */}
           <div className="lg:col-span-7">
             <h2
               className="about-item font-display font-black mb-8 leading-[1.1] tracking-tighter"
@@ -107,21 +100,20 @@ export default function About() {
               <span className="signal-text glow-breathe mix-blend-screen">systems</span> and{" "}
               <span className="signal-text glow-breathe mix-blend-screen" style={{ animationDelay: "1.5s" }}>intelligence</span>
             </h2>
-            <p className="about-item text-muted leading-relaxed mb-4">
+            <p className="about-item text-glow-ambient leading-relaxed mb-4">
               I&#39;m a Computer Science Engineering student specializing in AI/ML at
               SRM University–AP, on track to graduate in 2027. My work spans the
-              full stack — from writing pixel-level image processing kernels and
+              full stack - from writing pixel-level image processing kernels and
               OpenGL renderers to building production web platforms with Next.js
               and deploying ML models as real-time APIs.
             </p>
-            <p className="about-item text-muted leading-relaxed">
+            <p className="about-item text-glow-ambient leading-relaxed">
               What drives me is the challenge of making complex systems work
-              reliably at scale — whether that&#39;s optimizing a neural network to
+              reliably at scale - whether that&#39;s optimizing a neural network to
               run on a 512KB microcontroller, or engineering a CDN caching layer
               that halves page-load times on 3G connections.
             </p>
 
-            {/* Animated bar callout with glowing leading edge */}
             <div className="about-item mt-8 space-y-3">
               {[
                 { label: "Systems / Low-Level", blocks: 15, level: "Advanced" },
@@ -152,14 +144,12 @@ export default function About() {
             </div>
           </div>
 
-          {/* Stats grid */}
           <div className="lg:col-span-5 grid grid-cols-2 gap-6">
             {STATS.map((stat, i) => (
               <div
                 key={stat.label}
                 className="about-item card-glass-ultra noise-overlay shimmer-container stat-card-pulse flex flex-col relative group cursor-default p-6"
               >
-                {/* Glow corner */}
                 <div className="absolute top-0 right-0 w-24 h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
                   style={{ background: "radial-gradient(circle at top right, rgba(240,160,0,0.25), transparent 70%)" }} />
 
@@ -177,7 +167,6 @@ export default function About() {
                   {stat.sub}
                 </span>
 
-                {/* Bottom accent bar */}
                 <div className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500 ease-out"
                   style={{ background: "linear-gradient(to right, #f0a000, transparent)" }} />
               </div>
@@ -185,7 +174,6 @@ export default function About() {
           </div>
         </div>
 
-        {/* Education */}
         <div className="about-item mt-12 flex flex-wrap items-center gap-4 text-sm text-muted">
           <div className="flex items-center gap-2">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -207,7 +195,6 @@ export default function About() {
         </div>
       </div>
 
-      {/* Section wave divider */}
       <div className="section-wave" />
     </section>
   );

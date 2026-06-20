@@ -1,33 +1,20 @@
 "use client";
 
-/**
- * Animation factory functions for GSAP ScrollTrigger timelines.
- * Each function creates, configures, and returns a timeline + ScrollTrigger
- * so callers can kill them on unmount.
- */
 
 import { gsap, ScrollTrigger } from "@/lib/gsap-register";
 
-/** Check if user prefers reduced motion */
 export function prefersReducedMotion(): boolean {
   return false;
 }
 
-/**
- * Hero intro — character stagger for the headline.
- * Splits text into <span> wrapped chars and staggers them in.
- */
 export function createHeroIntro(container: HTMLElement): gsap.core.Timeline {
   const tl = gsap.timeline({ delay: 0.2 });
 
-  // Bypass complex stagger animations on mobile for maximum reliability
   if (prefersReducedMotion() || (typeof window !== "undefined" && window.innerWidth < 768)) {
-    // Instant reveal with a quick fade
     tl.set(container, { opacity: 1 });
     return tl;
   }
 
-  // Find all split characters
   const chars = container.querySelectorAll(".char");
   const words = container.querySelectorAll(".word");
   const subtexts = container.querySelectorAll(".hero-subtext");
@@ -74,7 +61,6 @@ export function createHeroIntro(container: HTMLElement): gsap.core.Timeline {
         "-=0.3"
       );
   } else {
-    // Fallback: always make container visible
     tl.set(container, { opacity: 1 }).from(subtexts, {
       opacity: 0,
       y: 30,
@@ -87,10 +73,6 @@ export function createHeroIntro(container: HTMLElement): gsap.core.Timeline {
   return tl;
 }
 
-/**
- * Staggered entrance for elements (pills, cards, list items).
- * Triggers on scroll into view.
- */
 export function createStaggerEntrance(
   trigger: HTMLElement,
   items: HTMLElement[] | NodeListOf<Element>,
@@ -132,9 +114,6 @@ export function createStaggerEntrance(
   return tl.scrollTrigger!;
 }
 
-/**
- * Counter animation — animate a number from 0 to target.
- */
 export function animateCounter(
   el: HTMLElement,
   target: number,
@@ -168,9 +147,6 @@ export function animateCounter(
   return st;
 }
 
-/**
- * Magnetic effect for buttons — pulls the element toward cursor.
- */
 export function createMagneticEffect(
   el: HTMLElement,
   strength: number = 0.3
@@ -205,9 +181,6 @@ export function createMagneticEffect(
   };
 }
 
-/**
- * 3D tilt effect — perspective + rotateX/Y tied to mouse position.
- */
 export function createTiltEffect(
   el: HTMLElement,
   maxDeg: number = 8
@@ -247,10 +220,6 @@ export function createTiltEffect(
   };
 }
 
-/**
- * Kill all ScrollTrigger instances and GSAP animations.
- * Call on page unmount.
- */
 export function killAll() {
   ScrollTrigger.getAll().forEach((st) => st.kill());
   gsap.killTweensOf("*");

@@ -6,7 +6,6 @@ import { prefersReducedMotion } from "@/lib/animations";
 import MagneticButton from "./MagneticButton";
 import ParticleField from "./ParticleField";
 
-// Terminal-style contact info
 const CONTACT_LINES = [
   { prefix: "email", value: "dhruvnarayanbajaj@gmail.com" },
   { prefix: "github", value: "github.com/Dhuvie" },
@@ -23,7 +22,6 @@ export default function Contact() {
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    // Parallax on the big decorative text
     if (bigTextRef.current && !prefersReducedMotion()) {
       gsap.to(bigTextRef.current, {
         y: -60,
@@ -40,13 +38,12 @@ export default function Contact() {
 
   return (
     <section ref={sectionRef} id="contact" className="relative overflow-hidden">
-      {/* Particle field */}
       <ParticleField count={50} connectionDist={90} />
 
-      {/* Background grid dots */}
-      <div className="absolute inset-0 grid-dots opacity-15 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#020202] via-[#020202]/50 to-transparent pointer-events-none z-0" />
+      
+      <div className="absolute inset-0 grid-dots opacity-15 pointer-events-none z-0" />
 
-      {/* Decorative large background text */}
       <div
         ref={bigTextRef}
         className="absolute bottom-0 left-0 right-0 select-none pointer-events-none overflow-hidden"
@@ -77,32 +74,30 @@ export default function Contact() {
             Let&apos;s <span className="gradient-text-animated">connect</span>
           </h2>
 
-          <p className="contact-item text-muted mb-8 leading-relaxed">
+          <p className="contact-item text-ink/90 font-medium drop-shadow-md mb-8 leading-relaxed">
             Open to collaborating on innovative projects and exploring new
-            opportunities. I respond fast — usually within 24 hours.
+            opportunities. I respond fast - usually within 24 hours.
           </p>
 
-          {/* Availability badge */}
-          <div className="contact-item flex items-center gap-3 mb-8 p-4 rounded-xl border border-signal/15 bg-surface/40 w-fit">
+          <div className="contact-item flex items-center gap-3 mb-8 p-4 rounded-xl border border-white/10 bg-white/[0.02] backdrop-blur-md w-fit">
             <span className="relative flex h-2.5 w-2.5">
               <span className="ping-ripple absolute inline-flex h-full w-full rounded-full bg-signal" />
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-signal" />
             </span>
-            <span className="font-util text-xs tracking-widest uppercase text-signal">
+            <span className="font-util text-xs tracking-widest uppercase text-signal drop-shadow-sm font-bold">
               Currently Available for Internship / Freelance
             </span>
           </div>
 
-          {/* Terminal-style contact info */}
           <div
             ref={terminalRef}
-            className="contact-item mb-8 p-5 rounded-xl bg-surface/60 border border-ink/5 font-mono text-sm space-y-2"
+            className="contact-item mb-8 p-5 rounded-xl bg-white/[0.02] backdrop-blur-md border border-white/10 font-mono text-sm space-y-2"
           >
             <div className="flex items-center gap-2 mb-3 text-muted text-xs">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
               <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
               <span className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
-              <span className="ml-2 tracking-widest uppercase">contact.sh</span>
+              <span className="ml-2 tracking-widest uppercase text-ink/80 drop-shadow-sm">contact.sh</span>
             </div>
             {CONTACT_LINES.map((line, i) => (
               <div
@@ -113,14 +108,14 @@ export default function Contact() {
                   transform: "translateY(0)",
                 }}
               >
-                <span className="text-signal/60">$</span>
-                <span className="text-muted">{line.prefix}:</span>
-                <span className="text-ink">{line.value}</span>
+                <span className="text-signal/90 font-bold drop-shadow-sm">$</span>
+                <span className="text-ink/80 drop-shadow-sm">{line.prefix}:</span>
+                <span className="text-ink font-semibold drop-shadow-sm">{line.value}</span>
               </div>
             ))}
             <div className="relative min-h-[1.5rem] group w-full">
-              <span className="text-signal/60 mr-2">$</span>
-              <span className="text-signal whitespace-pre-wrap break-all typewriter-cursor">
+              <span className="text-signal/90 font-bold drop-shadow-sm mr-2">$</span>
+              <span className="text-signal font-semibold drop-shadow-sm whitespace-pre-wrap break-all typewriter-cursor">
                 {termText || '\u200B'}
               </span>
               <input 
@@ -136,7 +131,6 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Links */}
           <div className="contact-item flex flex-wrap gap-4 mb-12">
             <MagneticButton href="mailto:dhruvnarayanbajaj@gmail.com" variant="primary">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

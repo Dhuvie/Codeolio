@@ -11,7 +11,6 @@ const PARTICLE_COUNT = isMobile ? 120 : 600; // Drastically drop particle count 
 const MAX_DISTANCE = isMobile ? 12.0 : 5.5; // Huge connection distance on mobile so it still forms a cohesive web
 const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 
-// Custom shader for ultra-premium glowing data nodes
 const pointVertexShader = `
 attribute float aSize;
 varying vec3 vColor;
@@ -29,11 +28,9 @@ void main() {
     float dist = length(gl_PointCoord - vec2(0.5));
     if (dist > 0.5) discard;
     
-    // Core glow falloff
     float intensity = 1.0 - (dist * 2.0);
     intensity = pow(intensity, 1.5);
     
-    // Add a hot white core
     vec3 coreColor = mix(vColor, vec3(1.0), pow(intensity, 3.0));
     gl_FragColor = vec4(coreColor, intensity * 0.9);
 }
@@ -44,7 +41,6 @@ function NeuralMatrix() {
   const linesRef = useRef<THREE.LineSegments>(null);
   const { camera } = useThree();
 
-  // Initialize Particles into a Massive Spinning Accretion Disk
   const { positions, basePositions, velocities, colors, sizes, angles, radii } = useMemo(() => {
     const pos = new Float32Array(PARTICLE_COUNT * 3);
     const basePos = new Float32Array(PARTICLE_COUNT * 3);
@@ -55,7 +51,6 @@ function NeuralMatrix() {
     const rds = new Float32Array(PARTICLE_COUNT);
     
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      // ACCRETION DISK: Massive spinning spiral
       const radius = 5.0 + Math.pow(Math.random(), 2) * 35.0; 
       const angle = Math.random() * Math.PI * 2;
       
@@ -71,10 +66,8 @@ function NeuralMatrix() {
       angs[i] = angle;
       rds[i] = radius;
 
-      // Make it spin at exactly 1.4x the original slow speed
       vel[i] = (4.0 / Math.pow(radius, 1.5)) * 0.084; 
 
-      // Brighter Colors & Larger Sizes for Mobile (to compensate for no Bloom)
       const sizeMultiplier = isMobile ? 1.8 : 1.0;
       
       const isPhotonRing = radius < 7.0;
@@ -95,7 +88,6 @@ function NeuralMatrix() {
     return { positions: pos, basePositions: basePos, velocities: vel, colors: cols, sizes: szs, angles: angs, radii: rds };
   }, []);
 
-  // Pre-allocate BufferGeometry for lines to prevent GC pauses
   const lineGeometry = useMemo(() => {
     const geom = new THREE.BufferGeometry();
     const maxConnections = PARTICLE_COUNT * 20 * 3; // safe buffer
@@ -171,24 +163,19 @@ function NeuralMatrix() {
 
     const time = state.clock.getElapsedTime();
 
-    // Idle Wandering if no interaction yet
     if (!hasInteracted.current) {
-      // Cinematic slow figure-8
       targetMouse.current.x = Math.sin(time * 0.4) * 0.4;
       targetMouse.current.y = Math.sin(time * 0.8) * 0.2;
     }
 
-    // Smoothly unproject mouse to 3D world space
     const vector = new THREE.Vector3(targetMouse.current.x, targetMouse.current.y, 0.5);
     vector.unproject(camera);
     vector.sub(camera.position).normalize();
     const distance = (0 - camera.position.z) / vector.z;
     const mouseWorldPos = camera.position.clone().add(vector.multiplyScalar(distance));
     
-    // Lerp global mouse for smoothness
     globalMouse.current.lerp(mouseWorldPos, 0.1);
 
-    // Update Shockwave
     if (clickWave.current.active) {
       clickWave.current.radius += 0.08; // Very slow and majestic expansion
       if (clickWave.current.radius > 40) clickWave.current.active = false;
@@ -209,7 +196,6 @@ function NeuralMatrix() {
       const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       const scrollPerc = scrollY / maxScroll;
 
-      // Mobile: Lock flat (edge-on) and spin. Twist the pillar based on scroll depth!
       pointsRef.current.rotation.x = 0;
       pointsRef.current.rotation.z = 0;
       pointsRef.current.rotation.y = time * 0.035 + scrollPerc * Math.PI * 4;
@@ -217,7 +203,6 @@ function NeuralMatrix() {
       linesRef.current.rotation.z = 0;
       linesRef.current.rotation.y = time * 0.035 + scrollPerc * Math.PI * 4;
     } else {
-      // Desktop: Slowly tilt the entire accretion disk over time
       pointsRef.current.rotation.x = Math.sin(time * 0.1) * 0.1 + 0.2;
       pointsRef.current.rotation.z = Math.cos(time * 0.1) * 0.1;
       pointsRef.current.rotation.y = time * 0.021;
@@ -229,7 +214,6 @@ function NeuralMatrix() {
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const i3 = i * 3;
       
-      // Accretion Disk Animation
       angles[i] += velocities[i];
       const r = radii[i];
       
@@ -244,12 +228,7 @@ function NeuralMatrix() {
       posArray[i3 + 1] = basePositions[i3 + 1] - gravityDrop + Math.sin(time * 2.0 + i)*0.2;
       posArray[i3 + 2] = pz;
 
-      // -----------------------------------------
-      // MOUSE INTERACTION (Mini Gravity Well)
-      // -----------------------------------------
       if (!isMobile) {
-        // We must account for group rotation when calculating distance to mouse.
-        // Easiest hack: transform local pos to world, check distance, apply local force.
         const worldPos = new THREE.Vector3(posArray[i3], posArray[i3+1], posArray[i3+2]);
         worldPos.applyEuler(pointsRef.current.rotation);
         
@@ -258,27 +237,22 @@ function NeuralMatrix() {
         const dz = globalMouse.current.z - worldPos.z;
         const distToMouseSq = dx * dx + dy * dy + dz * dz;
         
-        // Increased interaction radius from 6.0 to 12.0
         if (distToMouseSq < 144.0) { 
           const distToMouse = Math.sqrt(distToMouseSq);
           const force = (12.0 - distToMouse) / 12.0;
           
-          // Create a whirlpool effect by taking the cross product
           const toMouse = new THREE.Vector3(dx, dy, dz).normalize();
           const up = new THREE.Vector3(0, 1, 0);
           const tangent = new THREE.Vector3().crossVectors(toMouse, up).normalize();
           
-          // Inverse transform forces back to local space
           const localToMouse = toMouse.clone().applyEuler(new THREE.Euler(-pointsRef.current.rotation.x, -pointsRef.current.rotation.y, -pointsRef.current.rotation.z));
           const localTangent = tangent.clone().applyEuler(new THREE.Euler(-pointsRef.current.rotation.x, -pointsRef.current.rotation.y, -pointsRef.current.rotation.z));
           
-          // Pull particles in (Gravity) AND swirl them around (Vortex)
           posArray[i3] += (localToMouse.x * 0.8 + localTangent.x * 2.5) * force;
           posArray[i3 + 1] += (localToMouse.y * 0.8 + localTangent.y * 2.5) * force;
           posArray[i3 + 2] += (localToMouse.z * 0.8 + localTangent.z * 2.5) * force;
         }
         
-        // Click Wave Interaction - Smooth Cosine Ripple from Click Origin
         if (clickWave.current.active) {
           const dxClick = clickWave.current.origin.x - worldPos.x;
           const dzClick = clickWave.current.origin.z - worldPos.z;
@@ -286,18 +260,15 @@ function NeuralMatrix() {
           const waveDist = Math.abs(distToClick - clickWave.current.radius);
           
           if (waveDist < 3.5) {
-             // Smooth bell curve displacement (1.0 at wave center, 0.0 at wave edge)
              const rippleIntensity = (Math.cos((waveDist / 3.5) * Math.PI) + 1.0) * 0.5;
              posArray[i3 + 1] += rippleIntensity * 2.5; // Smoothly lift them up
           }
         }
       }
 
-      // Check connections
       for (let j = i + 1; j < PARTICLE_COUNT; j++) {
         const j3 = j * 3;
         
-        // QUICK REJECTS: Avoid expensive distance checks if they are far apart on any axis
         const dx2 = posArray[i3] - posArray[j3];
         if (Math.abs(dx2) > MAX_DISTANCE) continue;
         
@@ -342,13 +313,11 @@ function NeuralMatrix() {
     lineGeometry.setDrawRange(0, lineIndex);
     
     if (isMobile) {
-      // Mobile: Fixed camera to prevent scroll lag. Looking straight at the edge.
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, 0, 0.1);
       camera.position.y = THREE.MathUtils.lerp(camera.position.y, 0, 0.1);
       camera.position.z = THREE.MathUtils.lerp(camera.position.z, 28, 0.1);
       camera.lookAt(0, 0, 0);
     } else {
-      // Desktop: Scroll Parallax Camera - The Seamless Wormhole Orbit
       const scrollY = window.scrollY || document.documentElement.scrollTop;
       const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       const scrollPerc = scrollY / maxScroll;
@@ -404,7 +373,6 @@ function NeuralMatrix() {
 }
 
 const getShapes = () => {
-  // Shape 0: Grid (8x8)
   const grid = [];
   for(let i=0; i<64; i++) {
      const r = Math.floor(i/8);
@@ -412,36 +380,29 @@ const getShapes = () => {
      grid.push({ x: (c-3.5)*22, y: (r-3.5)*22, r: 45 });
   }
 
-  // Shape 1: Question Mark (?) (About / Experience)
   const question = [];
-  // Dot at (0, 35) (8 points)
   for(let i=0; i<8; i++) {
      const a = (i/8)*Math.PI*2;
      question.push({ x: Math.cos(a)*6, y: 35 + Math.sin(a)*6, r: 0 });
   }
-  // Stem from (0, 15) to (0, -10) (16 points)
   for(let i=0; i<16; i++) {
      question.push({ x: 0, y: 15 - (25*i/15), r: 0 });
   }
-  // Curve from (0,-10) to (20, -30) (10 points)
   for(let i=0; i<10; i++) {
      const a = Math.PI + (Math.PI/2 * i/9);
      question.push({ x: 20 + Math.cos(a)*20, y: -10 + Math.sin(a)*20, r: 45 });
   }
-  // Top Arc from (20, -30) to (-20, -30) (30 points)
   for(let i=0; i<30; i++) {
      const a = 0 - (Math.PI * i/29);
      question.push({ x: Math.cos(a)*20, y: -30 + Math.sin(a)*20, r: 0 });
   }
 
-  // Shape 2: Code Brackets < > (Projects)
   const brackets = [];
   for(let i=0; i<16; i++) brackets.push({ x: -40 + (-30*i/15), y: -40 + (40*i/15), r: -45 });
   for(let i=0; i<16; i++) brackets.push({ x: -70 + (30*i/15), y: 0 + (40*i/15), r: 45 });
   for(let i=0; i<16; i++) brackets.push({ x: 40 + (30*i/15), y: -40 + (40*i/15), r: 45 });
   for(let i=0; i<16; i++) brackets.push({ x: 70 + (-30*i/15), y: 0 + (40*i/15), r: -45 });
 
-  // Shape 3: Crown (Achievements)
   const crown = [];
   for(let i=0; i<16; i++) crown.push({ x: -50 + (100*i/15), y: 40, r: 0 }); // base
   for(let i=0; i<8; i++) crown.push({ x: -50 + (10*i/7), y: 40 + (-60*i/7), r: 80 }); // left up
@@ -451,7 +412,6 @@ const getShapes = () => {
   for(let i=0; i<8; i++) crown.push({ x: 15 + (25*i/7), y: 20 + (-40*i/7), r: 45 }); // right up
   for(let i=0; i<8; i++) crown.push({ x: 40 + (10*i/7), y: -20 + (60*i/7), r: -80 }); // right down
 
-  // Shape 4: Certificate (Certifications)
   const cert = [];
   for(let i=0; i<16; i++) cert.push({ x: -35 + (70*i/15), y: -45, r: 0 }); // Top
   for(let i=0; i<12; i++) cert.push({ x: 35, y: -45 + (75*i/11), r: 90 }); // Right
@@ -462,15 +422,12 @@ const getShapes = () => {
      cert.push({ x: 20 + Math.cos(a)*10, y: 20 + Math.sin(a)*10, r: 0 }); // Seal
   }
 
-  // Shape 5: Atom (Skills)
   const atom = [];
-  // Orbit 1 (Horizontal)
   for(let i=0; i<16; i++) {
      const a = (i/16)*Math.PI*2;
      const tangent = Math.atan2(Math.cos(a)*15, -Math.sin(a)*40);
      atom.push({ x: Math.cos(a)*40, y: Math.sin(a)*15, r: tangent*180/Math.PI });
   }
-  // Orbit 2 (Tilted 60 deg)
   for(let i=0; i<16; i++) {
      const a = (i/16)*Math.PI*2;
      const x0 = Math.cos(a)*40;
@@ -480,7 +437,6 @@ const getShapes = () => {
      const tangent = Math.atan2(Math.cos(a)*15, -Math.sin(a)*40);
      atom.push({ x, y, r: (tangent + Math.PI/3)*180/Math.PI });
   }
-  // Orbit 3 (Tilted -60 deg)
   for(let i=0; i<16; i++) {
      const a = (i/16)*Math.PI*2;
      const x0 = Math.cos(a)*40;
@@ -490,13 +446,11 @@ const getShapes = () => {
      const tangent = Math.atan2(Math.cos(a)*15, -Math.sin(a)*40);
      atom.push({ x, y, r: (tangent - Math.PI/3)*180/Math.PI });
   }
-  // Core
   for(let i=0; i<16; i++) {
      const a = (i/16)*Math.PI*2;
      atom.push({ x: Math.cos(a)*8, y: Math.sin(a)*8, r: (a*180/Math.PI)+90 });
   }
 
-  // Shape 6: Classic Telephone Handset (Contact)
   const phone = [];
   for(let i=0; i<8; i++) phone.push({ x: -15 + (30*i/7), y: -10, r: 0 }); // top grip
   for(let i=0; i<4; i++) phone.push({ x: 15 + (10*i/3), y: -10 - (15*i/3), r: 45 }); // right stem inner
@@ -522,18 +476,15 @@ const getShapes = () => {
 const MobileAnimeGrid = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Pre-calculate all geometric points and exploded chaos vectors so the GPU has zero math to do during scroll
   const shards = useMemo(() => {
     const allShapes = getShapes();
     const items = [];
     for (let i = 0; i < 64; i++) {
-      // Stagger logic based on distance from center of the initial grid
       const row = Math.floor(i / 8);
       const col = i % 8;
       const distFromCenter = Math.sqrt(Math.pow(col - 3.5, 2) + Math.pow(row - 3.5, 2));
       const delay = (1 - distFromCenter / 5); // 0.0 to 1.0 (Outer edge is 0, Center is 1)
 
-      // Random explosion vectors
       const rx = (Math.random() - 0.5) * 2;
       const ry = (Math.random() - 0.5) * 2;
       const rz = (Math.random() - 0.5) * 2;
@@ -552,7 +503,6 @@ const MobileAnimeGrid = () => {
       const scrollY = window.scrollY || document.documentElement.scrollTop;
       const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       
-      // We have 7 shapes, so 6 transitions spanning the whole page
       const numTransitions = 6;
       const rawPerc = Math.min(1, Math.max(0, scrollY / maxScroll));
       const scaledPerc = rawPerc * numTransitions;
@@ -569,7 +519,6 @@ const MobileAnimeGrid = () => {
         const shape1 = s.positions[segment];
         const shape2 = s.positions[segment + 1];
         
-        // Stagger timelines: Outer edges explode first, assemble first.
         const explodeStart = s.delay * 0.15; // 0.0 to 0.15
         const explodeEnd = explodeStart + 0.3; // 0.3 to 0.45
         const assembleStart = 0.5 + s.delay * 0.15; // 0.5 to 0.65
@@ -578,10 +527,8 @@ const MobileAnimeGrid = () => {
         let tx = 0, ty = 0, tz = 0, tr = 0, op = 1;
 
         if (progress < explodeStart) {
-            // Stable Assembled State 1
             tx = shape1.x; ty = shape1.y; tz = 0; tr = shape1.r;
         } else if (progress < explodeEnd) {
-            // Exploding into chaos!
             let local = (progress - explodeStart) / (explodeEnd - explodeStart);
             let ease = local * local * local; // Cubic ease in
             tx = shape1.x + s.rx * 300 * ease;
@@ -590,14 +537,12 @@ const MobileAnimeGrid = () => {
             tr = shape1.r + s.rRot * ease;
             op = 1 - (ease * 0.85); // Fade heavily during chaos
         } else if (progress < assembleStart) {
-            // Suspended in deep space mid-air
             tx = shape1.x + s.rx * 300;
             ty = shape1.y + s.ry * 300;
             tz = s.rz * 400;
             tr = shape1.r + s.rRot;
             op = 0.15;
         } else if (progress < assembleEnd) {
-            // Magnetizing into State 2!
             let local = (progress - assembleStart) / (assembleEnd - assembleStart);
             let ease = 1 - Math.pow(1 - local, 3); // Cubic ease out
             
@@ -612,7 +557,6 @@ const MobileAnimeGrid = () => {
             tr = chaosR + (shape2.r - chaosR) * ease;
             op = 0.15 + (ease * 0.85);
         } else {
-            // Stable Assembled State 2
             tx = shape2.x; ty = shape2.y; tz = 0; tr = shape2.r;
         }
 
@@ -629,10 +573,8 @@ const MobileAnimeGrid = () => {
   return (
     <div className="fixed inset-0 w-full h-full bg-[#0d0b08] overflow-hidden pointer-events-none" style={{ zIndex: 0, perspective: '1000px' }}>
       
-      {/* Background Vignette */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1a1205] via-[#0d0b08] to-[#050300] opacity-100" />
 
-      {/* Constant Breathing Background Core */}
       <div 
         className="absolute top-1/2 left-1/2 w-[250px] h-[250px] rounded-full blur-[80px]"
         style={{
@@ -641,7 +583,6 @@ const MobileAnimeGrid = () => {
         }}
       />
 
-      {/* The 3D Matrix Container */}
       <div 
         ref={containerRef}
         className="absolute top-[45%] left-1/2" // Slightly higher than center
@@ -677,7 +618,7 @@ export default function GlobalCanvas() {
   return (
     <div 
       className="fixed inset-0 w-full h-full pointer-events-none" 
-      style={{ zIndex: 0, opacity: 0.8 }} 
+      style={{ zIndex: 0, opacity: 0.55 }} 
       aria-hidden="true"
     >
       <Canvas
@@ -687,7 +628,7 @@ export default function GlobalCanvas() {
       >
         <NeuralMatrix />
         <EffectComposer>
-          <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} intensity={4.0} mipmapBlur />
+          <Bloom luminanceThreshold={0.4} luminanceSmoothing={0.9} intensity={1.8} mipmapBlur />
           <ChromaticAberration offset={new THREE.Vector2(0.002, 0.002)} />
           <Noise opacity={0.03} />
           <Vignette eskil={false} offset={0.1} darkness={1.1} />

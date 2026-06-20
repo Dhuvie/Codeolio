@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { LenisProvider } from "@/lib/lenis-provider";
 import { killAll } from "@/lib/animations";
 
-/* Components */
 import Navbar from "@/components/Navbar";
 import SignalLine from "@/components/SignalLine";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -27,7 +26,6 @@ import FolderTransition from "@/components/FolderTransition";
 import Preloader from "@/components/Preloader";
 
 export default function Home() {
-  // Clean up all GSAP/ScrollTrigger on unmount
   useEffect(() => {
     return () => {
       killAll();
@@ -38,15 +36,12 @@ export default function Home() {
     <>
       <Preloader />
       <LenisProvider>
-      {/* Morphing WebGL Global Background */}
       <GlobalCanvas />
-      {/* Persistent overlays */}
       <Navbar />
       <SignalLine />
       <ScrollProgress />
       <FolderTransition />
 
-      {/* Page sections — data-section drives folder transition labels */}
       <main>
         <div data-section="hero"><Hero /></div>
         <div data-section="about"><About /></div>

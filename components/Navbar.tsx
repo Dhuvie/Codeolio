@@ -32,7 +32,6 @@ export default function Navbar() {
       },
     });
 
-    // Magnetic effect on nav links (desktop only)
     const cleanups: (() => void)[] = [];
     const links = navRef.current?.querySelectorAll<HTMLElement>(".nav-link");
     links?.forEach((link) => {
@@ -49,14 +48,12 @@ export default function Navbar() {
     setMobileOpen(false);
 
     if (isMobile) {
-      // Allow native browser scrolling to anchor on mobile for guaranteed reliability
       return;
     }
 
     e.preventDefault();
     const sectionId = href.replace("#", "");
 
-    // Dispatch a global event that FolderTransition will listen to
     window.dispatchEvent(
       new CustomEvent("trigger-wipe", {
         detail: { sectionId },
@@ -73,7 +70,6 @@ export default function Navbar() {
       style={{ height: "var(--nav-height)" }}
     >
       <div className="max-w-[1400px] mx-auto h-full flex items-center justify-between px-6 lg:px-12">
-        {/* Logo / Name */}
         <a
           href="#hero"
           onClick={(e) => handleNavClick(e, "#hero")}
@@ -83,7 +79,6 @@ export default function Navbar() {
           <span className="text-signal" style={{ textShadow: "0 0 12px rgba(240,160,0,0.6)" }}>D</span>NB
         </a>
 
-        {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
             <a

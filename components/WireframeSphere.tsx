@@ -2,10 +2,6 @@
 import { useRef, useEffect } from "react";
 import { prefersReducedMotion } from "@/lib/animations";
 
-// ── Rotating 3D wireframe globe ──────────────────────────────────────────────
-// Inspired by the central spinning world of messenger.abeto.co.
-// Pure Canvas 2D — latitude/longitude lines with depth-based alpha fade.
-// ─────────────────────────────────────────────────────────────────────────────
 
 const SIG: [number, number, number] = [57, 255, 136];
 const LAT = 14;
@@ -39,18 +35,15 @@ export default function WireframeSphere({ size = 500 }: { size?: number }) {
     }
 
     function project(x: number, y: number, z: number): V3 {
-      // Y-axis rotation
       const ca = Math.cos(angleY);
       const sa = Math.sin(angleY);
       const rx = x * ca - z * sa;
       const rz = x * sa + z * ca;
-      // Slight X-axis tilt
       const tilt = 0.28;
       const ct = Math.cos(tilt);
       const st = Math.sin(tilt);
       const ry2 = y * ct - rz * st;
       const rz2 = y * st + rz * ct;
-      // Near-orthographic (long focal length = minimal distortion)
       const fov = size * 3;
       const s = fov / (fov + rz2 * 0.5);
       return [cx + rx * s, cy - ry2 * s, rz2];
@@ -70,7 +63,6 @@ export default function WireframeSphere({ size = 500 }: { size?: number }) {
       ctx.clearRect(0, 0, size, size);
       ctx.lineWidth = 0.8;
 
-      // Latitude circles
       for (let i = 1; i < LAT; i++) {
         const phi = (i / LAT) * Math.PI;
         const pts: V3[] = [];
@@ -83,7 +75,6 @@ export default function WireframeSphere({ size = 500 }: { size?: number }) {
         }
       }
 
-      // Longitude lines
       for (let j = 0; j < LON; j++) {
         const theta = (j / LON) * Math.PI * 2;
         const pts: V3[] = [];
@@ -96,7 +87,6 @@ export default function WireframeSphere({ size = 500 }: { size?: number }) {
         }
       }
 
-      // Glowing intersection dots on the equator
       for (let j = 0; j < LON; j++) {
         const theta = (j / LON) * Math.PI * 2;
         const [px, py, pz] = project(R * Math.cos(theta), 0, R * Math.sin(theta));

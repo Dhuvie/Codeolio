@@ -53,10 +53,8 @@ export default function MagneticButton({
 
   const renderContent = () => (
     <>
-      {/* ── 1. Deep Tech Base ── */}
       <span className="absolute inset-0 rounded-full bg-[#080808] border border-signal/20 transition-colors duration-300 md:group-hover:border-signal/80 z-0" />
 
-      {/* ── 2. Laser Grid Background ── */}
       <span 
         className="absolute inset-0 rounded-full z-0 opacity-10 md:group-hover:opacity-40 transition-opacity duration-500 mix-blend-screen"
         style={{
@@ -65,7 +63,6 @@ export default function MagneticButton({
         }}
       />
 
-      {/* ── 3. Plasma Glow Core ── */}
       <span 
         className="absolute inset-0 opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 z-0 mix-blend-screen"
         style={{
@@ -75,12 +72,10 @@ export default function MagneticButton({
         }}
       />
 
-      {/* ── 4. Cybernetic Scanline (Animated across) ── */}
       <span className="absolute inset-0 z-0 overflow-hidden rounded-full">
         <span className="absolute top-0 bottom-0 left-0 w-[200%] h-full bg-gradient-to-r from-transparent via-signal/30 to-transparent -translate-x-full md:group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
       </span>
 
-      {/* ── 5. Text Content (3D Roll with aggressive glow) ── */}
       <span className="relative z-20 flex items-center gap-2 overflow-hidden h-full drop-shadow-[0_0_8px_rgba(240,160,0,1.0)]">
         <span className="flex flex-col transition-transform duration-500 md:group-hover:-translate-y-full">
           <span className="flex items-center justify-center gap-2 h-full">{children}</span>

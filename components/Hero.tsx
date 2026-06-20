@@ -7,7 +7,6 @@ import MagneticButton from "./MagneticButton";
 import TextDecoder from "./TextDecoder";
 
 
-// Roles for typing animation
 const ROLES = [
   "Full-Stack Engineer",
   "AI/ML Builder",
@@ -24,13 +23,11 @@ export default function Hero() {
   const hudBottomRef = useRef<HTMLDivElement>(null);
   const typeRef = useRef<HTMLSpanElement>(null);
 
-  // Typing animation state
   const [roleIndex, setRoleIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [displayedRole, setDisplayedRole] = useState("");
 
-  // Typing effect
   useEffect(() => {
     const currentRole = ROLES[roleIndex];
     let timeout: NodeJS.Timeout;
@@ -39,7 +36,6 @@ export default function Hero() {
       setDisplayedRole(currentRole.slice(0, charIndex));
       timeout = setTimeout(() => setCharIndex((c) => c + 1), 60 + Math.random() * 40);
     } else if (!isDeleting && charIndex > currentRole.length) {
-      // Pause at end
       timeout = setTimeout(() => setIsDeleting(true), 2200);
     } else if (isDeleting && charIndex > 0) {
       setDisplayedRole(currentRole.slice(0, charIndex - 1));
@@ -52,7 +48,6 @@ export default function Hero() {
     return () => clearTimeout(timeout);
   }, [charIndex, isDeleting, roleIndex]);
 
-  // Background scroll fade-out
   const bgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -60,7 +55,6 @@ export default function Hero() {
 
     const tl = createHeroIntro(contentRef.current);
 
-    // Fade and sink the entire hero background smoothly on scroll
     let bgSt: ScrollTrigger | undefined;
     if (bgRef.current && !prefersReducedMotion()) {
       bgSt = ScrollTrigger.create({
@@ -76,7 +70,6 @@ export default function Hero() {
       });
     }
 
-    // Animate stats in — staggered counter-like entrance
     if (statsRef.current && !prefersReducedMotion()) {
       const statItems = statsRef.current.querySelectorAll(".hero-stat");
       gsap.fromTo(
@@ -94,7 +87,6 @@ export default function Hero() {
       );
     }
 
-    // Slow rotating decorative ring
     if (decorRingRef.current && !prefersReducedMotion()) {
       gsap.to(decorRingRef.current, {
         rotation: 360,
@@ -104,7 +96,6 @@ export default function Hero() {
       });
     }
 
-    // Parallax depth on HUD corners
     if (!prefersReducedMotion()) {
       const parallaxElements = [hudTopRef.current, hudBottomRef.current, decorRingRef.current].filter(Boolean);
       parallaxElements.forEach((el, i) => {
@@ -121,7 +112,6 @@ export default function Hero() {
       });
     }
 
-    // Removed Hero pinning to ensure the seamless infinite scroll loop works perfectly without overlapping the Contact section.
 
     return () => {
       tl.kill();
@@ -135,12 +125,9 @@ export default function Hero() {
       id="hero"
       className="relative min-h-screen flex items-center overflow-hidden"
     >
-      {/* BACKGROUND WRAPPER (fades out completely to avoid any hard horizontal line when scrolling) */}
       <div ref={bgRef} className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-        {/* Grid dot background - Hidden on mobile because rendering a full-screen alpha texture over WebGL destroys mobile GPU fill-rate */}
         <div className="hidden md:block absolute inset-0 grid-dots opacity-20 pointer-events-none" />
 
-        {/* Cinematic left-to-right vignette (Lighter/Simpler on mobile) */}
         <div
           className="absolute inset-0 pointer-events-none hidden md:block"
           style={{
@@ -148,7 +135,6 @@ export default function Hero() {
               "linear-gradient(108deg, rgba(13,11,8,0.94) 0%, rgba(13,11,8,0.78) 32%, rgba(13,11,8,0.28) 62%, rgba(13,11,8,0.08) 100%)",
           }}
         />
-        {/* Simpler, faster gradient for mobile to keep text readable without lagging WebGL */}
         <div
           className="absolute inset-0 pointer-events-none md:hidden"
           style={{
@@ -157,7 +143,6 @@ export default function Hero() {
         />
       </div>
 
-      {/* Decorative rotating ring (top-right corner) */}
       <div
         ref={decorRingRef}
         className="absolute top-16 right-8 lg:right-24 w-48 h-48 pointer-events-none opacity-20"
@@ -176,7 +161,6 @@ export default function Hero() {
         </svg>
       </div>
 
-      {/* HUD corners -- kprverse.com inspired */}
       <div ref={hudTopRef} className="absolute top-0 left-0 w-44 h-44 pointer-events-none" aria-hidden="true" style={{ opacity: 0.35 }}>
         <svg viewBox="0 0 176 176" fill="none" className="w-full h-full">
           <path d="M0 70 L0 0 L70 0" stroke="#f0a000" strokeWidth="1.5" fill="none" />
@@ -187,13 +171,11 @@ export default function Hero() {
           <div>DHRUV.V3</div>
         </div>
       </div>
-      {/* HUD corner -- bottom right */}
       <div ref={hudBottomRef} className="absolute bottom-0 right-0 w-32 h-32 pointer-events-none" aria-hidden="true" style={{ opacity: 0.25 }}>
         <svg viewBox="0 0 128 128" fill="none" className="w-full h-full">
           <path d="M128 58 L128 128 L58 128" stroke="#f0a000" strokeWidth="1" fill="none" />
         </svg>
       </div>
-      {/* kprverse-style system log -- top of section */}
       <div
         className="absolute top-0 left-0 right-0 pointer-events-none overflow-hidden"
         style={{ paddingTop: "calc(var(--nav-height) + 0.5rem)" }}
@@ -203,17 +185,14 @@ export default function Hero() {
           className="font-mono text-signal/30 px-6 whitespace-nowrap"
           style={{ fontSize: "9px", letterSpacing: "0.12em", animation: "marquee 30s linear infinite" }}
         >
-          // sys.online / portfolio.v3 / projects.ready / contact.active / build.9vw / stack.fullstack / ai.ml / systems.kernel&nbsp;&nbsp;&nbsp;&nbsp;// sys.online / portfolio.v3 / projects.ready / contact.active / build.9vw / stack.fullstack / ai.ml / systems.kernel
         </div>
       </div>
 
-      {/* Content */}
       <div
         ref={contentRef}
         className="relative z-10 section-container hero-content-container"
         style={{ paddingTop: "calc(var(--nav-height) + 2rem)" }}
       >
-        {/* Status indicator */}
         <div className="hero-subtext flex items-center gap-3 mb-4">
           <span className="relative flex h-2.5 w-2.5">
             <span className="ping-ripple absolute inline-flex h-full w-full rounded-full bg-signal" />
@@ -225,7 +204,6 @@ export default function Hero() {
           </span>
         </div>
 
-        {/* Name — original coordinate labels and TextDecoder */}
         <h1
           className="font-display font-bold mb-6 relative z-20"
           style={{
@@ -234,7 +212,6 @@ export default function Hero() {
             letterSpacing: "-0.03em",
           }}
         >
-          {/* kprverse-inspired: numbered coordinate labels per line */}
           <div className="flex items-end gap-3">
             <span className="font-mono text-signal/40 mb-2 shrink-0" style={{ fontSize: "9px", letterSpacing: "0.12em" }}>01</span>
             <TextDecoder text="Dhruv" className="block text-ink" />
@@ -245,31 +222,28 @@ export default function Hero() {
           </div>
           <div className="flex items-end gap-3">
             <span className="font-mono text-signal/40 mb-2 shrink-0" style={{ fontSize: "9px", letterSpacing: "0.12em" }}>03</span>
-            <div className="flex">
-              <TextDecoder text="Baj" className="block" />
-              {/* "a" -- glowing gradient green, the hidden "ai" easter egg */}
-              <span
-                className="char inline-block gradient-text-animated md:drop-shadow-[0_0_18px_rgba(240,160,0,0.8)] md:drop-shadow-[0_0_40px_rgba(240,160,0,0.4)]"
-              >a</span>
-              <TextDecoder text="j" className="block text-ink" />
+            <div className="flex items-baseline">
+              <TextDecoder text="Baj" className="text-ink" />
+              <TextDecoder 
+                text="a" 
+                className="gradient-text-animated drop-shadow-[0_0_18px_rgba(240,160,0,0.8)] drop-shadow-[0_0_40px_rgba(240,160,0,0.4)]" 
+              />
+              <TextDecoder text="j" className="text-ink" />
             </div>
           </div>
         </h1>
 
-        {/* Tagline — typing animation with role cycling */}
         <div className="hero-subtext font-util text-sm md:text-base tracking-wider text-muted mb-6 max-w-2xl h-7">
           <span ref={typeRef} className="text-ink typewriter-cursor">
             {displayedRole}
           </span>
         </div>
 
-        {/* One-liner */}
-        <p className="hero-subtext text-muted max-w-xl mb-12 leading-relaxed lg:ml-24 font-body opacity-80" style={{ fontSize: "var(--font-size-body)" }}>
-          I turn ideas into production-grade architectures — from kernel-level tools
+        <p className="hero-subtext text-glow-ambient max-w-xl mb-12 leading-relaxed lg:ml-24 font-body" style={{ fontSize: "var(--font-size-body)" }}>
+          I turn ideas into production-grade architectures - from kernel-level tools
           and real-time OpenGL engines to scalable AI platforms serving real users.
         </p>
 
-        {/* CTAs */}
         <div className="hero-subtext flex flex-wrap gap-4 mb-14">
           <div data-cursor-text="VIEW" className="btn-primary-glow rounded-full">
             <MagneticButton href="#projects" variant="primary">

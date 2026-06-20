@@ -55,7 +55,6 @@ export default function SpotlightCard({ children, className = "", maxDeg = 5, st
         className={`relative rounded-xl h-full card-glass-ultra noise-overlay ${className}`}
         style={style}
       >
-        {/* Warm amber spotlight — matches signal palette */}
         <div
           className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 z-10"
           style={{

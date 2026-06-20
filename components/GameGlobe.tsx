@@ -1,12 +1,6 @@
 ﻿"use client";
 import { useRef, useEffect } from "react";
 
-// -- GameGlobe ----------------------------------------------------------------
-// A 3D rotating planet rendered in Canvas 2D.
-// Cell-shaded surface (amber continents / deep teal oceans / ice poles),
-// diffuse lighting, atmosphere halo, orbit ring, tiny surface structures.
-// Directly inspired by the game-world globe of messenger.abeto.co.
-// -----------------------------------------------------------------------------
 
 const LAT_SEGS = 20;
 const LON_SEGS = 32;
@@ -14,21 +8,17 @@ const LON_SEGS = 32;
 type V3 = [number, number, number];
 type V2 = [number, number];
 
-// ── Surface color based on lat/lon (procedural continent map) ─────────────────
 function surfaceRGB(lat: number, lon: number): V3 {
   const absLat = Math.abs(lat);
 
-  // Polar ice caps
   if (absLat > 1.25) return [242, 238, 222];
 
-  // Pseudo-noise: creates blob-shaped continents
   const n =
     Math.sin(lat * 3.8 + 0.4) * Math.cos(lon * 2.7 - 0.9) * 0.50 +
     Math.sin(lat * 2.0 - lon * 3.2 + 1.1) * 0.30 +
     Math.cos(lat * 5.5 + lon * 1.8 - 0.7) * 0.20;
 
   if (n > 0.08) {
-    // Land: warm amber / desert
     const h = Math.min(1, (n - 0.08) / 0.60);
     return [
       Math.floor(148 + h * 92),   // r: 148-240
@@ -36,46 +26,38 @@ function surfaceRGB(lat: number, lon: number): V3 {
       Math.floor(h * 12),          // b: 0-12
     ];
   } else if (n > -0.45) {
-    // Ocean: deep blue-teal (game-sea color)
     return [14, 44, 68];
   } else {
-    // Deep trench
     return [7, 24, 40];
   }
 }
 
-// ── Diffuse lighting (sun at upper-right) ─────────────────────────────────────
 const LIGHT: V3 = [0.50, 0.35, 0.80]; // pre-normalized
 function shade(n: V3): number {
   return Math.max(0.22, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]);
 }
 
-// ── Rotate around Y ───────────────────────────────────────────────────────────
 function rotY(p: V3, a: number): V3 {
   const ca = Math.cos(a), sa = Math.sin(a);
   return [p[0] * ca - p[2] * sa, p[1], p[0] * sa + p[2] * ca];
 }
 
-// ── Sphere point ──────────────────────────────────────────────────────────────
 function sph(lat: number, lon: number): V3 {
   return [Math.cos(lat) * Math.cos(lon), Math.sin(lat), Math.cos(lat) * Math.sin(lon)];
 }
 
-// ── Near-orthographic project ──────────────────────────────────────────────────
 function proj(p: V3, R: number, cx: number, cy: number): V2 {
   const fov = R * 5;
   const s = fov / (fov + p[2] * R * 0.12);
   return [cx + p[0] * R * s, cy - p[1] * R * s];
 }
 
-// ── Building positions (lat, lon) at likely "land" tiles ──────────────────────
 const STRUCTS: [number, number][] = [
   [ 0.32,  0.78], [-0.18,  2.10], [ 0.51,  3.48], [ 0.08,  5.20],
   [ 0.70,  1.30], [-0.40,  4.02], [ 0.22,  0.20], [-0.28,  2.82],
   [ 0.44,  4.90], [-0.55,  1.60], [ 0.15,  5.80], [ 0.62,  3.10],
 ];
 
-// ── Stable star field (generated once at module level) ────────────────────────
 const STARS = Array.from({ length: 220 }, () => ({
   x: Math.random(), y: Math.random(),
   r: 0.25 + Math.random() * 1.1,
@@ -109,7 +91,6 @@ export default function GameGlobe() {
       const cx = W * 0.52;   // slightly right of center
       const cy = H * 0.50;
 
-      // ── Stars ───────────────────────────────────────────────────────────────
       for (const s of STARS) {
         ctx.fillStyle = `rgba(255,235,195,${s.a.toFixed(2)})`;
         ctx.beginPath();
@@ -117,7 +98,6 @@ export default function GameGlobe() {
         ctx.fill();
       }
 
-      // ── Build and sort surface quads ─────────────────────────────────────────
       type Quad = { pts: V2[]; z: number; r: number; g: number; b: number };
       const quads: Quad[] = [];
 
@@ -163,7 +143,6 @@ export default function GameGlobe() {
         ctx.fill();
       }
 
-      // ── Surface grid lines (very subtle) ─────────────────────────────────────
       ctx.strokeStyle = "rgba(0,0,0,0.15)";
       ctx.lineWidth = 0.4;
       for (const q of quads) {
@@ -174,7 +153,6 @@ export default function GameGlobe() {
         ctx.stroke();
       }
 
-      // ── Structures (tiny buildings on land tiles) ────────────────────────────
       for (const [lat, lon] of STRUCTS) {
         const p = rotY(sph(lat, lon), angle);
         if (p[2] < 0.1) continue;
@@ -184,13 +162,10 @@ export default function GameGlobe() {
         const sz      = R * 0.022 * depth;
         const bright  = Math.floor(200 + depth * 55);
 
-        // Tower body
         ctx.fillStyle = `rgb(${bright},${Math.floor(bright * 0.55)},0)`;
         ctx.fillRect(bx - sz * 0.7, by - sz * 2.4, sz * 1.4, sz * 2.4);
-        // Roof / top accent (bright signal)
         ctx.fillStyle = `rgb(255,${Math.floor(bright * 0.85)},80)`;
         ctx.fillRect(bx - sz * 0.9, by - sz * 2.8, sz * 1.8, sz * 0.5);
-        // Antenna
         ctx.strokeStyle = `rgba(255,200,80,${(depth * 0.9).toFixed(2)})`;
         ctx.lineWidth = sz * 0.25;
         ctx.beginPath();
@@ -199,7 +174,6 @@ export default function GameGlobe() {
         ctx.stroke();
       }
 
-      // ── Orbit ring ───────────────────────────────────────────────────────────
       ctx.save();
       ctx.strokeStyle = "rgba(240,160,0,0.40)";
       ctx.lineWidth = 1.5;
@@ -207,7 +181,6 @@ export default function GameGlobe() {
       ctx.beginPath();
       ctx.ellipse(cx, cy, R * 1.52, R * 0.30, 0.08, 0, Math.PI * 2);
       ctx.stroke();
-      // Orbit dot
       const dotAngle = angle * 0.6;
       const dotX = cx + Math.cos(dotAngle) * R * 1.52;
       const dotY = cy + Math.sin(dotAngle) * R * 0.30 * Math.cos(0.08) + Math.cos(dotAngle) * R * 0.30 * Math.sin(0.08);
@@ -218,7 +191,6 @@ export default function GameGlobe() {
       ctx.fill();
       ctx.restore();
 
-      // ── Atmosphere halo ───────────────────────────────────────────────────────
       const atmo = ctx.createRadialGradient(cx, cy, R * 0.94, cx, cy, R * 1.22);
       atmo.addColorStop(0,   "rgba(240,130,20,0.22)");
       atmo.addColorStop(0.5, "rgba(220,80,10,0.09)");
@@ -228,7 +200,6 @@ export default function GameGlobe() {
       ctx.arc(cx, cy, R * 1.22, 0, Math.PI * 2);
       ctx.fill();
 
-      // ── Specular glint (sun catch on upper-right edge) ────────────────────────
       const gx = cx + R * 0.30;
       const gy = cy - R * 0.28;
       const spec = ctx.createRadialGradient(gx, gy, 0, gx, gy, R * 0.45);

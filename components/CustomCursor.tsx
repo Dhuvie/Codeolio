@@ -4,19 +4,18 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { prefersReducedMotion } from "@/lib/animations";
 
-const DOT_COUNT = 6;
+const TAIL_LENGTH = 20;
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const dotsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const linesRef = useRef<(SVGLineElement | null)[]>([]);
   
-  // State for fluid physics
   const mouse = useRef({ x: -1000, y: -1000 });
-  const dotsState = useRef(Array(DOT_COUNT).fill(null).map(() => ({ x: -1000, y: -1000 })));
+  const dotsState = useRef(Array(TAIL_LENGTH).fill(null).map(() => ({ x: -1000, y: -1000 })));
   const isHovering = useRef(false);
 
   useEffect(() => {
-    if (!cursorRef.current || dotsRef.current.length === 0) return;
+    if (!cursorRef.current || linesRef.current.length === 0) return;
     if (prefersReducedMotion() || window.matchMedia("(pointer: coarse)").matches) {
       cursorRef.current.style.display = "none";
       return;
@@ -31,7 +30,7 @@ export default function CustomCursor() {
       const target = e.target as HTMLElement;
 
       if (target.closest("#certifications")) {
-        gsap.to(dotsRef.current, { scale: 0, opacity: 0, duration: 0.2 });
+        gsap.to(cursorRef.current, { scale: 0, opacity: 0, duration: 0.2 });
         return;
       }
 
@@ -42,18 +41,15 @@ export default function CustomCursor() {
         target.classList.contains("cursor-grab")
       ) {
         isHovering.current = true;
-        gsap.to(dotsRef.current, { scale: 2.5, backgroundColor: "rgba(240, 160, 0, 0.4)", duration: 0.3, stagger: 0.02, ease: "power3.out" });
+        gsap.to(cursorRef.current, { scale: 3, backgroundColor: "rgba(240, 160, 0, 0.4)", duration: 0.3, ease: "power3.out" });
       } else {
         isHovering.current = false;
-        gsap.to(dotsRef.current, { scale: 1, backgroundColor: "var(--signal)", duration: 0.3, stagger: 0.02, ease: "power3.out" });
-        dotsRef.current.forEach((dot, index) => {
-           if (dot) gsap.to(dot, { opacity: 1 - index * 0.15, duration: 0.3 });
-        });
+        gsap.to(cursorRef.current, { scale: 1, backgroundColor: "var(--signal)", duration: 0.3, ease: "power3.out", opacity: 1 });
       }
     };
 
-    const onMouseDown = () => gsap.to(dotsRef.current, { scale: 0.5, duration: 0.15 });
-    const onMouseUp = () => gsap.to(dotsRef.current, { scale: 1, duration: 0.4, ease: "bounce.out" });
+    const onMouseDown = () => gsap.to(cursorRef.current, { scale: 0.5, duration: 0.15 });
+    const onMouseUp = () => gsap.to(cursorRef.current, { scale: isHovering.current ? 3 : 1, duration: 0.4, ease: "bounce.out" });
 
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseover", onMouseHover);
@@ -65,29 +61,29 @@ export default function CustomCursor() {
     style.innerHTML = `* { cursor: none !important; }`;
     document.head.appendChild(style);
 
-    // Buttery Smooth Physics Loop
     let animationFrameId: number;
     const render = () => {
-      // The head dot exactly follows the mouse
       dotsState.current[0].x = mouse.current.x;
       dotsState.current[0].y = mouse.current.y;
 
-      // The rest of the dots mathematically lerp towards the dot in front of them
-      for (let i = 1; i < DOT_COUNT; i++) {
-        // If hovering, they all snap directly to the center for the "orb" effect
+      for (let i = 1; i < TAIL_LENGTH; i++) {
         const targetX = isHovering.current ? dotsState.current[0].x : dotsState.current[i - 1].x;
         const targetY = isHovering.current ? dotsState.current[0].y : dotsState.current[i - 1].y;
         
-        // Lower lerp factor = more fluid/draggy. Higher = stiff string.
-        dotsState.current[i].x += (targetX - dotsState.current[i].x) * 0.4;
-        dotsState.current[i].y += (targetY - dotsState.current[i].y) * 0.4;
+        dotsState.current[i].x += (targetX - dotsState.current[i].x) * 0.45;
+        dotsState.current[i].y += (targetY - dotsState.current[i].y) * 0.45;
       }
 
-      // Apply to DOM
-      dotsRef.current.forEach((dot, i) => {
-        if (dot) {
-          // -50% translate is handled by margin in the style below, so we just set Left/Top
-          dot.style.transform = `translate3d(${dotsState.current[i].x}px, ${dotsState.current[i].y}px, 0)`;
+      if (cursorRef.current) {
+         cursorRef.current.style.transform = `translate3d(${mouse.current.x}px, ${mouse.current.y}px, 0)`;
+      }
+
+      linesRef.current.forEach((line, i) => {
+        if (line) {
+          line.setAttribute("x1", dotsState.current[i].x.toString());
+          line.setAttribute("y1", dotsState.current[i].y.toString());
+          line.setAttribute("x2", dotsState.current[i + 1].x.toString());
+          line.setAttribute("y2", dotsState.current[i + 1].y.toString());
         }
       });
 
@@ -107,27 +103,34 @@ export default function CustomCursor() {
   }, []);
 
   return (
-    <div ref={cursorRef} className="fixed inset-0 pointer-events-none z-[9999] hidden md:block mix-blend-difference">
-      {[...Array(DOT_COUNT)].map((_, i) => {
-        const size = 12 - i * 1.5;
-        const opacity = 1 - i * 0.15;
-        
-        return (
-          <div 
-            key={i}
-            ref={(el) => { dotsRef.current[i] = el; }}
-            className="absolute top-0 left-0 rounded-full bg-signal shadow-[0_0_10px_rgba(240,160,0,0.8)]"
-            style={{ 
-              width: `${size}px`, 
-              height: `${size}px`,
-              opacity,
-              willChange: "transform",
-              marginLeft: `-${size / 2}px`,
-              marginTop: `-${size / 2}px`
-            }}
-          />
-        );
-      })}
-    </div>
+    <>
+      <svg className="fixed inset-0 pointer-events-none z-[9998] hidden md:block mix-blend-difference w-full h-full">
+        {[...Array(TAIL_LENGTH - 1)].map((_, i) => {
+          // Taper the width from 8px at the head down to 0 at the tail
+          const strokeWidth = 8 * (1 - i / (TAIL_LENGTH - 1));
+          const opacity = 1 - (i / (TAIL_LENGTH - 1));
+          
+          return (
+            <line
+              key={i}
+              ref={(el) => { linesRef.current[i] = el; }}
+              stroke="var(--signal)"
+              strokeWidth={Math.max(0.5, strokeWidth)}
+              strokeLinecap="round"
+              opacity={opacity}
+            />
+          );
+        })}
+      </svg>
+      <div 
+        ref={cursorRef} 
+        className="fixed top-0 left-0 w-3 h-3 rounded-full bg-signal shadow-[0_0_12px_rgba(240,160,0,0.8)] pointer-events-none z-[9999] hidden md:block mix-blend-difference"
+        style={{ 
+          marginLeft: '-6px', 
+          marginTop: '-6px',
+          willChange: 'transform'
+        }} 
+      />
+    </>
   );
 }

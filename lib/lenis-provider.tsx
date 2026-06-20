@@ -18,7 +18,6 @@ export function LenisProvider({ children }: { children: ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    // Skip if reduced motion is preferred
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const lenis = new Lenis({
@@ -30,15 +29,12 @@ export function LenisProvider({ children }: { children: ReactNode }) {
 
     lenisRef.current = lenis;
 
-    // Sync Lenis with GSAP ScrollTrigger
     lenis.on("scroll", ScrollTrigger.update);
 
-    // Use GSAP ticker for Lenis RAF loop
     const tickerCallback = (time: number) => {
       lenis.raf(time * 1000);
     };
 
-    // We need to add a GSAP ticker listener
     const gsapModule = require("gsap").gsap;
     gsapModule.ticker.add(tickerCallback);
     gsapModule.ticker.lagSmoothing(0);

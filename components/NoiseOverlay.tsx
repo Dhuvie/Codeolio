@@ -25,7 +25,6 @@ export default function NoiseOverlay() {
     window.addEventListener("resize", resize);
     resize();
 
-    // Create a noise pattern offscreen for better performance
     const patternCanvas = document.createElement("canvas");
     patternCanvas.width = 128;
     patternCanvas.height = 128;
@@ -34,11 +33,9 @@ export default function NoiseOverlay() {
     const render = () => {
       if (!pCtx) return;
 
-      // Generate noise on small canvas
       const imgData = pCtx.createImageData(128, 128);
       const data = imgData.data;
       for (let i = 0; i < data.length; i += 4) {
-        // Subtle grey noise
         const color = Math.floor(Math.random() * 255);
         data[i] = color;
         data[i + 1] = color;
@@ -47,17 +44,14 @@ export default function NoiseOverlay() {
       }
       pCtx.putImageData(imgData, 0, 0);
 
-      // Draw random offset to main canvas
       ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = ctx.createPattern(patternCanvas, "repeat") as CanvasPattern;
       
-      // Randomly offset the pattern to create flicker
       ctx.save();
       ctx.translate(Math.random() * 128, Math.random() * 128);
       ctx.fillRect(-128, -128, width + 256, height + 256);
       ctx.restore();
 
-      // Only run every ~3 frames (20fps) to save battery and look like film
       setTimeout(() => {
         animationFrameId = requestAnimationFrame(render);
       }, 50);

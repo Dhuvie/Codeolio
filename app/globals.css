@@ -355,6 +355,19 @@ h1, h2, h3, h4 {
   }
 }
 
+/* ===================================================
+   AMBIENT TEXT GLOW — High Contrast Readability
+   =================================================== */
+.text-glow-ambient {
+  color: rgba(240, 232, 208, 0.95); /* Bright ink color */
+  text-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.95),
+    0 4px 16px rgba(0, 0, 0, 0.8),
+    0 12px 32px rgba(0, 0, 0, 0.6);
+  position: relative;
+  z-index: 10;
+}
+
 /* Shimmer across a surface */
 @keyframes shimmer {
   0%   { transform: translateX(-100%); }

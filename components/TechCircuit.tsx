@@ -4,7 +4,6 @@ import { useRef, useEffect } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap-register";
 import { prefersReducedMotion } from "@/lib/animations";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 interface Pt { x: number; y: number }
 
 interface TraceSegment {
@@ -21,7 +20,6 @@ interface Block {
   appearAt: number;       // scroll progress to pop in
 }
 
-// ─── Static layout (relative coords) ─────────────────────────────────────────
 const BLOCKS: Block[] = [
   { rx: 0.50, ry: 0.50, w: 120, h: 56, label: "AI CORE",   sub: "Gemini · Genkit",   appearAt: 0.42 },
   { rx: 0.20, ry: 0.50, w: 104, h: 44, label: "SYSTEMS",   sub: "C++ · OpenGL · C",  appearAt: 0.16 },
@@ -34,43 +32,28 @@ const BLOCKS: Block[] = [
   { rx: 0.80, ry: 0.78, w: 94,  h: 40, label: "EDGE",      sub: "Cloudflare · CDN",  appearAt: 0.36 },
 ];
 
-// Build traces between block centres (routing computed at render time).
-// Defined as pairs of block indices + optional horizontal/vertical waypoint.
 const TRACE_DEFS: { from: number; to: number; startAt: number; endAt: number }[] = [
-  // Spine: SYSTEMS ↔ AI CORE ↔ WEB
   { from: 1, to: 0, startAt: 0.05, endAt: 0.22 },
   { from: 0, to: 2, startAt: 0.05, endAt: 0.22 },
-  // Vertical: ML ↔ AI CORE ↔ DATA
   { from: 3, to: 0, startAt: 0.14, endAt: 0.30 },
   { from: 0, to: 4, startAt: 0.14, endAt: 0.30 },
-  // GRAPHICS ↔ SYSTEMS
   { from: 5, to: 1, startAt: 0.22, endAt: 0.34 },
-  // GRAPHICS ↔ ML
   { from: 5, to: 3, startAt: 0.25, endAt: 0.36 },
-  // DEVOPS ↔ WEB
   { from: 6, to: 2, startAt: 0.22, endAt: 0.34 },
-  // DEVOPS ↔ ML
   { from: 6, to: 3, startAt: 0.25, endAt: 0.36 },
-  // SECURITY ↔ SYSTEMS
   { from: 7, to: 1, startAt: 0.28, endAt: 0.40 },
-  // SECURITY ↔ DATA
   { from: 7, to: 4, startAt: 0.30, endAt: 0.42 },
-  // EDGE ↔ WEB
   { from: 8, to: 2, startAt: 0.28, endAt: 0.40 },
-  // EDGE ↔ DATA
   { from: 8, to: 4, startAt: 0.30, endAt: 0.42 },
 ];
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
 
 function buildTrace(p1: Pt, p2: Pt): Pt[] {
-  // Right-angle routing: go horizontal first, then vertical
   const mid: Pt = { x: p2.x, y: p1.y };
   return [p1, mid, p2];
 }
 
-/** Draw a polyline up to `progress` fraction of its total length */
 function strokePolylinePartial(
   ctx: CanvasRenderingContext2D,
   pts: Pt[],
@@ -78,7 +61,6 @@ function strokePolylinePartial(
 ) {
   if (pts.length < 2 || progress <= 0) return;
 
-  // Compute total length
   let total = 0;
   const segs: number[] = [];
   for (let i = 1; i < pts.length; i++) {
@@ -128,7 +110,6 @@ function roundRect(
   ctx.closePath();
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
 export default function TechCircuit() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -145,7 +126,6 @@ export default function TechCircuit() {
     let time = 0;
     let animId = 0;
 
-    // ── Precomputed geometry (rebuilt on resize) ─────────────────────────────
     let blockPx: Pt[] = [];       // center of each block in px
     let traces: TraceSegment[] = [];
 
@@ -167,7 +147,6 @@ export default function TechCircuit() {
     resize();
     window.addEventListener("resize", resize);
 
-    // ── ScrollTrigger ────────────────────────────────────────────────────────
     const st = ScrollTrigger.create({
       trigger: document.documentElement,
       start: "top top",
@@ -175,15 +154,12 @@ export default function TechCircuit() {
       onUpdate: (s) => { progress = s.progress; },
     });
 
-    // ── Signal pulses per trace ───────────────────────────────────────────────
     const pulseOffsets = TRACE_DEFS.map((_, i) => i * 0.13);
 
-    // ── Render ────────────────────────────────────────────────────────────────
     const render = () => {
       time += 0.012;
       ctx.clearRect(0, 0, W, H);
 
-      // ── 1. Background grid (fades in first) ─────────────────────────────────
       const gridAlpha = Math.min(1, progress / 0.05) * 0.04;
       if (gridAlpha > 0) {
         ctx.strokeStyle = `rgba(240,160,0,${gridAlpha})`;
@@ -197,27 +173,23 @@ export default function TechCircuit() {
         }
       }
 
-      // ── 2. Traces drawing in ─────────────────────────────────────────────────
       traces.forEach((trace) => {
         if (progress < trace.startAt) return;
 
         const tp = Math.min(1, (progress - trace.startAt) / (trace.endAt - trace.startAt));
 
-        // Outer glow
         ctx.shadowBlur = 10;
         ctx.shadowColor = "rgba(240,160,0,0.5)";
         ctx.strokeStyle = "rgba(240,160,0,0.55)";
         ctx.lineWidth = 1.5;
         strokePolylinePartial(ctx, trace.pts, tp);
 
-        // Bright core
         ctx.shadowBlur = 4;
         ctx.strokeStyle = "rgba(240,160,0,0.9)";
         ctx.lineWidth = 0.8;
         strokePolylinePartial(ctx, trace.pts, tp);
         ctx.shadowBlur = 0;
 
-        // Nodes at endpoints
         [trace.pts[0], trace.pts[trace.pts.length - 1]].forEach((pt, ni) => {
           if (ni === 1 && tp < 1) return;
           ctx.beginPath();
@@ -230,14 +202,12 @@ export default function TechCircuit() {
         });
       });
 
-      // ── 3. Signal pulses (after 50% scroll) ──────────────────────────────────
       if (progress > 0.50) {
         const pulseAlpha = Math.min(1, (progress - 0.50) / 0.12);
 
         traces.forEach((trace, ti) => {
           if (progress < trace.endAt) return; // only on completed traces
 
-          // Compute total trace length
           let total = 0;
           for (let i = 1; i < trace.pts.length; i++) {
             total += Math.hypot(
@@ -265,7 +235,6 @@ export default function TechCircuit() {
             drawn += segLen;
           }
 
-          // Pulse glow
           const grad = ctx.createRadialGradient(px, py, 0, px, py, 8);
           grad.addColorStop(0, `rgba(240,160,0,${0.9 * pulseAlpha})`);
           grad.addColorStop(1, `rgba(240,160,0,0)`);
@@ -284,7 +253,6 @@ export default function TechCircuit() {
         });
       }
 
-      // ── 4. Block boxes ────────────────────────────────────────────────────────
       BLOCKS.forEach((blk, bi) => {
         if (progress < blk.appearAt) return;
 
@@ -294,7 +262,6 @@ export default function TechCircuit() {
 
         ctx.globalAlpha = fadeT;
 
-        // Animated corner brackets instead of a full box — more technical looking
         const bSize = 10, bGap = 0;
         const x0 = x - bGap, y0 = y - bGap;
         const x1 = x + blk.w + bGap, y1 = y + blk.h + bGap;
@@ -304,30 +271,23 @@ export default function TechCircuit() {
         ctx.shadowBlur = 6;
         ctx.shadowColor = "rgba(240,160,0,0.5)";
 
-        // TL
         ctx.beginPath(); ctx.moveTo(x0 + bSize, y0); ctx.lineTo(x0, y0); ctx.lineTo(x0, y0 + bSize); ctx.stroke();
-        // TR
         ctx.beginPath(); ctx.moveTo(x1 - bSize, y0); ctx.lineTo(x1, y0); ctx.lineTo(x1, y0 + bSize); ctx.stroke();
-        // BL
         ctx.beginPath(); ctx.moveTo(x0 + bSize, y1); ctx.lineTo(x0, y1); ctx.lineTo(x0, y1 - bSize); ctx.stroke();
-        // BR
         ctx.beginPath(); ctx.moveTo(x1 - bSize, y1); ctx.lineTo(x1, y1); ctx.lineTo(x1, y1 - bSize); ctx.stroke();
 
         ctx.shadowBlur = 0;
 
-        // Dark fill
         ctx.fillStyle = "rgba(13,17,23,0.75)";
         roundRect(ctx, x, y, blk.w, blk.h, 3);
         ctx.fill();
 
-        // Label
         ctx.fillStyle = `rgba(240,160,0,${0.95 * fadeT})`;
         ctx.font = `bold 10px 'IBM Plex Mono', monospace`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(blk.label, cx, cy - 8);
 
-        // Sub-label
         ctx.fillStyle = `rgba(139,148,158,${0.8 * fadeT})`;
         ctx.font = `9px 'IBM Plex Mono', monospace`;
         ctx.fillText(blk.sub, cx, cy + 8);

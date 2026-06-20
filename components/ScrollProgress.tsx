@@ -4,11 +4,6 @@ import { useRef, useEffect, useState } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap-register";
 import { prefersReducedMotion } from "@/lib/animations";
 
-/**
- * Scroll progress indicator — side rail with a numeric counter,
- * not a generic top bar. Shows as a vertical rail on the right
- * with a glowing progress number.
- */
 
 const SECTION_NAMES = ["Hero", "About", "Experience", "Projects", "Achievements", "Skills", "Contact"];
 
@@ -21,7 +16,6 @@ export default function ScrollProgress() {
   useEffect(() => {
     if (prefersReducedMotion()) return;
 
-    // Main progress bar
     const st = ScrollTrigger.create({
       trigger: document.documentElement,
       start: "top top",
@@ -39,7 +33,6 @@ export default function ScrollProgress() {
       },
     });
 
-    // Track which section is active
     const sections = ["hero", "about", "experience", "projects", "achievements", "skills", "contact"];
     const sectionTriggers = sections.map((id, index) => {
       const el = document.getElementById(id);
@@ -64,13 +57,11 @@ export default function ScrollProgress() {
       ref={railRef}
       className="fixed right-6 bottom-6 z-50 hidden lg:flex flex-col items-center gap-2 group"
     >
-      {/* Current section label that appears on hover */}
       <div className="absolute right-16 top-1/2 -translate-y-1/2 font-util text-[10px] text-signal/0 group-hover:text-signal/80 tracking-[0.2em] uppercase whitespace-nowrap transition-all duration-300 translate-x-4 group-hover:translate-x-0">
         {SECTION_NAMES[currentSection]}
       </div>
 
       <div className="relative w-16 h-16 flex items-center justify-center">
-        {/* Background ring */}
         <svg className="absolute inset-0 w-full h-full -rotate-90">
           <circle
             cx="32"
@@ -83,7 +74,6 @@ export default function ScrollProgress() {
           />
         </svg>
 
-        {/* Foreground glowing tracing ring */}
         <svg className="absolute inset-0 w-full h-full -rotate-90">
           <circle
             ref={fillRef}
@@ -100,7 +90,6 @@ export default function ScrollProgress() {
           />
         </svg>
 
-        {/* Progress counter inside */}
         <div className="font-mono text-[10px] text-signal/80 tabular-nums font-bold tracking-widest">
           <span ref={counterRef}>0</span>
         </div>

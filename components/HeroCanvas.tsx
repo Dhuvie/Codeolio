@@ -3,11 +3,6 @@
 import { useRef, useEffect } from "react";
 import { prefersReducedMotion } from "@/lib/animations";
 
-/**
- * HeroCanvas — generative oscilloscope waveform background.
- * Draws multiple sine-wave signals that respond to scroll velocity.
- * Think CRT oscilloscope readout, not a generic particle field.
- */
 export default function HeroCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scrollVelocityRef = useRef(0);
@@ -20,7 +15,6 @@ export default function HeroCanvas() {
     if (!canvas) return;
 
     if (prefersReducedMotion()) {
-      // Draw a static version
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       canvas.width = window.innerWidth;
@@ -39,7 +33,6 @@ export default function HeroCanvas() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Track scroll velocity
     const handleScroll = () => {
       const currentScroll = window.scrollY;
       scrollVelocityRef.current = Math.abs(currentScroll - lastScrollRef.current);
@@ -47,7 +40,6 @@ export default function HeroCanvas() {
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
 
-    // Animation loop
     const animate = () => {
       timeRef.current += 0.008;
       const t = timeRef.current;
@@ -55,14 +47,11 @@ export default function HeroCanvas() {
       const h = canvas.height;
       const velocity = Math.min(scrollVelocityRef.current, 50);
 
-      // Gradually decay velocity
       scrollVelocityRef.current *= 0.92;
 
-      // Clear with a slight trail effect
       ctx.fillStyle = "rgba(13, 17, 23, 0.15)";
       ctx.fillRect(0, 0, w, h);
 
-      // Draw multiple waveform channels at different Y positions
       const channels = [
         { y: h * 0.3, freq: 1.2, amp: 40, color: "57, 255, 136", opacity: 0.15 },
         { y: h * 0.45, freq: 0.8, amp: 60, color: "57, 255, 136", opacity: 0.08 },
@@ -75,10 +64,8 @@ export default function HeroCanvas() {
         drawWaveform(ctx, w, ch.y, ch.freq * velocityBoost, ch.amp * velocityBoost, t, ch.color, ch.opacity);
       });
 
-      // Draw scanline grid overlay
       drawScanlines(ctx, w, h, t);
 
-      // Draw a horizontal center-line "readout"
       drawReadoutLine(ctx, w, h * 0.5, t, velocity);
 
       animFrameRef.current = requestAnimationFrame(animate);
@@ -133,7 +120,6 @@ function drawWaveform(
 
   ctx.stroke();
 
-  // Add glow effect
   ctx.shadowColor = `rgba(${color}, ${opacity * 2})`;
   ctx.shadowBlur = 8;
   ctx.stroke();
@@ -149,7 +135,6 @@ function drawScanlines(
   ctx.strokeStyle = "rgba(57, 255, 136, 0.015)";
   ctx.lineWidth = 0.5;
 
-  // Horizontal scanlines
   for (let y = 0; y < height; y += 60) {
     const offset = Math.sin(y * 0.01 + time) * 2;
     ctx.beginPath();
@@ -158,7 +143,6 @@ function drawScanlines(
     ctx.stroke();
   }
 
-  // Vertical grid lines
   for (let x = 0; x < width; x += 100) {
     ctx.beginPath();
     ctx.moveTo(x, 0);
@@ -192,7 +176,6 @@ function drawStaticWaveform(
   ctx.fillStyle = "rgba(13, 17, 23, 1)";
   ctx.fillRect(0, 0, width, height);
 
-  // Draw a single gentle waveform
   ctx.beginPath();
   ctx.strokeStyle = "rgba(57, 255, 136, 0.1)";
   ctx.lineWidth = 1;

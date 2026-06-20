@@ -4,31 +4,12 @@ import { useRef, useEffect, useState } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap-register";
 import { prefersReducedMotion } from "@/lib/animations";
 
-/**
- * BackgroundScrollVideo — Full-page fixed video that scrubs with scroll.
- *
- * HOW TO USE (METHOD 1 - MP4 Video):
- * 1. Drop your MP4 into /public (e.g., /public/bg-video.mp4)
- * 2. Pass src="/bg-video.mp4"
- * 
- * HOW TO USE (METHOD 2 - Image Sequence / Frames) - RECOMMENDED FOR SMOOTHNESS:
- * 1. Convert video to frames (e.g., using ffmpeg: `ffmpeg -i video.mp4 -vf fps=30 frames/frame_%04d.jpg`)
- * 2. Put frames in /public/frames/
- * 3. Pass frameSequenceUrlTemplate="/frames/frame_{index}.jpg" and frameCount={numberOfFrames}
- *
- * If neither is provided, falls back to a generative canvas animation.
- */
 
 interface BackgroundScrollVideoProps {
-  /** Path to MP4 file in /public. */
   src?: string;
-  /** Template for frame sequence URLs. Use {index} which will be replaced by 1-based, 4-digit padded number. */
   frameSequenceUrlTemplate?: string;
-  /** Total number of frames in the sequence. */
   frameCount?: number;
-  /** Opacity of the video layer (0-1). Default 0.3 for readability. */
   opacity?: number;
-  /** Playback speed multiplier. Default 1. */
   playbackRate?: number;
 }
 
@@ -43,7 +24,6 @@ export default function BackgroundScrollVideo({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [videoReady, setVideoReady] = useState(false);
 
-  // === MODE 1: VIDEO SCRUB (MP4) ===
   useEffect(() => {
     if (!src || !videoRef.current || frameSequenceUrlTemplate) return;
     if (prefersReducedMotion()) return;
@@ -73,7 +53,6 @@ export default function BackgroundScrollVideo({
     return () => video.removeEventListener("loadedmetadata", onLoaded);
   }, [src, playbackRate, frameSequenceUrlTemplate]);
 
-  // === MODE 2: FRAME SEQUENCE SCRUB (CANVAS) ===
   useEffect(() => {
     if (!frameSequenceUrlTemplate || !frameCount || !canvasRef.current) return;
     if (prefersReducedMotion()) return;
@@ -85,14 +64,12 @@ export default function BackgroundScrollVideo({
     const images: HTMLImageElement[] = [];
     const loadedImages = new Set<number>();
     
-    // Preload images (1-based, padded to 4 digits e.g. 0001, 0002)
     for (let i = 0; i < frameCount; i++) {
       const img = new Image();
       const paddedIndex = (i + 1).toString().padStart(4, "0");
       img.src = frameSequenceUrlTemplate.replace("{index}", paddedIndex);
       img.onload = () => {
         loadedImages.add(i);
-        // If this is the first frame, render it immediately
         if (i === 0) render(0);
       };
       images.push(img);
@@ -104,7 +81,6 @@ export default function BackgroundScrollVideo({
     let canvasRatio = 1;
 
     const calculateDimensions = () => {
-      // Assuming all frames have the same aspect ratio, we calculate using the first loaded image
       const sampleImg = images.find(img => img.width > 0);
       if (!sampleImg) return;
       
@@ -131,7 +107,6 @@ export default function BackgroundScrollVideo({
         }
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // Only draw if dimensions are calculated
         if (drawWidth > 0) {
           ctx.drawImage(images[index], offsetX, offsetY, drawWidth, drawHeight);
         }
@@ -145,7 +120,6 @@ export default function BackgroundScrollVideo({
       render(currentIndex); 
     };
     
-    // Attempt initial resize to set up
     resize();
     window.addEventListener("resize", resize);
 
@@ -155,7 +129,6 @@ export default function BackgroundScrollVideo({
       end: "bottom bottom",
       scrub: 2.5, // Increased from 1.5 for ultra-smooth fluid scrolling
       onUpdate: (self) => {
-        // Calculate which frame we should be on based on scroll progress
         const frameIndex = Math.min(
           frameCount - 1,
           Math.floor(self.progress * frameCount)
@@ -163,7 +136,6 @@ export default function BackgroundScrollVideo({
         
         if (currentIndex !== frameIndex) {
           currentIndex = frameIndex;
-          // Use requestAnimationFrame for smooth rendering without blocking main thread
           requestAnimationFrame(() => render(frameIndex));
         }
       },
@@ -175,7 +147,6 @@ export default function BackgroundScrollVideo({
     };
   }, [frameSequenceUrlTemplate, frameCount]);
 
-  // === MODE 3: GENERATIVE CANVAS FALLBACK ===
   useEffect(() => {
     if (src || frameSequenceUrlTemplate) return; 
     if (!canvasRef.current) return;
@@ -219,7 +190,6 @@ export default function BackgroundScrollVideo({
 
       const phase = scrollProgress;
 
-      // Layer 1: Data streams
       const streamCount = 30 + Math.floor(phase * 20);
       ctx.font = "10px 'IBM Plex Mono', monospace";
       for (let i = 0; i < streamCount; i++) {
@@ -243,7 +213,6 @@ export default function BackgroundScrollVideo({
         }
       }
 
-      // Layer 2: Waveforms
       const waveCount = 3 + Math.floor(phase * 4);
       for (let w_i = 0; w_i < waveCount; w_i++) {
         const baseY = (w_i + 1) / (waveCount + 1) * h;
@@ -267,7 +236,6 @@ export default function BackgroundScrollVideo({
         ctx.stroke();
       }
 
-      // Layer 3: Grid
       const gridOpacity = 0.008 + phase * 0.012;
       ctx.strokeStyle = `rgba(57, 255, 136, ${gridOpacity})`;
       ctx.lineWidth = 0.5;

@@ -2,13 +2,9 @@
 import { useRef, useEffect } from "react";
 import { prefersReducedMotion } from "@/lib/animations";
 
-// â”€â”€â”€ Blip definition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface Blip { id: string; label: string; sublabel?: string; ring: number; angle: number; glow: number }
 
-// Ring 1 = innermost (Languages), Ring 4 = outermost (Projects)
-// angle: degrees from top (north), clockwise
 const BLIPS: Blip[] = [
-  // Ring 1 â€” Languages
   { id:"cpp",  label:"C++",        ring:1, angle:300, glow:0 },
   { id:"py",   label:"Python",     ring:1, angle: 60, glow:0 },
   { id:"ts",   label:"TypeScript", ring:1, angle:120, glow:0 },
@@ -16,7 +12,6 @@ const BLIPS: Blip[] = [
   { id:"sql",  label:"SQL",        ring:1, angle:185, glow:0 },
   { id:"java", label:"Java",       ring:1, angle: 10, glow:0 },
 
-  // Ring 2 â€” Frameworks
   { id:"ogl",  label:"OpenGL",     ring:2, angle:280, glow:0 },
   { id:"pt",   label:"PyTorch",    ring:2, angle: 45, glow:0 },
   { id:"xgb",  label:"XGBoost",    ring:2, angle: 85, glow:0 },
@@ -26,14 +21,12 @@ const BLIPS: Blip[] = [
   { id:"nd",   label:"Node.js",    ring:2, angle:155, glow:0 },
   { id:"glsl", label:"GLSL",       ring:2, angle:265, glow:0 },
 
-  // Ring 3 â€” Systems / Platforms
   { id:"gem",  label:"Gemini API", ring:3, angle: 52, glow:0 },
   { id:"dkr",  label:"Docker",     ring:3, angle:172, glow:0 },
   { id:"rd",   label:"Redis",      ring:3, angle:192, glow:0 },
   { id:"cf",   label:"Cloudflare", ring:3, angle:112, glow:0 },
   { id:"gtk",  label:"Genkit",     ring:3, angle: 72, glow:0 },
 
-  // Ring 4 â€” Projects (outermost)
   { id:"ev",   label:"EdgeVision", sublabel:"AI Image Engine",  ring:4, angle: 55, glow:0 },
   { id:"upi",  label:"UPI Fraud",  sublabel:"6M+ Transactions", ring:4, angle:182, glow:0 },
   { id:"agr",  label:"AgriVision", sublabel:"AI Ã— Agriculture", ring:4, angle:102, glow:0 },
@@ -50,7 +43,6 @@ const IDLE_SPD  = 11;   // degrees/second when idle  (~33s per rotation)
 const FAST_SPD  = 45;   // degrees/second when scrolling fast
 const RING_LABELS = ["LANGUAGES", "FRAMEWORKS", "SYSTEMS", "PROJECTS"];
 
-// â”€â”€â”€ Radar scanner body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function NeuralFlow() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -69,7 +61,6 @@ export default function NeuralFlow() {
     let lastSY = window.scrollY;
     let mx = -1, my = -1;
 
-    // Seed initial glows so the screen isn't empty on first load
     blips.forEach(b => {
       const age = b.angle / IDLE_SPD; // seconds as if sweep started from 0
       b.glow = Math.max(0, 0.9 - DECAY * age);
@@ -89,7 +80,6 @@ export default function NeuralFlow() {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("mousemove", (e: MouseEvent) => { mx = e.clientX; my = e.clientY; });
 
-    // Convert my "0=top, CW" angle to a canvas endpoint
     const pt = (angle: number, r: number, cx: number, cy: number): [number, number] => [
       cx + r * Math.sin(angle * Math.PI / 180),
       cy - r * Math.cos(angle * Math.PI / 180),
@@ -107,7 +97,6 @@ export default function NeuralFlow() {
       sweep      += delta;
       const curr  = sweep % 360;
 
-      // Blip crossing detection
       blips.forEach(b => {
         const a       = b.angle;
         const crossed = prev < curr
@@ -124,7 +113,6 @@ export default function NeuralFlow() {
       const radii = RING_PCTS.map(f => base * f);
       const maxR  = radii[radii.length - 1];
 
-      // â”€â”€ Concentric rings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       radii.forEach((r, i) => {
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -133,7 +121,6 @@ export default function NeuralFlow() {
         ctx.stroke();
       });
 
-      // Radial grid lines every 30Â°
       for (let a = 0; a < 360; a += 30) {
         const [ex, ey] = pt(a, maxR, cx, cy);
         ctx.beginPath();
@@ -144,7 +131,6 @@ export default function NeuralFlow() {
         ctx.stroke();
       }
 
-      // â”€â”€ Sweep trail (fading pie slices) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       const SLICES = 40;
       for (let s = 0; s < SLICES; s++) {
         const t0 = s / SLICES;
@@ -159,7 +145,6 @@ export default function NeuralFlow() {
         ctx.fill();
       }
 
-      // â”€â”€ Sweep line (leading edge) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       const [ex, ey] = pt(curr, maxR, cx, cy);
       ctx.beginPath();
       ctx.moveTo(cx, cy);
@@ -171,7 +156,6 @@ export default function NeuralFlow() {
       ctx.stroke();
       ctx.shadowBlur  = 0;
 
-      // â”€â”€ Origin dot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       ctx.beginPath();
       ctx.arc(cx, cy, 3, 0, Math.PI * 2);
       ctx.fillStyle   = `rgb(${SIG})`;
@@ -180,7 +164,6 @@ export default function NeuralFlow() {
       ctx.fill();
       ctx.shadowBlur  = 0;
 
-      // â”€â”€ Blips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       blips.forEach(b => {
         const [bx, by] = pt(b.angle, radii[b.ring - 1], cx, cy);
         const near     = mx >= 0 && Math.hypot(mx - bx, my - by) < 44;
@@ -188,7 +171,6 @@ export default function NeuralFlow() {
         const isProj   = b.ring === 4;
         const r        = isProj ? 5 : 3.5;
 
-        // Glow halo
         if (gEff > 0.04) {
           const hr = r * (isProj ? 9 : 6);
           const hg = ctx.createRadialGradient(bx, by, 0, bx, by, hr);
@@ -200,7 +182,6 @@ export default function NeuralFlow() {
           ctx.fill();
         }
 
-        // Dot
         ctx.beginPath();
         ctx.arc(bx, by, r, 0, Math.PI * 2);
         ctx.fillStyle   = `rgba(${SIG},${0.18 + gEff * 0.82})`;
@@ -208,7 +189,6 @@ export default function NeuralFlow() {
         ctx.fill();
         ctx.shadowBlur = 0;
 
-        // Label â€” radially outward from center
         const baseAlpha = isProj ? 0.38 : 0;
         const lAlpha    = near || gEff > 0.12 ? Math.min(1, gEff + 0.2) : baseAlpha;
 
@@ -230,7 +210,6 @@ export default function NeuralFlow() {
           if (b.sublabel && (gEff > 0.12 || near)) {
             ctx.font      = "9px 'IBM Plex Mono', monospace";
             ctx.fillStyle = "rgba(139,148,158,0.9)";
-            // Sub-label below/above label depending on side
             const ly2 = ly + (ly >= cy ? 13 : -13);
             ctx.textBaseline = ly >= cy ? "top" : "bottom";
             ctx.fillText(b.sublabel, lx, ly2);
@@ -239,7 +218,6 @@ export default function NeuralFlow() {
         }
       });
 
-      // â”€â”€ Ring annotations (right side) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       RING_LABELS.forEach((lbl, i) => {
         ctx.save();
         ctx.globalAlpha  = 0.18;
@@ -251,7 +229,6 @@ export default function NeuralFlow() {
         ctx.restore();
       });
 
-      // â”€â”€ Compass N mark â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       ctx.save();
       ctx.globalAlpha  = 0.25;
       ctx.textAlign    = "center";

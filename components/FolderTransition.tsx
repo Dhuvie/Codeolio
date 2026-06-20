@@ -61,7 +61,6 @@ export default function FolderTransition() {
 
       const tl = gsap.timeline({ onComplete: () => { isPlaying.current = false; } });
 
-      // ── Phase 1: Liquid Wave morphs up ──────────────────────────────
       tl.set(l1, { display: "block" })
         .to(pathNode, {
           attr: { d: "M 0 100 V 50 Q 50 -20 100 50 V 100 z" },
@@ -74,7 +73,6 @@ export default function FolderTransition() {
           ease: "power2.out",
         });
 
-      // Instant jump while screen is pure black
       tl.add(() => {
         if (lenis) {
           lenis.scrollTo(target, { immediate: true });
@@ -83,13 +81,11 @@ export default function FolderTransition() {
         }
       });
 
-      // ── Phase 2: Terminal flashes ─────────────────────────────────────────
       tl.set(text, { opacity: 0, scale: 0.9 })
         .to(text, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.5)" })
         .to({}, { duration: 0.4 }) // Hold
         .to(text, { opacity: 0, scale: 1.05, duration: 0.3, ease: "power3.in" });
 
-      // ── Phase 3: Liquid Wave continues up and away ────────────────────────
       tl.to(pathNode, {
           attr: { d: "M 0 0 V 0 Q 50 120 100 0 V 0 z" },
           duration: 0.4,
@@ -131,7 +127,6 @@ export default function FolderTransition() {
 
   return (
     <>
-      {/* ── Next-Level SVG Liquid Wave Wipe ───────────────────────── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 100 }}>
         
         <svg
@@ -147,7 +142,6 @@ export default function FolderTransition() {
           />
         </svg>
 
-        {/* ── Terminal Label ────────────────────────────────────────────── */}
         <div ref={textContainerRef} className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0">
           <div className="absolute w-64 h-64 bg-signal/20 rounded-full blur-[80px]" style={{ willChange: "transform" }} />
           
@@ -156,7 +150,6 @@ export default function FolderTransition() {
         </div>
       </div>
 
-      {/* ── Persistent path indicator ─────────────────────────────────────── */}
       <div className="fixed bottom-5 left-6 z-50 pointer-events-none select-none font-mono">
         <span className="text-xs text-signal/40">{statusPath}</span>
         <span className="text-xs ml-0.5 text-signal/70" style={{ opacity: blink ? 1 : 0, transition: "opacity 0.05s" }}>█</span>

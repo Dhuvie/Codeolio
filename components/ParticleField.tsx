@@ -60,7 +60,6 @@ export default function ParticleField({ count = 90, connectionDist = 120 }: { co
         p.pulse += p.pulseSpeed;
         const pulsedOpacity = p.opacity * (0.7 + 0.3 * Math.sin(p.pulse));
 
-        // Mouse repulsion
         const mdx = p.x - mouse.x;
         const mdy = p.y - mouse.y;
         const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
@@ -70,11 +69,9 @@ export default function ParticleField({ count = 90, connectionDist = 120 }: { co
           p.vy += (mdy / mdist) * force * 0.05;
         }
 
-        // Dampen velocity
         p.vx *= 0.99;
         p.vy *= 0.99;
 
-        // Clamp speed
         const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
         if (speed > 0.6) {
           p.vx = (p.vx / speed) * 0.6;
@@ -89,7 +86,6 @@ export default function ParticleField({ count = 90, connectionDist = 120 }: { co
         if (p.y < 0) p.y = H;
         if (p.y > H) p.y = 0;
 
-        // Draw glowing dot
         const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
         grd.addColorStop(0, `rgba(240,160,0,${pulsedOpacity})`);
         grd.addColorStop(1, `rgba(240,160,0,0)`);
@@ -99,7 +95,6 @@ export default function ParticleField({ count = 90, connectionDist = 120 }: { co
         ctx.fill();
       }
 
-      // Lines between close particles
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
