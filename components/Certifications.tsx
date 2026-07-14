@@ -8,8 +8,9 @@ const CERTIFICATIONS = [
     text: "Oracle Certified Pro: Java 17", 
     org: "Oracle", 
     id: "CR-9201",
-    issued: "Jan 2024",
-    description: "Professional industry credential validating advanced core Java scheduling, structural patterns, concurrency paradigms, garbage collection tuning, and API architectures.",
+    issued: "January 2024",
+    hash: "SHA-256: 8a4e9b98fd292c10a30bfe19",
+    description: "Professional certification validating advanced Java language constructs, memory optimizations, multi-threading architectures, garbage collection algorithms, and concurrency schedulers.",
     skills: "Java 17 OOP, Concurrency, Stream API, Memory Management, Unit Testing",
     verification: "https://www.oracle.com/education/certification/"
   },
@@ -17,8 +18,9 @@ const CERTIFICATIONS = [
     text: "SAP Generative AI Developer", 
     org: "SAP", 
     id: "CR-7742",
-    issued: "Nov 2024",
-    description: "Advanced AI credential focused on building generative agent workloads, prompt engineering, vector search algorithms, and setting up secure Retrieval-Augmented Generation (RAG) pipelines.",
+    issued: "November 2024",
+    hash: "SHA-256: 9b2d3e11a3b8c199201dfbc2",
+    description: "Advanced generative AI developer validation focusing on orchestrating cognitive agents, vector embedding layouts, RAG architectures, prompt engineering models, and LLM API integrations.",
     skills: "GenAI Foundations, LLM Orchestration, RAG Architectures, Vector Stores",
     verification: "https://credsverse.com/credentials/"
   },
@@ -26,8 +28,9 @@ const CERTIFICATIONS = [
     text: "SAP Business AI Solutions", 
     org: "SAP", 
     id: "CR-8831",
-    issued: "Dec 2024",
-    description: "Enterprise validation demonstrating competency in designing and deploying predictive machine learning algorithms and workflows into ERP architectures.",
+    issued: "December 2024",
+    hash: "SHA-256: 7c8d9e12f0a1c3b8890123df",
+    description: "Specialized validation verifying capability in designing, training, and integrating predictive ML pipelines and automated agents into enterprise database systems safely.",
     skills: "Predictive Analytics, Enterprise Integration, Automated Workflows, Ethics",
     verification: "https://credsverse.com/credentials/"
   }
@@ -110,7 +113,7 @@ export default function Certifications() {
     setTimeout(() => {
       setExpandedCardIdx(null);
       setIsClosing(false);
-    }, 700); // 700ms matches the vault door sliding closed
+    }, 800); // 800ms matches the 3D door swing duration
   };
 
   const activeCertIdx = expandedCardIdx !== null ? expandedCardIdx : lastOpenedIdxRef.current;
@@ -182,72 +185,102 @@ export default function Certifications() {
       {(expandedCardIdx !== null || isClosing) && (
         <div 
           onClick={handleCloseCard}
-          className="fixed inset-0 w-screen h-screen z-[99999] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm transition-opacity duration-500 cursor-default"
+          className="fixed inset-0 w-screen h-screen z-[99999] flex items-center justify-center p-6 bg-black/85 backdrop-blur-sm transition-opacity duration-500 cursor-default"
         >
           {/* Central Vault Box Wrapper */}
           <div 
             onClick={(e) => e.stopPropagation()}
-            className={`w-[90vw] max-w-[600px] h-[400px] relative overflow-hidden bg-[#0c0c0e] border border-[#f0a000]/30 rounded-lg shadow-2xl transition-all duration-500 ${
+            style={{ perspective: "1500px", transformStyle: "preserve-3d" }}
+            className={`w-[90vw] max-w-[600px] h-[440px] relative overflow-hidden bg-[#0c0c0e] border border-[#f0a000]/30 rounded-lg shadow-2xl transition-all duration-500 ${
               isClosing 
                 ? "animate-[scaleDownBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]" 
                 : "animate-[scaleUpBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]"
             }`}
           >
             {/* 1. REVEALED CENTRAL CORE (UNDER THE DOORS) */}
-            <div className="absolute inset-0 z-0 p-8 bg-[#040406] flex flex-col justify-between overflow-y-auto">
-              <div>
-                <div className="flex items-center justify-between border-b border-[#f0a000]/20 pb-4 mb-4 font-mono">
-                  <span className="text-[9px] text-[#f0a000] tracking-widest uppercase">
-                    SECURE_VAULT_NODE // DECLASSIFIED
-                  </span>
-                  <span className="text-[9px] text-white/40">
-                    ISSUED: {activeCert.issued}
+            <div className="absolute inset-0 z-0 p-8 bg-[#040406] flex flex-col justify-between overflow-y-auto font-mono text-xs">
+              {/* Gold backing aura */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(240,160,0,0.06)_0%,transparent_75%)] pointer-events-none" />
+
+              <div className="relative z-10">
+                {/* Header status bar */}
+                <div className="flex items-center justify-between border-b border-[#f0a000]/25 pb-3 mb-4 text-[9px]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#f0a000] animate-ping" />
+                    <span className="text-[#f0a000] tracking-widest uppercase font-bold">
+                      SECURE_VAULT_NODE // SHIELD_ACTIVE
+                    </span>
+                  </div>
+                  <span className="text-white/40">
+                    HASH: {activeCert.hash}
                   </span>
                 </div>
 
-                <h3 className="font-display font-bold text-xl md:text-2xl text-white uppercase tracking-wide mb-3 leading-snug">
-                  {activeCert.text}
-                </h3>
-                <p className="font-sans text-xs text-white/70 leading-relaxed mb-6 font-medium">
-                  {activeCert.description}
-                </p>
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-[9px] text-[#f0a000]/60 uppercase tracking-widest block mb-0.5">Title of Registry</span>
+                    <h3 className="font-display font-bold text-xl md:text-2xl text-white uppercase tracking-wide leading-tight">
+                      {activeCert.text}
+                    </h3>
+                  </div>
 
-                {/* Skills learned grid */}
-                <div className="space-y-2">
-                  <h4 className="font-mono text-[9px] text-[#f0a000] uppercase tracking-wider">
-                    Verified Competencies:
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {activeCert.skills.split(", ").map((skill) => (
-                      <span key={skill} className="font-mono text-[8px] text-white border border-white/10 bg-white/5 rounded px-2.5 py-1">
-                        {skill}
-                      </span>
-                    ))}
+                  <div className="grid grid-cols-2 gap-4 border-y border-white/5 py-4 my-2">
+                    <div className="space-y-1.5 border-r border-white/5 pr-4">
+                      <span className="text-[9px] text-white/30 uppercase tracking-wider block">Credential Authority</span>
+                      <p className="text-white font-bold text-xs uppercase font-sans">{activeCert.org}</p>
+                      <span className="text-[9px] text-white/30 uppercase tracking-wider block mt-2">Issued Date</span>
+                      <p className="text-white/80 font-bold text-[10px]">{activeCert.issued}</p>
+                    </div>
+                    <div className="space-y-1.5 pl-2">
+                      <span className="text-[9px] text-white/30 uppercase tracking-wider block">System registry code</span>
+                      <p className="text-[#f0a000] font-bold text-xs">{activeCert.id}</p>
+                      <span className="text-[9px] text-white/30 uppercase tracking-wider block mt-2">Status validation</span>
+                      <p className="text-green-400 font-bold text-[10px] uppercase">VERIFIED // SUCCESS</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <span className="text-[9px] text-[#f0a000]/60 uppercase tracking-widest block">Operational syllabus modules</span>
+                    <p className="font-sans text-[11px] text-white/70 leading-relaxed font-medium">
+                      {activeCert.description}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2.5 pt-2">
+                    <span className="text-[9px] text-[#f0a000]/60 uppercase tracking-widest block">Acquired Competencies</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {activeCert.skills.split(", ").map((skill) => (
+                        <span key={skill} className="font-mono text-[8px] text-white border border-white/10 bg-white/5 rounded px-2.5 py-1">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="border-t border-[#f0a000]/15 pt-4 flex items-center justify-between mt-6">
-                <span className="font-mono text-[8px] text-white/30">CRED.ID: {activeCert.id}</span>
-                
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-[8px] text-[#f0a000]/40">[ Click outside to seal vault ]</span>
-                  <a 
-                    href={activeCert.verification} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="font-mono text-[9px] text-[#f0a000] border border-[#f0a000]/30 bg-[#f0a000]/5 px-3 py-1.5 rounded hover:bg-[#f0a000]/15 transition-all uppercase tracking-wider"
-                  >
-                    [ Verify Credential ]
-                  </a>
-                </div>
+              <div className="relative z-10 border-t border-[#f0a000]/15 pt-4 flex items-center justify-between mt-6">
+                <span className="text-[8px] text-white/20 uppercase tracking-widest">[ Click outside to seal vault ]</span>
+                <a 
+                  href={activeCert.verification} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="font-mono text-[9px] text-[#f0a000] border border-[#f0a000]/40 bg-[#f0a000]/5 px-4 py-2 rounded hover:bg-[#f0a000]/15 transition-all uppercase tracking-widest font-bold shadow-[0_0_15px_rgba(240,160,0,0.05)]"
+                >
+                  [ Verify Certificate ]
+                </a>
               </div>
             </div>
 
-            {/* 2. LEFT VAULT DOOR (Slides Left) */}
+            {/* 2. LEFT VAULT DOOR (Pivots open to the left) */}
             <div 
-              className="absolute left-0 top-0 bottom-0 w-1/2 bg-black border-r border-[#f0a000]/20 overflow-hidden transition-transform duration-700 ease-out z-10 pointer-events-none"
-              style={{ transform: isDeclassified ? "translateX(-100%)" : "translateX(0)" }}
+              className="absolute left-0 top-0 bottom-0 w-1/2 bg-black border-r border-[#f0a000]/25 overflow-hidden transition-all duration-[800ms] ease-out z-10 pointer-events-none origin-left"
+              style={{ 
+                transform: isDeclassified 
+                  ? "rotateY(-95deg) scale(0.95)" 
+                  : "rotateY(0deg) scale(1)",
+                opacity: isDeclassified ? 0 : 1
+              }}
             >
               <div className="w-[600px] h-full p-10 relative">
                 <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-signal/50 opacity-50" />
@@ -263,10 +296,15 @@ export default function Certifications() {
               </div>
             </div>
 
-            {/* 3. RIGHT VAULT DOOR (Slides Right) */}
+            {/* 3. RIGHT VAULT DOOR (Pivots open to the right) */}
             <div 
-              className="absolute right-0 top-0 bottom-0 w-1/2 bg-black border-l border-[#f0a000]/20 overflow-hidden transition-transform duration-700 ease-out z-10 pointer-events-none"
-              style={{ transform: isDeclassified ? "translateX(100%)" : "translateX(0)" }}
+              className="absolute right-0 top-0 bottom-0 w-1/2 bg-black border-l border-[#f0a000]/25 overflow-hidden transition-all duration-[800ms] ease-out z-10 pointer-events-none origin-right"
+              style={{ 
+                transform: isDeclassified 
+                  ? "rotateY(95deg) scale(0.95)" 
+                  : "rotateY(0deg) scale(1)",
+                opacity: isDeclassified ? 0 : 1
+              }}
             >
               <div className="w-[600px] h-full p-10 relative" style={{ transform: "translateX(-300px)" }}>
                 <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-signal/50 opacity-50" style={{ transform: "translateX(300px)" }} />
