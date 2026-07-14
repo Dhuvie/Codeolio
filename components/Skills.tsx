@@ -443,8 +443,7 @@ export default function Skills() {
                       {/* Peripheral nodes */}
                       <button
                         type="button"
-                        onPointerDown={(e) => { e.stopPropagation(); setMobileActiveIdx(0); }}
-                        onClick={(e) => { e.stopPropagation(); setMobileActiveIdx(0); }}
+                        onClick={() => setMobileActiveIdx(0)}
                         className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-30 pointer-events-auto transition-all duration-300 shadow active:scale-95 cursor-pointer
                           ${mobileActiveIdx === 0
                             ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
@@ -459,8 +458,7 @@ export default function Skills() {
 
                       <button
                         type="button"
-                        onPointerDown={(e) => { e.stopPropagation(); setMobileActiveIdx(1); }}
-                        onClick={(e) => { e.stopPropagation(); setMobileActiveIdx(1); }}
+                        onClick={() => setMobileActiveIdx(1)}
                         className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-30 pointer-events-auto transition-all duration-300 shadow active:scale-95 cursor-pointer
                           ${mobileActiveIdx === 1
                             ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
@@ -475,8 +473,7 @@ export default function Skills() {
 
                       <button
                         type="button"
-                        onPointerDown={(e) => { e.stopPropagation(); setMobileActiveIdx(2); }}
-                        onClick={(e) => { e.stopPropagation(); setMobileActiveIdx(2); }}
+                        onClick={() => setMobileActiveIdx(2)}
                         className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-30 pointer-events-auto transition-all duration-300 shadow active:scale-95 cursor-pointer
                           ${mobileActiveIdx === 2
                             ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
@@ -491,8 +488,7 @@ export default function Skills() {
 
                       <button
                         type="button"
-                        onPointerDown={(e) => { e.stopPropagation(); setMobileActiveIdx(3); }}
-                        onClick={(e) => { e.stopPropagation(); setMobileActiveIdx(3); }}
+                        onClick={() => setMobileActiveIdx(3)}
                         className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-30 pointer-events-auto transition-all duration-300 shadow active:scale-95 cursor-pointer
                           ${mobileActiveIdx === 3
                             ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
@@ -507,8 +503,7 @@ export default function Skills() {
 
                       <button
                         type="button"
-                        onPointerDown={(e) => { e.stopPropagation(); setMobileActiveIdx(4); }}
-                        onClick={(e) => { e.stopPropagation(); setMobileActiveIdx(4); }}
+                        onClick={() => setMobileActiveIdx(4)}
                         className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-30 pointer-events-auto transition-all duration-300 shadow active:scale-95 cursor-pointer
                           ${mobileActiveIdx === 4
                             ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")

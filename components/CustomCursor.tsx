@@ -15,9 +15,16 @@ export default function CustomCursor() {
   const isHovering = useRef(false);
 
   const [isLightMode, setIsLightMode] = useState(false);
+  const [isMobileDevice, setIsMobileDevice] = useState(true);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      setIsMobileDevice(window.innerWidth < 1024);
+      const handleResize = () => {
+        setIsMobileDevice(window.innerWidth < 1024);
+      };
+      window.addEventListener("resize", handleResize);
+
       setIsLightMode(document.documentElement.classList.contains("light"));
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
@@ -27,9 +34,15 @@ export default function CustomCursor() {
         });
       });
       observer.observe(document.documentElement, { attributes: true });
-      return () => observer.disconnect();
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+        observer.disconnect();
+      };
     }
   }, []);
+
+  if (isMobileDevice) return null;
 
   useEffect(() => {
     if (!cursorRef.current || linesRef.current.length === 0) return;
