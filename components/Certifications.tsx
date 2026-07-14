@@ -99,11 +99,9 @@ export default function Certifications() {
           {CERTIFICATIONS.map((cert, i) => (
             <div 
               key={i} 
-              className={`relative border p-10 backdrop-blur-sm pointer-events-auto transition-transform hover:scale-[1.02] ${
-                isLightMode 
-                  ? "border-black/10 bg-black/[0.01] hover:bg-black/[0.03]" 
-                  : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
-              } ${i % 2 === 0 ? "lg:mt-16" : ""} ${i === 4 ? "md:col-span-2 lg:col-span-1 lg:mt-32" : ""}`}
+              className={`relative border p-10 backdrop-blur-sm pointer-events-auto transition-transform hover:scale-[1.02] border-white/10 bg-black hover:bg-black/90 ${
+                i % 2 === 0 ? "lg:mt-16" : ""
+              } ${i === 4 ? "md:col-span-2 lg:col-span-1 lg:mt-32" : ""}`}
             >
               <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-signal/50 opacity-50" />
               <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-signal/50 opacity-50" />
@@ -112,12 +110,12 @@ export default function Certifications() {
                 SYS.ID // {cert.id}
               </span>
               
-              <h3 className="font-display font-bold text-2xl text-ink uppercase tracking-wide mb-4">
+              <h3 className="font-display font-bold text-2xl text-white uppercase tracking-wide mb-4">
                 {cert.text}
               </h3>
               
-              <p className="font-sans text-sm text-ink/50 uppercase tracking-widest">
-                Issued by: <span className="text-ink font-bold">{cert.org}</span>
+              <p className="font-sans text-sm text-white/50 uppercase tracking-widest">
+                Issued by: <span className="text-white font-bold">{cert.org}</span>
               </p>
 
               <div className="mt-12 w-full h-[1px] bg-gradient-to-r from-signal/50 to-transparent" />
