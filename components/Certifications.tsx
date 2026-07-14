@@ -210,40 +210,114 @@ export default function Certifications() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
-          {CERTIFICATIONS.map((cert, i) => (
-            <div 
-              key={i} 
-              onClick={() => handleOpenCard(i)}
-              className={`relative border p-10 backdrop-blur-sm pointer-events-auto cursor-pointer transition-transform hover:scale-[1.02] lg:mt-16 ${
-                isLightMode 
-                  ? "bg-[#ffffff] hover:bg-zinc-50 border-black/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)]" 
-                  : "bg-black hover:bg-black/90 border-white/10"
-              } ${
-                mobileCertHighlightIdx === i 
-                  ? "border-[#f0a000] shadow-[0_0_15px_rgba(240,160,0,0.25)]" 
-                  : ""
-              }`}
-            >
-              <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-signal/50 opacity-50" />
-              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-signal/50 opacity-50" />
-              
-              <span className="font-mono text-[10px] tracking-widest text-signal uppercase block mb-8">
-                SYS.ID // {cert.id}
-              </span>
-              
-              <h3 className={`font-display font-bold text-2xl uppercase tracking-wide mb-4 ${isLightMode ? "text-zinc-900" : "text-white"}`}>
-                {cert.text}
-              </h3>
-              
-              <p className={`font-sans text-sm uppercase tracking-widest ${isLightMode ? "text-zinc-500" : "text-white/50"}`}>
-                Issued by: <span className={`font-bold ${isLightMode ? "text-zinc-800" : "text-white"}`}>{cert.org}</span>
-              </p>
+        {isMobile ? (
+          /* FULLY UNLOCKED CERTIFICATION RECORD CARDS FOR MOBILE */
+          <div className="flex flex-col gap-8 max-w-xl mx-auto pointer-events-auto">
+            {CERTIFICATIONS.map((cert, i) => (
+              <div 
+                key={i} 
+                className={`relative border p-6 rounded-lg font-mono text-left transition-colors duration-300 ${
+                  isLightMode 
+                    ? "bg-[#eef2f6] border-[#0c0c0e]/15 shadow-sm text-zinc-900" 
+                    : "bg-[#0c0c0e]/90 border-zinc-800 text-white"
+                }`}
+              >
+                {/* Visual corners */}
+                <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-signal/50 opacity-40" />
+                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-signal/50 opacity-40" />
+                
+                <span className={`text-[8px] tracking-widest uppercase block mb-4 ${isLightMode ? "text-[#0033aa]" : "text-signal"}`}>
+                  SYS.ID // {cert.id}
+                </span>
+                
+                <h3 className={`font-display font-bold text-lg uppercase tracking-wide mb-2 ${isLightMode ? "text-zinc-900" : "text-white"}`}>
+                  {cert.text}
+                </h3>
+                
+                <p className={`text-[10px] uppercase tracking-widest mb-4 ${isLightMode ? "text-zinc-600" : "text-white/50"}`}>
+                  Issued by: <span className="font-bold">{cert.org}</span> // {cert.issued}
+                </p>
 
-              <div className={`mt-12 w-full h-[1px] ${isLightMode ? "bg-gradient-to-r from-black/15 to-transparent" : "bg-gradient-to-r from-signal/50 to-transparent"}`} />
-            </div>
-          ))}
-        </div>
+                <div className="space-y-3 mb-6">
+                  <div className={`text-[8px] font-bold border-b pb-1 ${isLightMode ? "border-black/10 text-zinc-500" : "border-white/10 text-white/40"}`}>
+                    [ CREDENTIAL_DECRYPTION_LOGS ]
+                  </div>
+                  <p className={`text-[9px] leading-relaxed ${isLightMode ? "text-zinc-600" : "text-white/70"}`}>
+                    {cert.description}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {cert.skills.split(", ").map((skill, sIdx) => (
+                      <span 
+                        key={sIdx}
+                        className={`text-[7px] px-1.5 py-0.5 rounded border ${
+                          isLightMode 
+                            ? "bg-white border-black/10 text-zinc-600" 
+                            : "bg-black/40 border-white/10 text-white/50"
+                        }`}
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="text-[7.5px] opacity-40 text-left pt-1 select-all font-mono">
+                    HASH: {cert.hash}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between border-t pt-4 border-subtle text-[8px]">
+                  <span className={isLightMode ? "text-zinc-400" : "text-white/30"}>STATUS // VERIFIED</span>
+                  <a 
+                    href={cert.verification} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={`font-mono text-[9px] border px-4 py-1.5 rounded transition-all uppercase tracking-widest font-bold ${
+                      isLightMode 
+                        ? "text-[#c08000] border-[#c08000]/40 bg-[#c08000]/5 hover:bg-[#c08000]/10" 
+                        : "text-[#f0a000] border-[#f0a000]/40 bg-[#f0a000]/5 hover:bg-[#f0a000]/10"
+                    }`}
+                  >
+                    [ Verify Link ]
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+            {CERTIFICATIONS.map((cert, i) => (
+              <div 
+                key={i} 
+                onClick={() => handleOpenCard(i)}
+                className={`relative border p-10 backdrop-blur-sm pointer-events-auto cursor-pointer transition-transform hover:scale-[1.02] lg:mt-16 ${
+                  isLightMode 
+                    ? "bg-[#ffffff] hover:bg-zinc-50 border-black/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)]" 
+                    : "bg-black hover:bg-black/90 border-white/10"
+                } ${
+                  mobileCertHighlightIdx === i 
+                    ? "border-[#f0a000] shadow-[0_0_15px_rgba(240,160,0,0.25)]" 
+                    : ""
+                }`}
+              >
+                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-signal/50 opacity-50" />
+                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-signal/50 opacity-50" />
+                
+                <span className="font-mono text-[10px] tracking-widest text-signal uppercase block mb-8">
+                  SYS.ID // {cert.id}
+                </span>
+                
+                <h3 className={`font-display font-bold text-2xl uppercase tracking-wide mb-4 ${isLightMode ? "text-zinc-900" : "text-white"}`}>
+                  {cert.text}
+                </h3>
+                
+                <p className={`font-sans text-sm uppercase tracking-widest ${isLightMode ? "text-zinc-500" : "text-white/50"}`}>
+                  Issued by: <span className={`font-bold ${isLightMode ? "text-zinc-800" : "text-white"}`}>{cert.org}</span>
+                </p>
+
+                <div className={`mt-12 w-full h-[1px] ${isLightMode ? "bg-gradient-to-r from-black/15 to-transparent" : "bg-gradient-to-r from-signal/50 to-transparent"}`} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* DETAILED CREDENTIAL SCI-FI VAULT MODAL */}

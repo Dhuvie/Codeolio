@@ -412,169 +412,57 @@ export default function Skills() {
                 </span>
 
                 {isMobileShelf ? (
-                  /* CYBERNETIC SILICON CHIP NODE MATRIX FOR MOBILE DEVICES */
-                  <div className="w-full flex flex-col gap-6 select-none">
-                    <div className="relative w-full max-w-[340px] mx-auto h-[220px] bg-black/10 rounded-xl border border-signal/15 p-4 flex items-center justify-center backdrop-blur-sm overflow-hidden z-20 pointer-events-auto">
-                      {/* SVG Background traces connecting core CPU and peripheral chip nodes */}
-                      <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" fill="none">
-                        <line x1="50" y1="50" x2="50" y2="20" stroke={mobileActiveIdx === 0 ? "var(--signal)" : "rgba(128,128,128,0.2)"} strokeWidth={mobileActiveIdx === 0 ? "1.5" : "0.8"} />
-                        <line x1="50" y1="50" x2="80" y2="35" stroke={mobileActiveIdx === 1 ? "var(--signal)" : "rgba(128,128,128,0.2)"} strokeWidth={mobileActiveIdx === 1 ? "1.5" : "0.8"} />
-                        <line x1="50" y1="50" x2="70" y2="75" stroke={mobileActiveIdx === 2 ? "var(--signal)" : "rgba(128,128,128,0.2)"} strokeWidth={mobileActiveIdx === 2 ? "1.5" : "0.8"} />
-                        <line x1="50" y1="50" x2="30" y2="75" stroke={mobileActiveIdx === 3 ? "var(--signal)" : "rgba(128,128,128,0.2)"} strokeWidth={mobileActiveIdx === 3 ? "1.5" : "0.8"} />
-                        <line x1="50" y1="50" x2="20" y2="35" stroke={mobileActiveIdx === 4 ? "var(--signal)" : "rgba(128,128,128,0.2)"} strokeWidth={mobileActiveIdx === 4 ? "1.5" : "0.8"} />
-                      </svg>
-
-                      {/* Central core CPU button node */}
-                      <button 
-                        type="button"
-                        className={`absolute w-14 h-14 rounded-lg flex flex-col items-center justify-center border font-mono text-[8px] z-10 shadow-md transition-all duration-300 pointer-events-none
+                  /* HIGH-DENSITY DEPLOYED SKILLS DIRECTORY FOR MOBILE DEVICES */
+                  <div className="w-full flex flex-col gap-6 text-left select-none pointer-events-auto">
+                    {BOOKS_DATA.map((book, i) => (
+                      <div 
+                        key={i}
+                        className={`border rounded-lg p-5 font-mono transition-colors duration-300
                           ${isLightMode 
-                            ? "bg-[#ffffff] border-[#0c0c0e]/20 text-[#0c0c0e] shadow-[#0033aa]/5" 
-                            : "bg-[#080808] border-signal/30 text-signal shadow-signal/10"
+                            ? "bg-[#eef2f6] border-[#0c0c0e]/15 shadow-sm" 
+                            : "bg-zinc-900/60 border-zinc-800 shadow-md"
                           }
                         `}
-                        style={{ left: "calc(50% - 28px)", top: "calc(50% - 28px)" }}
-                        disabled
                       >
-                        <span className="font-black animate-pulse">CPU</span>
-                        <span className="text-[6px] opacity-60">DHRUV-OS</span>
-                      </button>
+                        <div className={`text-xs font-bold uppercase mb-4 pb-1 border-b tracking-wider flex justify-between
+                          ${isLightMode ? "text-[#0033aa] border-[#0033aa]/10" : "text-signal border-signal/15"}
+                        `}>
+                          <span>[ NODE 0{i + 1} // {book.spineTitle} ]</span>
+                          <span className="text-[8px] opacity-55">{book.volume}</span>
+                        </div>
 
-                      {/* Peripheral nodes */}
-                      <button
-                        type="button"
-                        onClick={() => setMobileActiveIdx(0)}
-                        className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-30 pointer-events-auto transition-all duration-300 shadow active:scale-95 cursor-pointer
-                          ${mobileActiveIdx === 0
-                            ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
-                            : (isLightMode ? "bg-[#ffffff] border-[#0c0c0e]/15 text-[#0c0c0e]/70" : "bg-[#18181b] border-zinc-700 text-zinc-400")
-                          }
-                        `}
-                        style={{ left: "calc(50% - 24px)", top: "10px" }}
-                      >
-                        <span className="text-[12px] mb-0.5">📂</span>
-                        <span>SYNTAX</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setMobileActiveIdx(1)}
-                        className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-30 pointer-events-auto transition-all duration-300 shadow active:scale-95 cursor-pointer
-                          ${mobileActiveIdx === 1
-                            ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
-                            : (isLightMode ? "bg-[#ffffff] border-[#0c0c0e]/15 text-[#0c0c0e]/70" : "bg-[#18181b] border-zinc-700 text-zinc-400")
-                          }
-                        `}
-                        style={{ right: "12px", top: "45px" }}
-                      >
-                        <span className="text-[12px] mb-0.5">🧠</span>
-                        <span>COG_MCH</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setMobileActiveIdx(2)}
-                        className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-30 pointer-events-auto transition-all duration-300 shadow active:scale-95 cursor-pointer
-                          ${mobileActiveIdx === 2
-                            ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
-                            : (isLightMode ? "bg-[#ffffff] border-[#0c0c0e]/15 text-[#0c0c0e]/70" : "bg-[#18181b] border-zinc-700 text-zinc-400")
-                          }
-                        `}
-                        style={{ right: "45px", bottom: "15px" }}
-                      >
-                        <span className="text-[12px] mb-0.5">🌐</span>
-                        <span>DIST_WEB</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setMobileActiveIdx(3)}
-                        className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-30 pointer-events-auto transition-all duration-300 shadow active:scale-95 cursor-pointer
-                          ${mobileActiveIdx === 3
-                            ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
-                            : (isLightMode ? "bg-[#ffffff] border-[#0c0c0e]/15 text-[#0c0c0e]/70" : "bg-[#18181b] border-zinc-700 text-zinc-400")
-                          }
-                        `}
-                        style={{ left: "45px", bottom: "15px" }}
-                      >
-                        <span className="text-[12px] mb-0.5">💾</span>
-                        <span>STORAGE</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setMobileActiveIdx(4)}
-                        className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-30 pointer-events-auto transition-all duration-300 shadow active:scale-95 cursor-pointer
-                          ${mobileActiveIdx === 4
-                            ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
-                            : (isLightMode ? "bg-[#ffffff] border-[#0c0c0e]/15 text-[#0c0c0e]/70" : "bg-[#18181b] border-zinc-700 text-zinc-400")
-                          }
-                        `}
-                        style={{ left: "12px", top: "45px" }}
-                      >
-                        <span className="text-[12px] mb-0.5">🛠️</span>
-                        <span>SYSTEMS</span>
-                      </button>
-                    </div>
-
-                    {/* HUD Skill Terminal Readout below node block */}
-                    <div className={`border rounded-lg p-4 font-mono select-none transition-colors duration-300
-                      ${isLightMode 
-                        ? "bg-[#eef2f6] border-[#0c0c0e]/15 shadow-sm" 
-                        : "bg-black/85 border-[#00ffcc]/15 shadow-[inset_0_0_20px_rgba(0,255,204,0.02)]"
-                      }
-                    `}>
-                      <div className={`text-[10px] font-bold uppercase mb-4 pb-1 border-b tracking-wider flex justify-between
-                        ${isLightMode ? "text-[#0033aa] border-[#0033aa]/10" : "text-signal border-signal/15"}
-                      `}>
-                        <span>[ KNOWLEDGE NODE // {BOOKS_DATA[mobileActiveIdx].spineTitle} ]</span>
-                        <span className="animate-pulse">STREAMING</span>
-                      </div>
-
-                      <div className="space-y-4">
-                        {BOOKS_DATA[mobileActiveIdx].items.map((skill, idx) => (
-                          <div key={idx} className="space-y-1.5">
-                            <div className="flex items-center justify-between text-xs font-bold text-ink">
-                              <span>{skill.name}</span>
-                              <span className={`text-[9px] font-mono
-                                ${isLightMode ? "text-[#c07000]" : "text-signal/90"}
+                        <div className="space-y-5">
+                          {book.items.map((skill, idx) => (
+                            <div key={idx} className="space-y-1.5">
+                              <div className="flex items-center justify-between text-xs font-bold text-ink">
+                                <span>{skill.name}</span>
+                                <span className={`text-[9px] font-mono
+                                  ${isLightMode ? "text-[#c07000]" : "text-signal/90"}
+                                `}>
+                                  LEVEL_{skill.level * 20}%
+                                </span>
+                              </div>
+                              
+                              {/* Visual Level Progress Bar */}
+                              <div className={`w-full h-1.5 rounded-full overflow-hidden
+                                ${isLightMode ? "bg-black/10" : "bg-zinc-800"}
                               `}>
-                                LEVEL_{skill.level * 20}%
-                              </span>
-                            </div>
-                            
-                            {/* Visual Level Progress Bar */}
-                            <div className={`w-full h-1.5 rounded-full overflow-hidden
-                              ${isLightMode ? "bg-black/10" : "bg-zinc-800"}
-                            `}>
-                              <div 
-                                className={`h-full rounded-full transition-all duration-500
-                                  ${isLightMode ? "bg-[#0033aa]" : "bg-signal"}
-                                `}
-                                style={{ width: `${skill.level * 20}%` }}
-                              />
-                            </div>
+                                <div 
+                                  className={`h-full rounded-full transition-all duration-500
+                                    ${isLightMode ? "bg-[#0033aa]" : "bg-signal"}
+                                  `}
+                                  style={{ width: `${skill.level * 20}%` }}
+                                />
+                              </div>
 
-                            <p className="text-[9px] text-ink/50 pl-1 leading-relaxed">
-                              - {skill.note}
-                            </p>
-                          </div>
-                        ))}
+                              <p className="text-[9px] text-ink/50 pl-1 leading-relaxed">
+                                - {skill.note}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-
-                      <div className="pt-4 border-t border-subtle mt-4 flex items-center justify-between text-[8px] text-ink/40 font-bold uppercase">
-                        <span>VERIFIED_OK // CHECKSUM_VALID</span>
-                        <button
-                          type="button"
-                          onClick={() => handleOpenBook(mobileActiveIdx)}
-                          className={`underline hover:text-signal transition-all cursor-pointer text-[9px]
-                            ${isLightMode ? "text-[#0033aa]" : "text-signal"}
-                          `}
-                        >
-                          [ Full Archives Ledger ]
-                        </button>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 ) : (
                   /* THE WOODEN/STEEL BOOKSHELF PLATFORM FOR DESKTOP */
