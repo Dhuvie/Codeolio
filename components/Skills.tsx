@@ -161,115 +161,9 @@ const BOOKS_DATA = [
 
 export default function Skills() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [openBookIdx, setOpenBookIdx] = useState<number | null>(null);
-  const [isClosing, setIsClosing] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(0);
   const [isLightMode, setIsLightMode] = useState(false);
-  const lastOpenedBookIdxRef = useRef<number>(0);
 
-  // Mobile swipeable shelf states
-  const [isMobileShelf, setIsMobileShelf] = useState(false);
-  const [mobileActiveIdx, setMobileActiveIdx] = useState(2);
-  const [shelfDragOffset, setShelfDragOffset] = useState(0);
-  const [isDraggingShelf, setIsDraggingShelf] = useState(false);
-
-  const shelfDragStart = useRef(0);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handleResize = () => {
-      setIsMobileShelf(window.innerWidth < 768);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const handleShelfPointerDown = (e: React.PointerEvent) => {
-    shelfDragStart.current = e.clientX;
-    setIsDraggingShelf(true);
-    setShelfDragOffset(0);
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-  };
-
-  const handleShelfPointerMove = (e: React.PointerEvent) => {
-    if (!isDraggingShelf) return;
-    const dx = e.clientX - shelfDragStart.current;
-    setShelfDragOffset(dx);
-  };
-
-  const handleShelfPointerUp = (e: React.PointerEvent) => {
-    if (!isDraggingShelf) return;
-    setIsDraggingShelf(false);
-    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-
-    const dx = e.clientX - shelfDragStart.current;
-    if (Math.abs(dx) > 40) {
-      if (dx < 0) {
-        setMobileActiveIdx((prev) => Math.min(BOOKS_DATA.length - 1, prev + 1));
-      } else {
-        setMobileActiveIdx((prev) => Math.max(0, prev - 1));
-      }
-    } else {
-      if (Math.abs(dx) < 8) {
-        handleOpenBook(mobileActiveIdx);
-      }
-    }
-    setShelfDragOffset(0);
-  };
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handleLeft = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      if (customEvent.detail?.activeSection === "skills") {
-        setMobileActiveIdx((prev) => Math.max(0, prev - 1));
-      }
-    };
-    const handleRight = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      if (customEvent.detail?.activeSection === "skills") {
-        setMobileActiveIdx((prev) => Math.min(BOOKS_DATA.length - 1, prev + 1));
-      }
-    };
-    const handleButtonA = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      if (customEvent.detail?.activeSection === "skills") {
-        if (openBookIdx === null) {
-          handleOpenBook(mobileActiveIdx);
-        }
-      }
-    };
-    const handleButtonB = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      if (customEvent.detail?.activeSection === "skills") {
-        if (openBookIdx !== null) {
-          handleCloseBook();
-        }
-      }
-    };
-
-    window.addEventListener("mobile-dpad-left", handleLeft);
-    window.addEventListener("mobile-dpad-right", handleRight);
-    window.addEventListener("mobile-button-a", handleButtonA);
-    window.addEventListener("mobile-button-b", handleButtonB);
-
-    return () => {
-      window.removeEventListener("mobile-dpad-left", handleLeft);
-      window.removeEventListener("mobile-dpad-right", handleRight);
-      window.removeEventListener("mobile-button-a", handleButtonA);
-      window.removeEventListener("mobile-button-b", handleButtonB);
-    };
-  }, [openBookIdx, mobileActiveIdx]);
-
-  // Keep track of the last opened book index so that the text content
-  // remains rendered and readable during the exit/close animation.
-  useEffect(() => {
-    if (openBookIdx !== null) {
-      lastOpenedBookIdxRef.current = openBookIdx;
-    }
-  }, [openBookIdx]);
-
-  // Sync theme
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsLightMode(document.documentElement.classList.contains("light"));
@@ -308,64 +202,7 @@ export default function Skills() {
     };
   }, []);
 
-  // Procedural audio synthesizer for paper book flipping
-  const playPaperSound = (type: "open" | "close") => {
-    if (typeof window === "undefined") return;
-    try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const bufferSize = audioCtx.sampleRate * 0.35;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      
-      // Generate custom white noise values
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-      
-      const noiseSource = audioCtx.createBufferSource();
-      noiseSource.buffer = buffer;
 
-      const lowpassFilter = audioCtx.createBiquadFilter();
-      lowpassFilter.type = "lowpass";
-
-      if (type === "open") {
-        lowpassFilter.frequency.setValueAtTime(550, audioCtx.currentTime);
-        lowpassFilter.frequency.exponentialRampToValueAtTime(1100, audioCtx.currentTime + 0.25);
-      } else {
-        lowpassFilter.frequency.setValueAtTime(950, audioCtx.currentTime);
-        lowpassFilter.frequency.exponentialRampToValueAtTime(320, audioCtx.currentTime + 0.2);
-      }
-
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.32);
-
-      noiseSource.connect(lowpassFilter);
-      lowpassFilter.connect(gain);
-      gain.connect(audioCtx.destination);
-      
-      noiseSource.start();
-    } catch (err) {
-      // Audio contexts blocked by security
-    }
-  };
-
-  const handleOpenBook = (idx: number) => {
-    playPaperSound("open");
-    setOpenBookIdx(idx);
-  };
-
-  const handleCloseBook = () => {
-    playPaperSound("close");
-    setIsClosing(true);
-    setTimeout(() => {
-      setOpenBookIdx(null);
-      setIsClosing(false);
-    }, 600); // 600ms matches the closing transition duration
-  };
-
-  const activeBookIdx = openBookIdx !== null ? openBookIdx : lastOpenedBookIdxRef.current;
-  const activeBook = BOOKS_DATA[activeBookIdx];
 
   return (
     <section ref={sectionRef} id="skills" className="relative py-12 overflow-hidden border-b border-signal/15">
@@ -376,10 +213,10 @@ export default function Skills() {
         <SplitTextReveal text="Knowledge Library." className="font-display font-semibold text-5xl md:text-6xl mb-16" />
 
         {/* WORKSPACE CASE CONSOLE */}
-        <div className={`cyber-window cyber-window-skills w-full border border-subtle transition-colors duration-300 relative
+        <div className={`cyber-window cyber-window-skills w-full border border-subtle transition-colors duration-300 relative backdrop-blur-xl rounded-2xl
           ${isLightMode 
-            ? "bg-[#fafafa]/90 shadow-[0_30px_60px_rgba(0,0,0,0.06)]" 
-            : "bg-[#09090b]/80 shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
+            ? "bg-[#fafafa]/35 shadow-[0_30px_60px_rgba(0,0,0,0.06)]" 
+            : "bg-[#09090b]/35 shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
           }
         `}>
           {/* Decorative Terminal Header */}
@@ -391,40 +228,69 @@ export default function Skills() {
               </span>
             </div>
             <div className="font-mono text-[8px] text-ink/40 tracking-wider">
-              {openBookIdx !== null ? "VOL_OPEN // READING" : "VOL_CLOSED // SHELF"}
+              VOL_SELECTED // READ_ACTIVE
             </div>
           </div>
 
-          <div className="w-full p-6 bg-surface/5 relative pointer-events-auto">
-            {/* GRID DIRECTORY SHOWCASE */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left select-none">
+          <div className="w-full p-6 bg-surface/5 relative pointer-events-auto flex flex-col md:flex-row gap-6">
+            
+            {/* LEFT SIDEBAR: CATEGORY NAVIGATION (Horizontal scroll on mobile, Vertical stack on desktop) */}
+            <div className="w-full md:w-1/4 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-3 md:pb-0 border-b md:border-b-0 md:border-r border-subtle md:pr-4 scrollbar-none">
               {BOOKS_DATA.map((book, i) => (
-                <div 
+                <button
                   key={i}
-                  className={`border rounded-lg p-5 font-mono transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] lg:hover:scale-[1.01]
-                    ${isLightMode 
-                      ? "bg-[#ffffff] border-[#0c0c0e]/10 shadow-sm" 
-                      : "bg-[#0c0c0e]/60 border-zinc-800 shadow-md"
+                  type="button"
+                  onClick={() => setActiveIdx(i)}
+                  className={`w-full text-left font-mono text-[10px] md:text-xs px-3.5 py-2.5 rounded-lg border transition-all duration-200 flex items-center justify-between whitespace-nowrap md:whitespace-normal cursor-pointer select-none
+                    ${activeIdx === i
+                      ? (isLightMode 
+                          ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold shadow-md shadow-[#0033aa]/10" 
+                          : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/15"
+                        )
+                      : (isLightMode 
+                          ? "bg-white/80 border-black/5 hover:bg-zinc-100/80 text-zinc-600" 
+                          : "bg-zinc-950/20 border-zinc-800 hover:bg-zinc-900/30 text-zinc-400"
+                        )
                     }
                   `}
                 >
-                  <div className={`text-xs font-bold uppercase mb-4 pb-2 border-b tracking-wider flex justify-between items-center
+                  <div className="flex items-center gap-2">
+                    <span className="opacity-60">0{i + 1}.</span>
+                    <span className="tracking-wider">{book.spineTitle}</span>
+                  </div>
+                  <span className="text-[8px] opacity-50 hidden md:inline">{book.volume}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* RIGHT PANEL: SELECTED CATEGORY TELEMETRY READOUT */}
+            <div className="flex-grow text-left select-none">
+              <div 
+                className={`border rounded-lg p-5 font-mono transition-colors duration-300 min-h-[300px] flex flex-col justify-between
+                  ${isLightMode 
+                    ? "bg-white/40 border-black/5 shadow-sm text-zinc-900" 
+                    : "bg-[#0c0c0e]/30 border-zinc-800 shadow-md text-white"
+                  }
+                `}
+              >
+                <div>
+                  <div className={`text-[10px] font-bold uppercase mb-4 pb-2 border-b tracking-wider flex justify-between items-center
                     ${isLightMode ? "text-[#0033aa] border-black/5" : "text-signal border-white/5"}
                   `}>
                     <div className="flex items-center gap-2">
                       <span className={`w-1.5 h-1.5 rounded-full ${isLightMode ? "bg-[#0033aa]" : "bg-signal"} animate-pulse`} />
-                      <span>[ MODULE_0{i + 1} // {book.spineTitle} ]</span>
+                      <span>[ SYSTEM MODULE_0{activeIdx + 1} // {BOOKS_DATA[activeIdx].title} ]</span>
                     </div>
-                    <span className={`text-[8px] font-bold ${isLightMode ? "text-zinc-400" : "text-white/30"}`}>{book.volume}</span>
+                    <span className={`text-[8px] font-bold ${isLightMode ? "text-zinc-400" : "text-white/30"}`}>{BOOKS_DATA[activeIdx].volume}</span>
                   </div>
 
-                  <p className={`text-[10px] leading-relaxed mb-4 min-h-[40px] ${isLightMode ? "text-zinc-500" : "text-white/50"}`}>
-                    Technical registry of {book.title.toLowerCase()} and operational runtime architectures compiled during production.
+                  <p className={`text-[10px] leading-relaxed mb-5 ${isLightMode ? "text-zinc-500" : "text-white/50"}`}>
+                    Technical registry of {BOOKS_DATA[activeIdx].title.toLowerCase()} and operational runtime architectures compiled during production.
                   </p>
 
-                  <div className="space-y-4">
-                    {book.items.map((skill, idx) => (
-                      <div key={idx} className="space-y-1.5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {BOOKS_DATA[activeIdx].items.map((skill, idx) => (
+                      <div key={idx} className="space-y-1.5 border border-dashed rounded p-3 border-subtle">
                         <div className="flex items-center justify-between text-xs font-bold text-ink">
                           <span>{skill.name}</span>
                           <span className={`text-[9px] font-mono
@@ -435,7 +301,7 @@ export default function Skills() {
                         </div>
                         
                         {/* Visual Level Progress Bar */}
-                        <div className={`w-full h-1.5 rounded-full overflow-hidden
+                        <div className={`w-full h-1 rounded-full overflow-hidden
                           ${isLightMode ? "bg-black/10" : "bg-zinc-800"}
                         `}>
                           <div 
@@ -453,17 +319,15 @@ export default function Skills() {
                     ))}
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Plaque under grid */}
-            <div className="flex justify-center mt-8">
-              <div className={`px-5 py-1.5 border rounded-md font-mono text-[9px] uppercase tracking-widest
-                ${isLightMode ? "border-zinc-300 bg-white text-zinc-600" : "border-zinc-800 bg-zinc-900/60 text-zinc-400"}
-              `}>
-                Dhuvie Knowledge Archives // Directory Edition
+                {/* Plaque under panel */}
+                <div className={`border-t pt-4 mt-6 flex items-center justify-between text-[8.5px] font-bold uppercase ${isLightMode ? "border-black/5 text-zinc-400" : "border-white/5 text-white/30"}`}>
+                  <span>VERIFIED_OK // CHECKSUM_VALID</span>
+                  <span>Dhuvie Knowledge Archives // Directory Edition</span>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>

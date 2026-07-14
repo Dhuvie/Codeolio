@@ -2154,8 +2154,12 @@ export default function Projects() {
           </div>
         ) : (
           /* DESKTOP DEVELOPER IDE WORKSPACE */
-          <div className="border border-signal/20 bg-surface/30 backdrop-blur-md rounded-xl overflow-hidden shadow-[0_0_50px_rgba(240,160,0,0.03)]">
-            
+          <div className={`border rounded-xl overflow-hidden shadow-[0_0_50px_rgba(240,160,0,0.03)] backdrop-blur-xl transition-colors duration-300
+            ${isLightMode 
+              ? "bg-[#fafafa]/35 border-black/5" 
+              : "bg-[#0c0c0e]/30 border-signal/20"
+            }
+          `}>
             {/* Futuristic Terminal Title Bar */}
             <div className="border-b border-signal/20 bg-surface/80 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">

@@ -79,6 +79,22 @@ export default function Experience() {
   const [isClosingId, setIsClosingId] = useState<number | null>(null);
   const [positions, setPositions] = useState<{ [key: number]: { x: number; y: number; rot: number } }>({});
   const [draggingId, setDraggingId] = useState<number | null>(null);
+  const [isLightMode, setIsLightMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLightMode(document.documentElement.classList.contains("light"));
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === "class") {
+            setIsLightMode(document.documentElement.classList.contains("light"));
+          }
+        });
+      });
+      observer.observe(document.documentElement, { attributes: true });
+      return () => observer.disconnect();
+    }
+  }, []);
   
   // Mobile swipeable deck states
   const [cardOrder, setCardOrder] = useState<number[]>([0, 1, 2]);
@@ -362,9 +378,13 @@ export default function Experience() {
         {/* Top-down physical desk container */}
         <div 
           ref={deskRef}
-          className={`relative w-full border border-white/10 bg-[#0d0d11] rounded-3xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.85),inset_0_0_80px_rgba(0,0,0,0.7)] p-6 transition-all duration-300 ${
-            isMobileDesk && activeId === null && isClosingId === null ? "h-auto min-h-[500px] pb-12" : "h-[620px]"
-          }`}
+          className={`relative w-full border rounded-3xl overflow-hidden p-6 transition-all duration-300 backdrop-blur-xl
+            ${isLightMode 
+              ? "bg-[#fafafa]/35 border-black/5 shadow-[0_30px_80px_rgba(0,0,0,0.06)] text-zinc-900" 
+              : "bg-[#0d0d11]/35 border-white/5 shadow-[0_30px_80px_rgba(0,0,0,0.65)] text-white"
+            }
+            ${isMobileDesk && activeId === null && isClosingId === null ? "h-auto min-h-[500px] pb-12" : "h-[620px]"}
+          `}
         >
           <div className="absolute top-4 left-6 font-mono text-[9px] text-white/20 uppercase tracking-widest pointer-events-none z-10">
             DHOVIE_WORKSPACE // CLASSIFIED FILES {isMobileDesk ? "" : "(POINTER DRAGGABLE)"}

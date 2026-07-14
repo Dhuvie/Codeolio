@@ -213,10 +213,10 @@ export default function Certifications() {
           {CERTIFICATIONS.map((cert, i) => (
             <div 
               key={i} 
-              className={`relative border p-6 rounded-lg font-mono text-left transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] lg:hover:scale-[1.01] ${
+              className={`relative border p-6 rounded-lg font-mono text-left transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] lg:hover:scale-[1.01] backdrop-blur-xl ${
                 isLightMode 
-                  ? "bg-[#eef2f6] border-[#0c0c0e]/15 shadow-sm text-zinc-900" 
-                  : "bg-[#0c0c0e]/90 border-zinc-800 text-white"
+                  ? "bg-white/35 border-black/5 shadow-sm text-zinc-900" 
+                  : "bg-[#0c0c0e]/40 border-zinc-800 text-white"
               }`}
             >
               {/* Visual corners */}
