@@ -456,102 +456,241 @@ function NeuralMatrix({ isLightMode, isBatteryPower }: { isLightMode: boolean; i
 }
 
 const getShapes = () => {
-  const grid = [];
-  for(let i=0; i<64; i++) {
-     const r = Math.floor(i/8);
-     const c = i%8;
-     grid.push({ x: (c-3.5)*22, y: (r-3.5)*22, r: 45 });
+  const grid: { x: number; y: number; r: number }[] = [];
+  for (let i = 0; i < 64; i++) {
+    const r = Math.floor(i / 8);
+    const c = i % 8;
+    const x = (c - 3.5) * 20;
+    const y = (r - 3.5) * 20;
+    const rAngle = Math.atan2(y, x) * (180 / Math.PI);
+    grid.push({ x, y, r: rAngle });
   }
 
-  const question = [];
-  for(let i=0; i<8; i++) {
-     const a = (i/8)*Math.PI*2;
-     question.push({ x: Math.cos(a)*6, y: 35 + Math.sin(a)*6, r: 0 });
+  const question: { x: number; y: number; r: number }[] = [];
+  // Arc loop at the top: radius 25, centered at (0, 20) (30 points from -30deg to 210deg)
+  for (let i = 0; i < 30; i++) {
+    const angle = (-30 + (240 * i) / 29) * (Math.PI / 180);
+    const x = Math.cos(angle) * 25;
+    const y = 20 + Math.sin(angle) * 25;
+    const r = angle * (180 / Math.PI) + 90;
+    question.push({ x, y, r });
   }
-  for(let i=0; i<16; i++) {
-     question.push({ x: 0, y: 15 - (25*i/15), r: 0 });
+  // Hook curve/connection segment leading to center line (14 points)
+  for (let i = 0; i < 14; i++) {
+    const t = i / 13;
+    const x = 25 * (1 - t);
+    const y = 20 - 25 * t;
+    const r = -45;
+    question.push({ x, y, r });
   }
-  for(let i=0; i<10; i++) {
-     const a = Math.PI + (Math.PI/2 * i/9);
-     question.push({ x: 20 + Math.cos(a)*20, y: -10 + Math.sin(a)*20, r: 45 });
+  // Vertical stem segment (12 points)
+  for (let i = 0; i < 12; i++) {
+    const t = i / 11;
+    const x = 0;
+    const y = -5 - 17 * t;
+    const r = 90;
+    question.push({ x, y, r });
   }
-  for(let i=0; i<30; i++) {
-     const a = 0 - (Math.PI * i/29);
-     question.push({ x: Math.cos(a)*20, y: -30 + Math.sin(a)*20, r: 0 });
-  }
-
-  const brackets = [];
-  for(let i=0; i<16; i++) brackets.push({ x: -40 + (-30*i/15), y: -40 + (40*i/15), r: -45 });
-  for(let i=0; i<16; i++) brackets.push({ x: -70 + (30*i/15), y: 0 + (40*i/15), r: 45 });
-  for(let i=0; i<16; i++) brackets.push({ x: 40 + (30*i/15), y: -40 + (40*i/15), r: 45 });
-  for(let i=0; i<16; i++) brackets.push({ x: 70 + (-30*i/15), y: 0 + (40*i/15), r: -45 });
-
-  const crown = [];
-  for(let i=0; i<16; i++) crown.push({ x: -50 + (100*i/15), y: 40, r: 0 }); // base
-  for(let i=0; i<8; i++) crown.push({ x: -50 + (10*i/7), y: 40 + (-60*i/7), r: 80 }); // left up
-  for(let i=0; i<8; i++) crown.push({ x: -40 + (25*i/7), y: -20 + (40*i/7), r: -45 }); // left down
-  for(let i=0; i<8; i++) crown.push({ x: -15 + (15*i/7), y: 20 + (-70*i/7), r: 75 }); // center up
-  for(let i=0; i<8; i++) crown.push({ x: 0 + (15*i/7), y: -50 + (70*i/7), r: -75 }); // center down
-  for(let i=0; i<8; i++) crown.push({ x: 15 + (25*i/7), y: 20 + (-40*i/7), r: 45 }); // right up
-  for(let i=0; i<8; i++) crown.push({ x: 40 + (10*i/7), y: -20 + (60*i/7), r: -80 }); // right down
-
-  const cert = [];
-  for(let i=0; i<16; i++) cert.push({ x: -35 + (70*i/15), y: -45, r: 0 }); // Top
-  for(let i=0; i<12; i++) cert.push({ x: 35, y: -45 + (75*i/11), r: 90 }); // Right
-  for(let i=0; i<16; i++) cert.push({ x: 35 - (70*i/15), y: 30, r: 0 }); // Bottom
-  for(let i=0; i<12; i++) cert.push({ x: -35, y: 30 - (75*i/11), r: 90 }); // Left
-  for(let i=0; i<8; i++) {
-     const a = (i/8)*Math.PI*2;
-     cert.push({ x: 20 + Math.cos(a)*10, y: 20 + Math.sin(a)*10, r: 0 }); // Seal
+  // Bottom circle dot (8 points)
+  for (let i = 0; i < 8; i++) {
+    const angle = (i / 8) * Math.PI * 2;
+    const x = Math.cos(angle) * 3.5;
+    const y = -40 + Math.sin(angle) * 3.5;
+    const r = angle * (180 / Math.PI);
+    question.push({ x, y, r });
   }
 
-  const atom = [];
-  for(let i=0; i<16; i++) {
-     const a = (i/16)*Math.PI*2;
-     const tangent = Math.atan2(Math.cos(a)*15, -Math.sin(a)*40);
-     atom.push({ x: Math.cos(a)*40, y: Math.sin(a)*15, r: tangent*180/Math.PI });
+  const brackets: { x: number; y: number; r: number }[] = [];
+  // Left brace "{" (32 points)
+  for (let i = 0; i < 32; i++) {
+    let x = -30;
+    let y = 0;
+    let r = 90;
+    if (i < 6) {
+      const t = i / 5;
+      x = -40 + 10 * t;
+      y = 45 - 5 * (1 - t) * (1 - t);
+      r = 15;
+    } else if (i < 14) {
+      const t = (i - 6) / 7;
+      x = -30;
+      y = 40 - 30 * t;
+      r = 90;
+    } else if (i < 18) {
+      const t = (i - 14) / 3;
+      x = -30 - 10 * Math.sin(t * Math.PI);
+      y = 10 - 20 * t;
+      r = t < 0.5 ? 135 : 45;
+    } else if (i < 26) {
+      const t = (i - 18) / 7;
+      x = -30;
+      y = -10 - 30 * t;
+      r = 90;
+    } else {
+      const t = (i - 26) / 5;
+      x = -30 - 10 * t;
+      y = -40 - 5 * t * t;
+      r = -15;
+    }
+    brackets.push({ x, y, r });
   }
-  for(let i=0; i<16; i++) {
-     const a = (i/16)*Math.PI*2;
-     const x0 = Math.cos(a)*40;
-     const y0 = Math.sin(a)*15;
-     const x = x0*Math.cos(Math.PI/3) - y0*Math.sin(Math.PI/3);
-     const y = x0*Math.sin(Math.PI/3) + y0*Math.cos(Math.PI/3);
-     const tangent = Math.atan2(Math.cos(a)*15, -Math.sin(a)*40);
-     atom.push({ x, y, r: (tangent + Math.PI/3)*180/Math.PI });
-  }
-  for(let i=0; i<16; i++) {
-     const a = (i/16)*Math.PI*2;
-     const x0 = Math.cos(a)*40;
-     const y0 = Math.sin(a)*15;
-     const x = x0*Math.cos(-Math.PI/3) - y0*Math.sin(-Math.PI/3);
-     const y = x0*Math.sin(-Math.PI/3) + y0*Math.cos(-Math.PI/3);
-     const tangent = Math.atan2(Math.cos(a)*15, -Math.sin(a)*40);
-     atom.push({ x, y, r: (tangent - Math.PI/3)*180/Math.PI });
-  }
-  for(let i=0; i<16; i++) {
-     const a = (i/16)*Math.PI*2;
-     atom.push({ x: Math.cos(a)*8, y: Math.sin(a)*8, r: (a*180/Math.PI)+90 });
+  // Right brace "}" (32 points)
+  for (let i = 0; i < 32; i++) {
+    const leftPart = brackets[i];
+    brackets.push({
+      x: -leftPart.x,
+      y: leftPart.y,
+      r: -leftPart.r
+    });
   }
 
-  const phone = [];
-  for(let i=0; i<8; i++) phone.push({ x: -15 + (30*i/7), y: -10, r: 0 }); // top grip
-  for(let i=0; i<4; i++) phone.push({ x: 15 + (10*i/3), y: -10 - (15*i/3), r: 45 }); // right stem inner
-  for(let i=0; i<4; i++) phone.push({ x: 25 + (20*i/3), y: -25 + (10*i/3), r: -30 }); // right ear top
-  for(let i=0; i<10; i++) {
-     const a = -0.5 + (Math.PI/2 * i/9);
-     phone.push({ x: 35 + Math.cos(a)*18, y: 0 + Math.sin(a)*18, r: a*180/Math.PI + 90 }); // right arc
+  const crown: { x: number; y: number; r: number }[] = [];
+  // Base line (16 points)
+  for (let i = 0; i < 16; i++) {
+    const t = i / 15;
+    crown.push({ x: -45 + 90 * t, y: -35, r: 0 });
   }
-  for(let i=0; i<4; i++) phone.push({ x: 40 - (20*i/3), y: 15 - (10*i/3), r: 45 }); // right stem outer
-  for(let i=0; i<8; i++) phone.push({ x: 20 - (40*i/7), y: 5, r: 0 }); // bottom grip
-  for(let i=0; i<4; i++) phone.push({ x: -20 - (20*i/3), y: 5 + (10*i/3), r: -45 }); // left stem outer
-  for(let i=0; i<10; i++) {
-     const a = (Math.PI - 0.5) - (Math.PI/2 * i/9); 
-     phone.push({ x: -35 + Math.cos(a)*18, y: 0 + Math.sin(a)*18, r: a*180/Math.PI + 90 }); // left arc
+  // Left boundary line (6 points)
+  for (let i = 0; i < 6; i++) {
+    const t = i / 5;
+    crown.push({ x: -45, y: -35 + 25 * t, r: 90 });
   }
-  for(let i=0; i<4; i++) phone.push({ x: -45 + (20*i/3), y: -15 - (10*i/3), r: 30 }); // left ear top
-  for(let i=0; i<4; i++) phone.push({ x: -25 + (10*i/3), y: -25 + (15*i/3), r: -45 }); // left stem inner
-  for(let i=0; i<4; i++) phone.push({ x: (i%2===0 ? -5 : 5), y: 15 + (12*i), r: -45 }); // cord hanging down
+  // Right boundary line (6 points)
+  for (let i = 0; i < 6; i++) {
+    const t = i / 5;
+    crown.push({ x: 45, y: -35 + 25 * t, r: 90 });
+  }
+  // Left peak (12 points)
+  for (let i = 0; i < 12; i++) {
+    const t = i / 11;
+    let x = 0, y = 0, r = 0;
+    if (t < 0.5) {
+      const u = t * 2;
+      x = -45 + 22.5 * u;
+      y = -10 + 40 * u;
+      r = 60;
+    } else {
+      const u = (t - 0.5) * 2;
+      x = -22.5 + 22.5 * u;
+      y = 30 - 40 * u;
+      r = -60;
+    }
+    crown.push({ x, y, r });
+  }
+  // Right peak (12 points)
+  for (let i = 0; i < 12; i++) {
+    const t = i / 11;
+    let x = 0, y = 0, r = 0;
+    if (t < 0.5) {
+      const u = t * 2;
+      x = 0 + 22.5 * u;
+      y = -10 + 40 * u;
+      r = 60;
+    } else {
+      const u = (t - 0.5) * 2;
+      x = 22.5 + 22.5 * u;
+      y = 30 - 40 * u;
+      r = -60;
+    }
+    crown.push({ x, y, r });
+  }
+  // Center main peak (12 points)
+  for (let i = 0; i < 12; i++) {
+    const t = i / 11;
+    let x = 0, y = 0, r = 0;
+    if (t < 0.5) {
+      const u = t * 2;
+      x = -22.5 + 22.5 * u;
+      y = 30 + 20 * u;
+      r = 40;
+    } else {
+      const u = (t - 0.5) * 2;
+      x = 0 + 22.5 * u;
+      y = 50 - 20 * u;
+      r = -40;
+    }
+    crown.push({ x, y, r });
+  }
+
+  const cert: { x: number; y: number; r: number }[] = [];
+  // Outer rectangle lines (40 points)
+  for (let i = 0; i < 12; i++) cert.push({ x: -35 + 70 * (i / 11), y: 45, r: 0 });
+  for (let i = 0; i < 8; i++) cert.push({ x: 35, y: 45 - 90 * (i / 7), r: 90 });
+  for (let i = 0; i < 12; i++) cert.push({ x: 35 - 70 * (i / 11), y: -45, r: 0 });
+  for (let i = 0; i < 8; i++) cert.push({ x: -35, y: -45 + 90 * (i / 7), r: 90 });
+  
+  // Syllabus details rows (16 points)
+  for (let i = 0; i < 5; i++) cert.push({ x: -20 + 40 * (i / 4), y: 20, r: 0 });
+  for (let i = 0; i < 6; i++) cert.push({ x: -25 + 50 * (i / 5), y: 0, r: 0 });
+  for (let i = 0; i < 5; i++) cert.push({ x: -20 + 30 * (i / 4), y: -20, r: 0 });
+
+  // Bottom seal badge (8 points)
+  for (let i = 0; i < 8; i++) {
+    const angle = (i / 8) * Math.PI * 2;
+    cert.push({ x: 20 + Math.cos(angle) * 6, y: -30 + Math.sin(angle) * 6, r: angle * (180 / Math.PI) });
+  }
+
+  const atom: { x: number; y: number; r: number }[] = [];
+  // Orbit Ring 1 (18 points)
+  for (let i = 0; i < 18; i++) {
+    const a = (i / 18) * Math.PI * 2;
+    const x = Math.cos(a) * 42;
+    const y = Math.sin(a) * 12;
+    const r = Math.atan2(Math.cos(a) * 12, -Math.sin(a) * 42) * (180 / Math.PI);
+    atom.push({ x, y, r });
+  }
+  // Orbit Ring 2 tilted at 60deg (18 points)
+  const cos60 = Math.cos(Math.PI / 3);
+  const sin60 = Math.sin(Math.PI / 3);
+  for (let i = 0; i < 18; i++) {
+    const a = (i / 18) * Math.PI * 2;
+    const x0 = Math.cos(a) * 42;
+    const y0 = Math.sin(a) * 12;
+    const x = x0 * cos60 - y0 * sin60;
+    const y = x0 * sin60 + y0 * cos60;
+    const r = (Math.atan2(Math.cos(a) * 12, -Math.sin(a) * 42) * (180 / Math.PI)) + 60;
+    atom.push({ x, y, r });
+  }
+  // Orbit Ring 3 tilted at -60deg (18 points)
+  const cosNeg60 = Math.cos(-Math.PI / 3);
+  const sinNeg60 = Math.sin(-Math.PI / 3);
+  for (let i = 0; i < 18; i++) {
+    const a = (i / 18) * Math.PI * 2;
+    const x0 = Math.cos(a) * 42;
+    const y0 = Math.sin(a) * 12;
+    const x = x0 * cosNeg60 - y0 * sinNeg60;
+    const y = x0 * sinNeg60 + y0 * cosNeg60;
+    const r = (Math.atan2(Math.cos(a) * 12, -Math.sin(a) * 42) * (180 / Math.PI)) - 60;
+    atom.push({ x, y, r });
+  }
+  // Core Nucleus Cluster (10 points)
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2;
+    const radius = i % 2 === 0 ? 3 : 6;
+    atom.push({ x: Math.cos(a) * radius, y: Math.sin(a) * radius, r: a * (180 / Math.PI) });
+  }
+
+  const phone: { x: number; y: number; r: number }[] = [];
+  // Outer frame bounds (36 points)
+  for (let i = 0; i < 10; i++) phone.push({ x: -18 + 36 * (i / 9), y: 35, r: 0 });
+  for (let i = 0; i < 8; i++) phone.push({ x: 18, y: 35 - 70 * (i / 7), r: 90 });
+  for (let i = 0; i < 10; i++) phone.push({ x: 18 - 36 * (i / 9), y: -35, r: 0 });
+  for (let i = 0; i < 8; i++) phone.push({ x: -18, y: -35 + 70 * (i / 7), r: 90 });
+  
+  // Slit speaker (4 points)
+  for (let i = 0; i < 4; i++) phone.push({ x: -6 + 12 * (i / 3), y: 30, r: 0 });
+  
+  // Home button circle (8 points)
+  for (let i = 0; i < 8; i++) {
+    const angle = (i / 8) * Math.PI * 2;
+    phone.push({ x: Math.cos(angle) * 4, y: -28 + Math.sin(angle) * 4, r: angle * (180 / Math.PI) });
+  }
+  
+  // Inside screen window outline (16 points)
+  for (let i = 0; i < 5; i++) phone.push({ x: -14 + 28 * (i / 4), y: 20, r: 0 });
+  for (let i = 0; i < 3; i++) phone.push({ x: 14, y: 20 - 40 * (i / 2), r: 90 });
+  for (let i = 0; i < 5; i++) phone.push({ x: 14 - 28 * (i / 4), y: -20, r: 0 });
+  for (let i = 0; i < 3; i++) phone.push({ x: -14, y: -20 + 40 * (i / 2), r: 90 });
 
   return [grid, question, brackets, crown, cert, atom, phone];
 };
