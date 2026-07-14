@@ -217,6 +217,50 @@ export default function Skills() {
     setShelfDragOffset(0);
   };
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleLeft = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "skills") {
+        setMobileActiveIdx((prev) => Math.max(0, prev - 1));
+      }
+    };
+    const handleRight = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "skills") {
+        setMobileActiveIdx((prev) => Math.min(BOOKS_DATA.length - 1, prev + 1));
+      }
+    };
+    const handleButtonA = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "skills") {
+        if (openBookIdx === null) {
+          handleOpenBook(mobileActiveIdx);
+        }
+      }
+    };
+    const handleButtonB = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "skills") {
+        if (openBookIdx !== null) {
+          handleCloseBook();
+        }
+      }
+    };
+
+    window.addEventListener("mobile-dpad-left", handleLeft);
+    window.addEventListener("mobile-dpad-right", handleRight);
+    window.addEventListener("mobile-button-a", handleButtonA);
+    window.addEventListener("mobile-button-b", handleButtonB);
+
+    return () => {
+      window.removeEventListener("mobile-dpad-left", handleLeft);
+      window.removeEventListener("mobile-dpad-right", handleRight);
+      window.removeEventListener("mobile-button-a", handleButtonA);
+      window.removeEventListener("mobile-button-b", handleButtonB);
+    };
+  }, [openBookIdx, mobileActiveIdx]);
+
   // Keep track of the last opened book index so that the text content
   // remains rendered and readable during the exit/close animation.
   useEffect(() => {

@@ -1609,6 +1609,52 @@ export default function Projects() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const handleLeft = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "projects") {
+        setActiveIndex((prev) => Math.max(0, prev - 1));
+      }
+    };
+    const handleRight = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "projects") {
+        setActiveIndex((prev) => Math.min(PROJECTS.length - 1, prev + 1));
+      }
+    };
+    const handleButtonA = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "projects") {
+        if (!isExpanded) {
+          setIsExpanded(true);
+        } else {
+          window.dispatchEvent(new CustomEvent("mobile-simulation-trigger"));
+        }
+      }
+    };
+    const handleButtonB = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "projects") {
+        if (isExpanded) {
+          setIsExpanded(false);
+        }
+      }
+    };
+
+    window.addEventListener("mobile-dpad-left", handleLeft);
+    window.addEventListener("mobile-dpad-right", handleRight);
+    window.addEventListener("mobile-button-a", handleButtonA);
+    window.addEventListener("mobile-button-b", handleButtonB);
+
+    return () => {
+      window.removeEventListener("mobile-dpad-left", handleLeft);
+      window.removeEventListener("mobile-dpad-right", handleRight);
+      window.removeEventListener("mobile-button-a", handleButtonA);
+      window.removeEventListener("mobile-button-b", handleButtonB);
+    };
+  }, [isExpanded]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);

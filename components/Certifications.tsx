@@ -49,6 +49,52 @@ export default function Certifications() {
   const [isClosing, setIsClosing] = useState(false);
   const lastOpenedIdxRef = useRef<number>(0);
 
+  const [mobileCertHighlightIdx, setMobileCertHighlightIdx] = useState(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleLeft = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "certifications") {
+        setMobileCertHighlightIdx((prev) => Math.max(0, prev - 1));
+      }
+    };
+    const handleRight = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "certifications") {
+        setMobileCertHighlightIdx((prev) => Math.min(CERTIFICATIONS.length - 1, prev + 1));
+      }
+    };
+    const handleButtonA = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "certifications") {
+        if (expandedCardIdx === null) {
+          handleOpenCard(mobileCertHighlightIdx);
+        }
+      }
+    };
+    const handleButtonB = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "certifications") {
+        if (expandedCardIdx !== null) {
+          handleCloseCard();
+        }
+      }
+    };
+
+    window.addEventListener("mobile-dpad-left", handleLeft);
+    window.addEventListener("mobile-dpad-right", handleRight);
+    window.addEventListener("mobile-button-a", handleButtonA);
+    window.addEventListener("mobile-button-b", handleButtonB);
+
+    return () => {
+      window.removeEventListener("mobile-dpad-left", handleLeft);
+      window.removeEventListener("mobile-dpad-right", handleRight);
+      window.removeEventListener("mobile-button-a", handleButtonA);
+      window.removeEventListener("mobile-button-b", handleButtonB);
+    };
+  }, [expandedCardIdx, mobileCertHighlightIdx]);
+
   useEffect(() => {
     if (expandedCardIdx !== null) {
       lastOpenedIdxRef.current = expandedCardIdx;
@@ -158,7 +204,11 @@ export default function Certifications() {
             <div 
               key={i} 
               onClick={() => handleOpenCard(i)}
-              className="relative border p-10 backdrop-blur-sm pointer-events-auto cursor-pointer transition-transform hover:scale-[1.02] border-white/10 bg-black hover:bg-black/90 lg:mt-16"
+              className={`relative border p-10 backdrop-blur-sm pointer-events-auto cursor-pointer transition-transform hover:scale-[1.02] bg-black hover:bg-black/90 lg:mt-16 ${
+                mobileCertHighlightIdx === i 
+                  ? "border-[#f0a000] shadow-[0_0_15px_rgba(240,160,0,0.25)]" 
+                  : "border-white/10"
+              }`}
             >
               <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-signal/50 opacity-50" />
               <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-signal/50 opacity-50" />

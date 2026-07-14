@@ -24,6 +24,7 @@ const GlobalCanvas = dynamic(() => import("@/components/GlobalCanvas"), {
 
 import FolderTransition from "@/components/FolderTransition";
 import Preloader from "@/components/Preloader";
+import MobileConsole from "@/components/MobileConsole";
 
 export default function Home() {
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function Home() {
       <SignalLine />
       <ScrollProgress />
       <FolderTransition />
+      <MobileConsole />
 
       <main>
         <div data-section="hero"><Hero /></div>

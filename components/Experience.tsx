@@ -132,6 +132,66 @@ export default function Experience() {
       }
     }
   };
+
+  const swipeTopCard = (dir: -1 | 1) => {
+    if (activeId !== null) return;
+    const topId = cardOrder[0];
+    setSwipedCardId(topId);
+    setSwipeDirection(dir);
+    setTimeout(() => {
+      setCardOrder((prev) => {
+        const next = prev.filter((cid) => cid !== topId);
+        return [...next, topId];
+      });
+      setSwipedCardId(null);
+      setSwipeDirection(0);
+      setDragOffset({ x: 0, y: 0 });
+    }, 300);
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleLeft = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "experience") {
+        swipeTopCard(-1);
+      }
+    };
+    const handleRight = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "experience") {
+        swipeTopCard(1);
+      }
+    };
+    const handleButtonA = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "experience") {
+        if (activeId === null) {
+          openFolder(cardOrder[0]);
+        }
+      }
+    };
+    const handleButtonB = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.activeSection === "experience") {
+        if (activeId !== null) {
+          closeFolder();
+        }
+      }
+    };
+
+    window.addEventListener("mobile-dpad-left", handleLeft);
+    window.addEventListener("mobile-dpad-right", handleRight);
+    window.addEventListener("mobile-button-a", handleButtonA);
+    window.addEventListener("mobile-button-b", handleButtonB);
+
+    return () => {
+      window.removeEventListener("mobile-dpad-left", handleLeft);
+      window.removeEventListener("mobile-dpad-right", handleRight);
+      window.removeEventListener("mobile-button-a", handleButtonA);
+      window.removeEventListener("mobile-button-b", handleButtonB);
+    };
+  }, [activeId, cardOrder]);
   
   const pointerStart = useRef({ x: 0, y: 0 });
   const elementStart = useRef({ x: 0, y: 0, rot: 0 });
