@@ -467,20 +467,20 @@ const getShapes = () => {
   }
 
   const question: { x: number; y: number; r: number }[] = [];
-  // Arc loop at the top: radius 25, centered at (0, 20) (30 points from -30deg to 210deg)
+  // Arc loop: radius 25, centered at (0, 20) (30 points from 210deg to -30deg)
   for (let i = 0; i < 30; i++) {
-    const angle = (-30 + (240 * i) / 29) * (Math.PI / 180);
-    const x = -Math.cos(angle) * 25;
+    const angle = (210 - (240 * i) / 29) * (Math.PI / 180);
+    const x = Math.cos(angle) * 25;
     const y = 20 + Math.sin(angle) * 25;
-    const r = 90 - angle * (180 / Math.PI);
+    const r = angle * (180 / Math.PI) - 90;
     question.push({ x, y, r });
   }
-  // Hook curve/connection segment leading to center line (14 points)
+  // Hook segment leading from right side to center line (14 points)
   for (let i = 0; i < 14; i++) {
     const t = i / 13;
-    const x = -25 * (1 - t);
+    const x = 25 * (1 - t);
     const y = 20 - 25 * t;
-    const r = -45;
+    const r = 45;
     question.push({ x, y, r });
   }
   // Vertical stem segment (12 points)
@@ -494,7 +494,7 @@ const getShapes = () => {
   // Bottom circle dot (8 points)
   for (let i = 0; i < 8; i++) {
     const angle = (i / 8) * Math.PI * 2;
-    const x = -Math.cos(angle) * 3.5;
+    const x = Math.cos(angle) * 3.5;
     const y = -40 + Math.sin(angle) * 3.5;
     const r = angle * (180 / Math.PI);
     question.push({ x, y, r });
@@ -782,7 +782,7 @@ const MobileAnimeGrid = () => {
             tx = shape2.x; ty = shape2.y; tz = 0; tr = shape2.r;
         }
 
-        el.style.transform = `translate3d(${tx}px, ${ty}px, ${tz}px) rotate(${tr}deg)`;
+        el.style.transform = `translate3d(${tx}px, ${-ty}px, ${tz}px) rotate(${-tr}deg)`;
         el.style.opacity = op.toFixed(2);
       }
     };
@@ -823,7 +823,7 @@ const MobileAnimeGrid = () => {
               boxShadow: s.isOrange ? '0 0 6px rgba(0,0,0,0.1)' : '0 0 6px rgba(0,51,170,0.15)',
               borderRadius: '2px',
               willChange: 'transform, opacity',
-              transform: `translate3d(${s.positions[0].x}px, ${s.positions[0].y}px, 0px) rotate(${s.positions[0].r}deg)`,
+              transform: `translate3d(${s.positions[0].x}px, ${-s.positions[0].y}px, 0px) rotate(${-s.positions[0].r}deg)`,
             }}
           />
         ))}
