@@ -1420,7 +1420,7 @@ function ProjectVisualizer3D({ index, isExpanded, setIsExpanded }: { index: numb
 
       <button 
         onClick={() => setIsExpanded(true)}
-        className="absolute bottom-3 right-3 font-mono text-[9px] text-signal/90 border border-signal/30 bg-black/75 px-3 py-1 rounded hover:bg-signal/15 hover:text-white transition-all duration-300 z-30 shadow-[0_0_10px_rgba(240,160,0,0.05)] cursor-pointer"
+        className="absolute bottom-3 right-3 font-mono text-[9px] text-[#f0a000] border border-[#f0a000]/35 bg-black/75 px-3 py-1 rounded hover:bg-[#f0a000]/15 hover:text-[#ffffff] transition-all duration-300 z-30 shadow-[0_0_10px_rgba(240,160,0,0.05)] cursor-pointer"
       >
         [ EXPAND HUD OVERLAY ]
       </button>

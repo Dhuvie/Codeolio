@@ -39,8 +39,8 @@ export default function MagneticButton({
 
   const variantClasses =
     variant === "primary"
-      ? "text-signal"
-      : "text-ink";
+      ? "text-[#f0a000]"
+      : "text-[#ffffff]";
 
   const combinedClasses = `
     inline-flex items-center gap-2 px-8 py-4 rounded-full
@@ -79,7 +79,7 @@ export default function MagneticButton({
       <span className="relative z-20 flex items-center gap-2 overflow-hidden h-full drop-shadow-[0_0_8px_rgba(240,160,0,1.0)]">
         <span className="flex flex-col transition-transform duration-500 md:group-hover:-translate-y-full">
           <span className="flex items-center justify-center gap-2 h-full">{children}</span>
-          <span className="flex items-center justify-center gap-2 h-full absolute top-full left-0 text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]">{children}</span>
+          <span className="flex items-center justify-center gap-2 h-full absolute top-full left-0 text-[#ffffff] drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]">{children}</span>
         </span>
       </span>
     </>
