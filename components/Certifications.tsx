@@ -204,7 +204,7 @@ export default function Certifications() {
             }`}
           >
             {/* 1. REVEALED CENTRAL CORE (UNDER THE DOORS) */}
-            <div className={`absolute inset-0 z-0 p-8 flex flex-col justify-between overflow-y-auto font-mono text-xs ${
+            <div className={`absolute inset-0 z-0 p-5 md:p-8 flex flex-col justify-between overflow-y-auto font-mono text-xs ${
               isLightMode ? "bg-[#f4f4f7] text-[#0c0c0e]" : "bg-[#040406] text-white"
             }`}>
               {/* Gold backing aura */}
@@ -233,19 +233,19 @@ export default function Certifications() {
                   </span>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   <div>
                     <span className={`text-[9px] uppercase tracking-widest block mb-0.5 ${
                       isLightMode ? "text-[#c08000]/80" : "text-[#f0a000]/60"
                     }`}>Title of Registry</span>
-                    <h3 className={`font-display font-bold text-xl md:text-2xl uppercase tracking-wide leading-tight ${
+                    <h3 className={`font-display font-bold text-lg md:text-2xl uppercase tracking-wide leading-tight ${
                       isLightMode ? "text-black" : "text-white"
                     }`}>
                       {activeCert.text}
                     </h3>
                   </div>
 
-                  <div className={`grid grid-cols-2 gap-4 border-y py-4 my-2 ${
+                  <div className={`grid grid-cols-2 gap-3 md:gap-4 border-y py-3 md:py-4 my-2 ${
                     isLightMode ? "border-black/10" : "border-white/5"
                   }`}>
                     <div className={`space-y-1.5 border-r pr-4 ${isLightMode ? "border-black/10" : "border-white/5"}`}>
@@ -266,14 +266,14 @@ export default function Certifications() {
                     <span className={`text-[9px] uppercase tracking-widest block ${
                       isLightMode ? "text-[#c08000]/80" : "text-[#f0a000]/60"
                     }`}>Operational syllabus modules</span>
-                    <p className={`font-sans text-[11px] leading-relaxed font-medium ${
+                    <p className={`font-sans text-[10px] md:text-[11px] leading-relaxed font-medium ${
                       isLightMode ? "text-black/70" : "text-white/70"
                     }`}>
                       {activeCert.description}
                     </p>
                   </div>
 
-                  <div className="space-y-2.5 pt-2">
+                  <div className="space-y-2 md:space-y-2.5 pt-2">
                     <span className={`text-[9px] uppercase tracking-widest block ${
                       isLightMode ? "text-[#c08000]/80" : "text-[#f0a000]/60"
                     }`}>Acquired Competencies</span>
@@ -295,7 +295,7 @@ export default function Certifications() {
                 </div>
               </div>
 
-              <div className={`relative z-10 border-t pt-4 flex items-center justify-between mt-6 ${
+              <div className={`relative z-10 border-t pt-3 md:pt-4 flex items-center justify-between mt-4 md:mt-6 ${
                 isLightMode ? "border-black/10" : "border-[#f0a000]/15"
               }`}>
                 <span className={`text-[8px] uppercase tracking-widest ${isLightMode ? "text-black/40" : "text-white/20"}`}>[ Click outside to seal vault ]</span>
@@ -326,7 +326,7 @@ export default function Certifications() {
                 opacity: isDeclassified ? 0 : 1
               }}
             >
-              <div className="w-[600px] h-full p-10 relative">
+              <div className="w-[200%] h-full p-6 md:p-10 relative">
                 <div className={`absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 opacity-50 ${isLightMode ? "border-black/30" : "border-signal/50"}`} />
                 <span className={`font-mono text-[10px] tracking-widest uppercase block mb-8 ${isLightMode ? "text-[#c08000]" : "text-signal"}`}>
                   SYS.ID // {activeCert.id}
@@ -352,8 +352,8 @@ export default function Certifications() {
                 opacity: isDeclassified ? 0 : 1
               }}
             >
-              <div className="w-[600px] h-full p-10 relative" style={{ transform: "translateX(-300px)" }}>
-                <div className={`absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 opacity-50 ${isLightMode ? "border-black/30" : "border-signal/50"}`} style={{ transform: "translateX(300px)" }} />
+              <div className="w-[200%] h-full p-6 md:p-10 relative" style={{ transform: "translateX(-50%)" }}>
+                <div className={`absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 opacity-50 ${isLightMode ? "border-black/30" : "border-signal/50"}`} />
                 <span className={`font-mono text-[10px] tracking-widest uppercase block mb-8 ${isLightMode ? "text-[#c08000]" : "text-signal"}`}>
                   SYS.ID // {activeCert.id}
                 </span>
