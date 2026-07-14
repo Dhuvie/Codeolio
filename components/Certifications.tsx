@@ -12,7 +12,7 @@ const CERTIFICATIONS = [
     hash: "SHA-256: 8a4e9b98fd292c10a30bfe19",
     description: "Professional certification validating advanced Java language constructs, memory optimizations, multi-threading architectures, garbage collection algorithms, and concurrency schedulers.",
     skills: "Java 17 OOP, Concurrency, Stream API, Memory Management, Unit Testing",
-    verification: "https://www.oracle.com/education/certification/"
+    verification: "https://www.credly.com/users/dhruv-narayan-bajaj"
   },
   { 
     text: "SAP Generative AI Developer", 
@@ -22,7 +22,7 @@ const CERTIFICATIONS = [
     hash: "SHA-256: 9b2d3e11a3b8c199201dfbc2",
     description: "Advanced generative AI developer validation focusing on orchestrating cognitive agents, vector embedding layouts, RAG architectures, prompt engineering models, and LLM API integrations.",
     skills: "GenAI Foundations, LLM Orchestration, RAG Architectures, Vector Stores",
-    verification: "https://credsverse.com/credentials/"
+    verification: "https://www.credly.com/users/dhruv-narayan-bajaj"
   },
   { 
     text: "SAP Business AI Solutions", 
@@ -32,7 +32,7 @@ const CERTIFICATIONS = [
     hash: "SHA-256: 7c8d9e12f0a1c3b8890123df",
     description: "Specialized validation verifying capability in designing, training, and integrating predictive ML pipelines and automated agents into enterprise database systems safely.",
     skills: "Predictive Analytics, Enterprise Integration, Automated Workflows, Ethics",
-    verification: "https://credsverse.com/credentials/"
+    verification: "https://www.credly.com/users/dhruv-narayan-bajaj"
   }
 ];
 
