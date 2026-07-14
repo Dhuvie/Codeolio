@@ -2053,14 +2053,14 @@ export default function Projects() {
 
   return (
     <section id="projects" ref={containerRef} className="relative overflow-hidden py-24 border-y border-signal/15 z-10 bg-bg">
-      <div className="w-[96%] max-w-[1720px] mx-auto pb-12 relative z-20">
-        <p className="font-mono text-sm text-signal tracking-[0.5em] uppercase mb-4" data-cursor-magnetic>
+      <div className="w-[96%] max-w-[1200px] mx-auto pb-12 relative z-20">
+        <p className="font-mono text-xs md:text-sm text-signal tracking-[0.3em] md:tracking-[0.5em] uppercase mb-4" data-cursor-magnetic>
           {"// Project Workspace"}
         </p>
-        <SplitTextReveal text="Things I've built." className="font-display font-semibold text-5xl md:text-7xl text-white" />
+        <SplitTextReveal text="Things I've built." className="font-display font-semibold text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white" />
       </div>
 
-      <div className="w-[96%] max-w-[1720px] mx-auto relative z-20">
+      <div className="w-[96%] max-w-[1200px] mx-auto relative z-20">
         {isMobileView ? (
           /* MOBILE UNIFIED SCREEN PROJECT TELEMETRY DECK */
           <div className="flex flex-col gap-4">

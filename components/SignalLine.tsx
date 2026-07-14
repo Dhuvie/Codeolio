@@ -19,23 +19,23 @@ export default function SignalLine() {
       const height = document.documentElement.scrollHeight;
       setDocHeight(height);
 
-      // Determine the content container bounds (usually 1200px max, plus margins)
-      const contentWidth = Math.min(width - 60, 1200);
-      const leftBound = (width - contentWidth) / 2;
-      const rightBound = (width + contentWidth) / 2;
-      const sections = Array.from(document.querySelectorAll("main > [data-section]"));
-      const points: { x: number; topY: number; bottomY: number; centerY: number; id: string }[] = [];
+      // Determine the content container bounds (matches .section-container max-width of 1400px)
+        const contentWidth = Math.min(width - 60, 1000);
+        const leftBound = (width - contentWidth) / 2;
+        const rightBound = (width + contentWidth) / 2;
+        const sections = Array.from(document.querySelectorAll("main > [data-section]"));
+        const points: { x: number; topY: number; bottomY: number; centerY: number; id: string }[] = [];
 
-      sections.forEach((sec, i) => {
-        const el = sec as HTMLElement;
-        const rect = el.getBoundingClientRect();
-        const topY = window.scrollY + rect.top;
-        const bottomY = window.scrollY + rect.bottom;
-        const secHeight = rect.height;
-        
-        // Align signal line to run along the page content bounds (right bound on even, left bound on odd)
-        const x = (i % 2 === 0) ? rightBound + 12 : leftBound - 12;
-        const offset = Math.min(60, secHeight * 0.1);
+        sections.forEach((sec, i) => {
+          const el = sec as HTMLElement;
+          const rect = el.getBoundingClientRect();
+          const topY = window.scrollY + rect.top;
+          const bottomY = window.scrollY + rect.bottom;
+          const secHeight = rect.height;
+          
+          // Align signal line to run along the page content bounds (right bound on even, left bound on odd)
+          const x = (i % 2 === 0) ? rightBound + 190 : leftBound - 190;
+          const offset = Math.min(60, secHeight * 0.1);
         
         points.push({ 
           x, 

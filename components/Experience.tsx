@@ -369,10 +369,10 @@ export default function Experience() {
       <div className="section-container relative z-10 w-full">
         
         <div className="mb-16">
-          <p className="font-mono text-sm text-signal tracking-[0.5em] uppercase mb-4">
+          <p className="font-mono text-xs md:text-sm text-signal tracking-[0.3em] md:tracking-[0.5em] uppercase mb-4">
             {"// Tactical Operations Desk"}
           </p>
-          <SplitTextReveal text="Work Experience." className="font-display font-semibold text-5xl md:text-7xl text-white" />
+          <SplitTextReveal text="Work Experience." className="font-display font-semibold text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white" />
         </div>
 
         {/* Top-down physical desk container */}

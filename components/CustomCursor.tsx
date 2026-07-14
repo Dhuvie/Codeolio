@@ -42,8 +42,6 @@ export default function CustomCursor() {
     }
   }, []);
 
-  if (isMobileDevice) return null;
-
   useEffect(() => {
     if (!cursorRef.current || linesRef.current.length === 0) return;
     if (prefersReducedMotion() || window.matchMedia("(pointer: coarse)").matches) {
@@ -133,6 +131,8 @@ export default function CustomCursor() {
       cancelAnimationFrame(animationFrameId);
     };
   }, [isLightMode]);
+
+  if (isMobileDevice) return null;
 
   return (
     <>

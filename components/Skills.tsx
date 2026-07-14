@@ -265,10 +265,10 @@ export default function Skills() {
 
       <div className="section-container relative z-10">
         <p className="section-label" data-cursor-magnetic>Skills</p>
-        <SplitTextReveal text="Knowledge Library." className="font-display font-semibold text-5xl md:text-6xl mb-16" />
+        <SplitTextReveal text="Knowledge Library." className="font-display font-semibold text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-16" />
 
         {/* WORKSPACE CASE CONSOLE */}
-        <div className={`cyber-window cyber-window-skills w-full border border-subtle transition-colors duration-300 relative backdrop-blur-xl rounded-2xl
+        <div className={`cyber-window cyber-window-skills w-full max-w-4xl mx-auto border border-subtle transition-colors duration-300 relative backdrop-blur-xl rounded-2xl
           ${isLightMode 
             ? "bg-[#fafafa]/35 shadow-[0_30px_60px_rgba(0,0,0,0.06)]" 
             : "bg-[#09090b]/35 shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
@@ -299,11 +299,12 @@ export default function Skills() {
                   key={i}
                   type="button"
                   onClick={() => setActiveIdx(i)}
+                  style={{ color: (activeIdx === i && isLightMode) ? "#ffffff" : (activeIdx === i && !isLightMode) ? "#000000" : undefined }}
                   className={`w-full text-left font-mono text-xs px-3.5 py-2.5 rounded-lg border transition-all duration-200 flex items-center justify-between gap-3 cursor-pointer select-none
                     ${activeIdx === i
                       ? (isLightMode 
-                          ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold shadow-md shadow-[#0033aa]/10" 
-                          : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/15"
+                          ? "bg-[#000000] border-[#000000] font-extrabold shadow-md shadow-[#000000]/10" 
+                          : "bg-signal border-signal font-black shadow-lg shadow-signal/15"
                         )
                       : (isLightMode 
                           ? "bg-white/80 border-black/5 hover:bg-zinc-100/80 text-zinc-600" 
@@ -313,10 +314,10 @@ export default function Skills() {
                   `}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="opacity-75">{getCategoryIcon(i)}</span>
-                    <span className="tracking-wider">{book.spineTitle}</span>
+                    <span style={{ color: (activeIdx === i && isLightMode) ? "#ffffff" : (activeIdx === i && !isLightMode) ? "#000000" : undefined, opacity: (activeIdx === i) ? 1 : 0.75 }}>{getCategoryIcon(i)}</span>
+                    <span style={{ color: (activeIdx === i && isLightMode) ? "#ffffff" : (activeIdx === i && !isLightMode) ? "#000000" : undefined }} className="tracking-wider">{book.spineTitle}</span>
                   </div>
-                  <span className="text-[8px] opacity-50">{book.volume}</span>
+                  <span style={{ color: (activeIdx === i && isLightMode) ? "rgba(255,255,255,0.9)" : (activeIdx === i && !isLightMode) ? "rgba(0,0,0,0.8)" : undefined, opacity: (activeIdx === i) ? 1 : 0.5 }} className="text-[8px]">{book.volume}</span>
                 </button>
               ))}
             </div>
@@ -333,10 +334,10 @@ export default function Skills() {
               >
                 <div>
                   <div className={`text-[10px] font-bold uppercase mb-4 pb-2 border-b tracking-wider flex justify-between items-center
-                    ${isLightMode ? "text-[#0033aa] border-black/5" : "text-signal border-white/5"}
+                    ${isLightMode ? "text-[#000000] border-black/5" : "text-signal border-white/5"}
                   `}>
                     <div className="flex items-center gap-2">
-                      <span className={`w-1.5 h-1.5 rounded-full ${isLightMode ? "bg-[#0033aa]" : "bg-signal"} animate-pulse`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${isLightMode ? "bg-[#000000]" : "bg-signal"} animate-pulse`} />
                       <span>[ SYSTEM MODULE_0{activeIdx + 1} // {BOOKS_DATA[activeIdx].title} ]</span>
                     </div>
                     <span className={`text-[8px] font-bold ${isLightMode ? "text-zinc-400" : "text-white/30"}`}>{BOOKS_DATA[activeIdx].volume}</span>
@@ -352,7 +353,7 @@ export default function Skills() {
                         <div className="flex items-center justify-between text-xs font-bold text-ink">
                           <span className="tracking-tight">{skill.name}</span>
                           <span className={`text-[8.5px] font-mono tracking-wider
-                            ${isLightMode ? "text-[#0033aa]/90" : "text-signal/90"}
+                            ${isLightMode ? "text-[#000000]/90" : "text-signal/90"}
                           `}>
                             {getExperienceLabel(skill.level)} // {skill.level * 20}%
                           </span>
@@ -368,7 +369,7 @@ export default function Skills() {
                                 className={`h-1.5 flex-1 rounded-[1px] transition-all duration-500
                                   ${isLit 
                                     ? (isLightMode 
-                                        ? "bg-[#0033aa]" 
+                                        ? "bg-[#000000]" 
                                         : "bg-signal shadow-[0_0_5px_rgba(240,160,0,0.5)]"
                                       ) 
                                     : (isLightMode 
@@ -401,108 +402,172 @@ export default function Skills() {
           </div>
 
           {/* 2. MOBILE ACCORDION LAYOUT (Visible on mobile under md) */}
-          <div className="flex md:hidden flex-col gap-3 p-4">
+          <div className="flex md:hidden flex-col gap-2.5 p-4">
+
+            {/* Section intro line */}
+            <p className={`font-mono text-[9px] uppercase tracking-widest mb-1 ${isLightMode ? "text-zinc-400" : "text-white/30"}`}>
+              <span className={`inline-block w-1.5 h-1.5 rounded-full mr-2 align-middle animate-pulse ${isLightMode ? "bg-[#000000]" : "bg-signal"}`} />
+              KNOWLEDGE_BASE // {BOOKS_DATA.length} MODULES LOADED
+            </p>
+
             {BOOKS_DATA.map((book, i) => {
               const isOpen = mobileOpenIdx === i;
+              // Pick a subtle per-category accent color for the left border strip
+              const accentColors = [
+                { border: "#c0392b", glow: "rgba(192,57,43,0.15)" },   // SYNTAX — crimson
+                { border: "#27ae60", glow: "rgba(39,174,96,0.15)" },   // COGNITIVE — emerald
+                { border: "#2980b9", glow: "rgba(41,128,185,0.15)" },  // WEB — blue
+                { border: "#8e44ad", glow: "rgba(142,68,173,0.15)" },  // STORAGE — violet
+                { border: "#e67e22", glow: "rgba(230,126,34,0.15)" },  // PIPELINES — amber
+              ];
+              const accent = accentColors[i] ?? accentColors[0];
+              const topSkill = book.items[0];
+
               return (
-                <div 
-                  key={i} 
-                  className={`border rounded-xl overflow-hidden transition-all duration-350
-                    ${isOpen 
-                      ? (isLightMode ? "border-[#0033aa]/25 bg-white/60 shadow-sm" : "border-signal/25 bg-[#0c0c0e]/50 shadow-md") 
-                      : (isLightMode ? "border-black/5 bg-white/20" : "border-zinc-800 bg-[#0c0c0e]/15")
+                <div
+                  key={i}
+                  style={{
+                    borderLeftColor: isOpen ? accent.border : "transparent",
+                    boxShadow: isOpen ? `0 0 18px ${accent.glow}, inset 0 0 0 1px ${isLightMode ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.04)"}` : "none",
+                  }}
+                  className={`border border-l-[3px] rounded-xl overflow-hidden transition-all duration-300
+                    ${isOpen
+                      ? (isLightMode ? "bg-white/70 border-black/8" : "bg-[#0a0a0c]/60 border-white/5")
+                      : (isLightMode ? "bg-white/30 border-black/5 hover:bg-white/50" : "bg-[#0c0c0e]/20 border-white/5 hover:bg-[#0c0c0e]/35")
                     }
                   `}
                 >
-                  {/* Folder Accordion Trigger Header */}
+                  {/* Accordion Header */}
                   <button
                     type="button"
                     onClick={() => setMobileOpenIdx(isOpen ? null : i)}
-                    className="w-full px-4 py-3 flex items-center justify-between text-left font-mono text-xs cursor-pointer select-none active:scale-[0.99] transition-all"
+                    className="w-full px-4 py-3.5 flex items-center justify-between text-left cursor-pointer select-none transition-all active:scale-[0.985]"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className={`transition-colors duration-200 ${isOpen ? (isLightMode ? "text-[#0033aa]" : "text-signal") : "opacity-60"}`}>
-                        {getCategoryIcon(i)}
-                      </span>
-                      <div>
-                        <span className="opacity-50 text-[10px] mr-1">0{i + 1}.</span>
-                        <span className="font-bold tracking-tight text-ink">{book.spineTitle}</span>
+                    {/* Left: Icon + label */}
+                    <div className="flex items-center gap-3 min-w-0">
+                      {/* Accent icon bubble */}
+                      <div
+                        style={{ backgroundColor: isOpen ? accent.border : "transparent", borderColor: accent.border }}
+                        className="flex-shrink-0 w-7 h-7 rounded-lg border flex items-center justify-center transition-all duration-300"
+                      >
+                        <span className={`transition-colors duration-200 ${isOpen ? "text-white" : "opacity-50"}`} style={{ color: isOpen ? undefined : accent.border }}>
+                          {getCategoryIcon(i)}
+                        </span>
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono text-[9px] opacity-40 font-bold">{book.volume}</span>
+                          <span
+                            className="font-mono text-[8px] font-bold px-1.5 py-0.5 rounded-sm"
+                            style={{
+                              backgroundColor: `${accent.border}20`,
+                              color: accent.border,
+                            }}
+                          >
+                            {book.items.length} SKILLS
+                          </span>
+                        </div>
+                        <p className="font-mono text-[11px] font-bold tracking-tight text-ink truncate">{book.spineTitle}</p>
+                        {/* Top skill peek – only when closed */}
+                        {!isOpen && (
+                          <p className="font-mono text-[9px] opacity-40 truncate mt-0.5">
+                            ↳ {topSkill.name} · {topSkill.level * 20}%
+                          </p>
+                        )}
                       </div>
                     </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <span className="text-[7.5px] opacity-40 font-bold">{book.volume}</span>
-                      {/* Interactive Chevron Rotate */}
-                      <svg 
-                        className={`w-3.5 h-3.5 transition-transform duration-300 opacity-60 ${isOpen ? "rotate-180" : ""}`} 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2.5" 
-                        viewBox="0 0 24 24"
+
+                    {/* Right: chevron + LED mini-bar */}
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0 ml-3">
+                      <svg
+                        className={`w-3.5 h-3.5 transition-transform duration-300 opacity-50 ${isOpen ? "rotate-180" : ""}`}
+                        fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"
                       >
                         <polyline points="6 9 12 15 18 9" />
                       </svg>
+                      {/* Mini 5-dot skill density indicator */}
+                      <div className="flex gap-[2px]">
+                        {book.items.slice(0, 5).map((s, si) => (
+                          <div
+                            key={si}
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: `${accent.border}${isOpen ? "cc" : "55"}` }}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </button>
 
-                  {/* Folder Drawer */}
-                  <div 
-                    className={`transition-all duration-350 overflow-hidden font-mono
-                      ${isOpen ? "max-h-[800px] border-t border-subtle" : "max-h-0"}
+                  {/* Expanded drawer */}
+                  <div
+                    className={`overflow-hidden transition-all duration-300
+                      ${isOpen ? "max-h-[1200px]" : "max-h-0"}
                     `}
                   >
-                    <div className="p-4 space-y-4 text-left">
-                      <p className={`text-[10px] leading-relaxed ${isLightMode ? "text-zinc-500" : "text-white/50"}`}>
-                        Technical registry of {book.title.toLowerCase()} and operational runtime architectures compiled during production.
-                      </p>
+                    <div className={`border-t ${isLightMode ? "border-black/6" : "border-white/5"}`}>
+                      <div className="p-4 space-y-3">
 
-                      <div className="space-y-3">
+                        {/* Module descriptor */}
+                        <p className={`font-mono text-[9.5px] leading-relaxed ${isLightMode ? "text-zinc-500" : "text-white/40"}`}>
+                          Technical registry of {book.title.toLowerCase()} and runtime architectures compiled during production.
+                        </p>
+
+                        {/* Skill cards */}
                         {book.items.map((skill, idx) => (
-                          <div key={idx} className="space-y-1.5 border border-dashed rounded p-3 border-subtle">
-                            <div className="flex items-center justify-between text-[11px] font-bold text-ink">
-                              <span>{skill.name}</span>
-                              <span className={`text-[9px] font-mono
-                                ${isLightMode ? "text-[#0033aa]/90" : "text-signal/90"}
-                              `}>
-                                {getExperienceLabel(skill.level)} // {skill.level * 20}%
-                              </span>
+                          <div
+                            key={idx}
+                            className={`rounded-lg p-3 border transition-all duration-200
+                              ${isLightMode ? "bg-white/60 border-black/6 hover:border-black/12" : "bg-white/[0.03] border-white/6 hover:border-white/10"}
+                            `}
+                          >
+                            {/* Skill name + tier */}
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-mono text-[11px] font-bold text-ink">{skill.name}</span>
+                              <div className="flex items-center gap-1.5">
+                                <span
+                                  className="font-mono text-[7.5px] font-bold px-1.5 py-0.5 rounded-sm"
+                                  style={{ backgroundColor: `${accent.border}18`, color: accent.border }}
+                                >
+                                  {getExperienceLabel(skill.level)}
+                                </span>
+                                <span className={`font-mono text-[9px] font-bold ${isLightMode ? "text-zinc-500" : "text-white/40"}`}>
+                                  {skill.level * 20}%
+                                </span>
+                              </div>
                             </div>
-                            
-                            {/* Segmented LED Indicators */}
-                            <div className="flex gap-[3.5px] py-1">
+
+                            {/* 10-seg LED bar */}
+                            <div className="flex gap-[3px] mb-2">
                               {[...Array(10)].map((_, step) => {
                                 const isLit = step < skill.level * 2;
                                 return (
-                                  <div 
-                                    key={step} 
-                                    className={`h-1.5 flex-1 rounded-[1px] transition-all duration-500
-                                      ${isLit 
-                                        ? (isLightMode 
-                                            ? "bg-[#0033aa]" 
-                                            : "bg-signal shadow-[0_0_5px_rgba(240,160,0,0.5)]"
-                                          ) 
-                                        : (isLightMode 
-                                            ? "bg-black/10" 
-                                            : "bg-zinc-800"
-                                          )
-                                      }
-                                    `}
+                                  <div
+                                    key={step}
+                                    className="h-[5px] flex-1 rounded-[1.5px] transition-all duration-500"
+                                    style={{
+                                      backgroundColor: isLit
+                                        ? accent.border
+                                        : isLightMode ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.06)",
+                                      boxShadow: isLit ? `0 0 6px ${accent.glow}` : "none",
+                                    }}
                                   />
                                 );
                               })}
                             </div>
 
-                            <p className="text-[9px] text-ink/50 pl-1 leading-relaxed">
-                              - {skill.note}
+                            <p className={`font-mono text-[8.5px] leading-relaxed ${isLightMode ? "text-zinc-400" : "text-white/35"}`}>
+                              {skill.note}
                             </p>
                           </div>
                         ))}
-                      </div>
 
-                      {/* Small signature plate */}
-                      <div className={`pt-2 border-t flex justify-between text-[7px] font-bold uppercase ${isLightMode ? "border-black/5 text-zinc-400" : "border-white/5 text-white/30"}`}>
-                        <span>VERIFIED_OK</span>
-                        <span>Knowledge Archives</span>
+                        {/* Footer chip */}
+                        <div className={`pt-1 flex items-center justify-between font-mono text-[7.5px] font-bold uppercase ${isLightMode ? "text-zinc-300" : "text-white/20"}`}>
+                          <span>VERIFIED_OK</span>
+                          <span style={{ color: `${accent.border}70` }}>● {book.spineTitle}</span>
+                        </div>
+
                       </div>
                     </div>
                   </div>

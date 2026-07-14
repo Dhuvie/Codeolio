@@ -189,7 +189,7 @@ export default function Achievements() {
     <section ref={sectionRef} id="achievements" className="relative py-12">
       <div className="section-container relative z-10">
         <p className="section-label" data-cursor-magnetic>Verified Ledger</p>
-        <SplitTextReveal text="Competition blocks." className="font-display font-semibold text-4xl md:text-5xl lg:text-6xl mb-16" />
+        <SplitTextReveal text="Competition blocks." className="font-display font-semibold text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-16" />
 
         <div className={`cave-hint fixed top-1/2 right-0 md:right-4 -translate-y-1/2 flex items-center gap-3 bg-black/80 border border-signal/30 p-2 md:p-3 rounded-l-full md:rounded-full pointer-events-none z-50 shadow-[0_0_15px_rgba(240,160,0,0.2)] transition-all duration-700 ease-out ${showHint ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
           <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-signal/50 flex items-center justify-center text-signal font-mono text-xs md:text-sm animate-pulse">
