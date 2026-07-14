@@ -19,6 +19,10 @@ export default function SignalLine() {
       const height = document.documentElement.scrollHeight;
       setDocHeight(height);
 
+      // Determine the content container bounds (usually 1200px max, plus margins)
+      const contentWidth = Math.min(width - 60, 1200);
+      const leftBound = (width - contentWidth) / 2;
+      const rightBound = (width + contentWidth) / 2;
       const sections = Array.from(document.querySelectorAll("main > [data-section]"));
       const points: { x: number; topY: number; bottomY: number; centerY: number; id: string }[] = [];
 
@@ -29,7 +33,8 @@ export default function SignalLine() {
         const bottomY = window.scrollY + rect.bottom;
         const secHeight = rect.height;
         
-        const x = (i % 2 === 0) ? width * 0.96 : width * 0.04;
+        // Align signal line to run along the page content bounds (right bound on even, left bound on odd)
+        const x = (i % 2 === 0) ? rightBound + 12 : leftBound - 12;
         const offset = Math.min(60, secHeight * 0.1);
         
         points.push({ 
@@ -52,12 +57,20 @@ export default function SignalLine() {
           if (i < points.length - 1) {
             const next = points[i + 1];
             
-            const cp1X = curr.x;
-            const cp1Y = curr.bottomY + (next.topY - curr.bottomY) * 0.5;
-            const cp2X = next.x;
-            const cp2Y = curr.bottomY + (next.topY - curr.bottomY) * 0.5;
-            
-            d += ` C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${next.x} ${next.topY}`;
+            const sign = next.x > curr.x ? 1 : -1;
+            const radius = Math.min(30, (next.topY - curr.bottomY) * 0.4);
+            const midY = curr.bottomY + (next.topY - curr.bottomY) * 0.5;
+
+            // Go down vertically to the start of the first corner turn
+            d += ` L ${curr.x} ${midY - radius}`;
+            // Curve corner 1 (turn horizontal)
+            d += ` Q ${curr.x} ${midY}, ${curr.x + sign * radius} ${midY}`;
+            // Horizontal line across the gap space
+            d += ` L ${next.x - sign * radius} ${midY}`;
+            // Curve corner 2 (turn vertical)
+            d += ` Q ${next.x} ${midY}, ${next.x} ${midY + radius}`;
+            // Go to the top start of the next section
+            d += ` L ${next.x} ${next.topY}`;
           }
         }
         

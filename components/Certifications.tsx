@@ -180,11 +180,9 @@ export default function Certifications() {
     <section 
       id="certifications" 
       ref={containerRef}
-      className={`relative w-full min-h-[850px] overflow-hidden z-10 cursor-crosshair border-y transition-colors duration-300 ${
+      className={`relative w-full min-h-[600px] overflow-hidden z-10 border-y transition-colors duration-300 ${
         isLightMode ? "bg-[#ffffff] border-black/5" : "bg-[#020202] border-white/5"
       }`}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
     >
       <div 
         className="absolute inset-0 z-0 opacity-20 pointer-events-none"
@@ -196,339 +194,80 @@ export default function Certifications() {
         }}
       />
 
-      <div className="relative z-10 w-full h-full section-container py-32 pointer-events-auto">
+      <div className="relative z-10 w-full h-full section-container py-24 pointer-events-auto">
         
-        <div className="mb-24 text-center">
+        <div className="mb-16 text-center">
           <p className="font-mono text-sm text-signal tracking-[0.5em] uppercase mb-4">
             {"// Verified Credentials"}
           </p>
-          <h2 className="font-display font-semibold text-5xl md:text-7xl text-ink tracking-tighter">
-            Hidden Vault.
+          <h2 className="font-display font-semibold text-5xl md:text-6xl text-ink tracking-tighter">
+            Credential Vault.
           </h2>
           <p className="font-mono text-xs text-signal/60 tracking-widest mt-6 uppercase animate-pulse">
-            [ Spotlight Reveals Cards // Click to Decrypt ]
+            [ SECURE RECORDS IN FULL VIEW // VERIFIED DIRECTLY ]
           </p>
         </div>
 
-        {isMobile ? (
-          /* FULLY UNLOCKED CERTIFICATION RECORD CARDS FOR MOBILE */
-          <div className="flex flex-col gap-8 max-w-xl mx-auto pointer-events-auto">
-            {CERTIFICATIONS.map((cert, i) => (
-              <div 
-                key={i} 
-                className={`relative border p-6 rounded-lg font-mono text-left transition-colors duration-300 ${
-                  isLightMode 
-                    ? "bg-[#eef2f6] border-[#0c0c0e]/15 shadow-sm text-zinc-900" 
-                    : "bg-[#0c0c0e]/90 border-zinc-800 text-white"
-                }`}
-              >
-                {/* Visual corners */}
-                <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-signal/50 opacity-40" />
-                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-signal/50 opacity-40" />
-                
-                <span className={`text-[8px] tracking-widest uppercase block mb-4 ${isLightMode ? "text-[#0033aa]" : "text-signal"}`}>
-                  SYS.ID // {cert.id}
-                </span>
-                
-                <h3 className={`font-display font-bold text-lg uppercase tracking-wide mb-2 ${isLightMode ? "text-zinc-900" : "text-white"}`}>
-                  {cert.text}
-                </h3>
-                
-                <p className={`text-[10px] uppercase tracking-widest mb-4 ${isLightMode ? "text-zinc-600" : "text-white/50"}`}>
-                  Issued by: <span className="font-bold">{cert.org}</span> // {cert.issued}
-                </p>
+        {/* 3-column direct dossier grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {CERTIFICATIONS.map((cert, i) => (
+            <div 
+              key={i} 
+              className={`relative border p-6 rounded-lg font-mono text-left transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] lg:hover:scale-[1.01] ${
+                isLightMode 
+                  ? "bg-[#eef2f6] border-[#0c0c0e]/15 shadow-sm text-zinc-900" 
+                  : "bg-[#0c0c0e]/90 border-zinc-800 text-white"
+              }`}
+            >
+              {/* Visual corners */}
+              <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-signal/50 opacity-40" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-signal/50 opacity-40" />
+              
+              <span className={`text-[8px] tracking-widest uppercase block mb-4 ${isLightMode ? "text-[#0033aa]" : "text-signal"}`}>
+                SYS.ID // {cert.id}
+              </span>
+              
+              <h3 className={`font-display font-bold text-lg uppercase tracking-wide mb-2 ${isLightMode ? "text-zinc-900" : "text-white"}`}>
+                {cert.text}
+              </h3>
+              
+              <p className={`text-[10px] uppercase tracking-widest mb-4 ${isLightMode ? "text-zinc-600" : "text-white/50"}`}>
+                Issued by: <span className="font-bold">{cert.org}</span> // {cert.issued}
+              </p>
 
-                <div className="space-y-3 mb-6">
-                  <div className={`text-[8px] font-bold border-b pb-1 ${isLightMode ? "border-black/10 text-zinc-500" : "border-white/10 text-white/40"}`}>
-                    [ CREDENTIAL_DECRYPTION_LOGS ]
-                  </div>
-                  <p className={`text-[9px] leading-relaxed ${isLightMode ? "text-zinc-600" : "text-white/70"}`}>
-                    {cert.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {cert.skills.split(", ").map((skill, sIdx) => (
-                      <span 
-                        key={sIdx}
-                        className={`text-[7px] px-1.5 py-0.5 rounded border ${
-                          isLightMode 
-                            ? "bg-white border-black/10 text-zinc-600" 
-                            : "bg-black/40 border-white/10 text-white/50"
-                        }`}
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="text-[7.5px] opacity-40 text-left pt-1 select-all font-mono">
-                    HASH: {cert.hash}
-                  </div>
+              <div className="space-y-3 mb-6">
+                <div className={`text-[8px] font-bold border-b pb-1 ${isLightMode ? "border-black/10 text-zinc-500" : "border-white/10 text-white/40"}`}>
+                  [ CREDENTIAL_DECRYPTION_LOGS ]
                 </div>
+                <p className={`text-[9px] leading-relaxed min-h-[90px] ${isLightMode ? "text-zinc-600" : "text-white/70"}`}>
+                  {cert.description}
+                </p>
+                <div className="flex flex-wrap gap-1.5 pt-1 min-h-[50px] items-start">
+                  {cert.skills.split(", ").map((skill, sIdx) => (
+                    <span 
+                      key={sIdx}
+                      className={`text-[7px] px-1.5 py-0.5 rounded border ${
+                        isLightMode 
+                          ? "bg-white border-black/10 text-zinc-600" 
+                          : "bg-black/40 border-white/10 text-white/50"
+                      }`}
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+                <div className="text-[7.5px] opacity-40 text-left pt-1 select-all font-mono">
+                  HASH: {cert.hash}
+                </div>
+              </div>
 
                 <div className="flex items-center justify-between border-t pt-4 border-subtle text-[8px]">
                   <span className={isLightMode ? "text-zinc-400" : "text-white/30"}>STATUS // VERIFIED</span>
-                  <a 
-                    href={cert.verification} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={`font-mono text-[9px] border px-4 py-1.5 rounded transition-all uppercase tracking-widest font-bold ${
-                      isLightMode 
-                        ? "text-[#c08000] border-[#c08000]/40 bg-[#c08000]/5 hover:bg-[#c08000]/10" 
-                        : "text-[#f0a000] border-[#f0a000]/40 bg-[#f0a000]/5 hover:bg-[#f0a000]/10"
-                    }`}
-                  >
-                    [ Verify Link ]
-                  </a>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
-            {CERTIFICATIONS.map((cert, i) => (
-              <div 
-                key={i} 
-                onClick={() => handleOpenCard(i)}
-                className={`relative border p-10 backdrop-blur-sm pointer-events-auto cursor-pointer transition-transform hover:scale-[1.02] lg:mt-16 ${
-                  isLightMode 
-                    ? "bg-[#ffffff] hover:bg-zinc-50 border-black/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)]" 
-                    : "bg-black hover:bg-black/90 border-white/10"
-                } ${
-                  mobileCertHighlightIdx === i 
-                    ? "border-[#f0a000] shadow-[0_0_15px_rgba(240,160,0,0.25)]" 
-                    : ""
-                }`}
-              >
-                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-signal/50 opacity-50" />
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-signal/50 opacity-50" />
-                
-                <span className="font-mono text-[10px] tracking-widest text-signal uppercase block mb-8">
-                  SYS.ID // {cert.id}
-                </span>
-                
-                <h3 className={`font-display font-bold text-2xl uppercase tracking-wide mb-4 ${isLightMode ? "text-zinc-900" : "text-white"}`}>
-                  {cert.text}
-                </h3>
-                
-                <p className={`font-sans text-sm uppercase tracking-widest ${isLightMode ? "text-zinc-500" : "text-white/50"}`}>
-                  Issued by: <span className={`font-bold ${isLightMode ? "text-zinc-800" : "text-white"}`}>{cert.org}</span>
-                </p>
-
-                <div className={`mt-12 w-full h-[1px] ${isLightMode ? "bg-gradient-to-r from-black/15 to-transparent" : "bg-gradient-to-r from-signal/50 to-transparent"}`} />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* DETAILED CREDENTIAL SCI-FI VAULT MODAL */}
-      {(expandedCardIdx !== null || isClosing) && (
-        <div 
-          onClick={handleCloseCard}
-          className={`fixed inset-0 w-screen h-screen z-[99999] flex items-center justify-center p-6 backdrop-blur-sm transition-opacity duration-500 cursor-default ${
-            isLightMode ? "bg-black/45" : "bg-black/85"
-          }`}
-        >
-          {/* Central Vault Box Wrapper */}
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            style={{ perspective: "1500px", transformStyle: "preserve-3d" }}
-            className={`w-[90vw] max-w-[600px] h-[440px] relative overflow-hidden rounded-lg shadow-2xl transition-all duration-500 ${
-              isLightMode 
-                ? "bg-[#fafafc] border border-black/10" 
-                : "bg-[#0c0c0e] border border-[#f0a000]/30"
-            } ${
-              isClosing 
-                ? "animate-[scaleDownBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]" 
-                : "animate-[scaleUpBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]"
-            }`}
-          >
-            {/* 1. REVEALED CENTRAL CORE (UNDER THE DOORS) */}
-            <div className={`absolute inset-0 z-0 p-5 md:p-8 flex flex-col justify-between overflow-y-auto font-mono text-xs ${
-              isLightMode ? "bg-[#f4f4f7] text-[#0c0c0e]" : "bg-[#040406] text-white"
-            }`}>
-              {/* Gold backing aura */}
-              <div 
-                className="absolute inset-0 pointer-events-none" 
-                style={{
-                  background: isLightMode 
-                    ? "radial-gradient(circle at center, rgba(192, 128, 0, 0.04) 0%, transparent 75%)" 
-                    : "radial-gradient(circle at center, rgba(240, 160, 0, 0.06) 0%, transparent 75%)"
-                }}
-              />
-
-              <div className="relative z-10">
-                {/* Header status bar */}
-                <div className={`flex items-center justify-between border-b pb-3 mb-4 text-[9px] ${
-                  isLightMode ? "border-black/15" : "border-[#f0a000]/25"
-                }`}>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full animate-ping ${isLightMode ? "bg-[#c08000]" : "bg-[#f0a000]"}`} />
-                    <span className={`tracking-widest uppercase font-bold ${isLightMode ? "text-[#c08000]" : "text-[#f0a000]"}`}>
-                      SECURE_VAULT_NODE // SHIELD_ACTIVE
-                    </span>
-                  </div>
-                  <span className={isLightMode ? "text-black/50" : "text-white/40"}>
-                    HASH: {activeCert.hash}
-                  </span>
-                </div>
-
-                <div className="space-y-3 md:space-y-4">
-                  <div>
-                    <span className={`text-[9px] uppercase tracking-widest block mb-0.5 ${
-                      isLightMode ? "text-[#c08000]/80" : "text-[#f0a000]/60"
-                    }`}>Title of Registry</span>
-                    <h3 className={`font-display font-bold text-lg md:text-2xl uppercase tracking-wide leading-tight ${
-                      isLightMode ? "text-black" : "text-white"
-                    }`}>
-                      {activeCert.text}
-                    </h3>
-                  </div>
-
-                  <div className={`grid grid-cols-2 gap-3 md:gap-4 border-y py-3 md:py-4 my-2 ${
-                    isLightMode ? "border-black/10" : "border-white/5"
-                  }`}>
-                    <div className={`space-y-1.5 border-r pr-4 ${isLightMode ? "border-black/10" : "border-white/5"}`}>
-                      <span className={`text-[9px] uppercase tracking-wider block ${isLightMode ? "text-black/40" : "text-white/30"}`}>Credential Authority</span>
-                      <p className={`font-bold text-xs uppercase font-sans ${isLightMode ? "text-black" : "text-white"}`}>{activeCert.org}</p>
-                      <span className={`text-[9px] uppercase tracking-wider block mt-2 ${isLightMode ? "text-black/40" : "text-white/30"}`}>Issued Date</span>
-                      <p className={`font-bold text-[10px] ${isLightMode ? "text-black/80" : "text-white/80"}`}>{activeCert.issued}</p>
-                    </div>
-                    <div className="space-y-1.5 pl-2">
-                      <span className={`text-[9px] uppercase tracking-wider block ${isLightMode ? "text-black/40" : "text-white/30"}`}>System registry code</span>
-                      <p className={`font-bold text-xs ${isLightMode ? "text-[#c08000]" : "text-[#f0a000]"}`}>{activeCert.id}</p>
-                      <span className={`text-[9px] uppercase tracking-wider block mt-2 ${isLightMode ? "text-black/40" : "text-white/30"}`}>Status validation</span>
-                      <p className={`font-bold text-[10px] uppercase ${isLightMode ? "text-green-700" : "text-green-400"}`}>VERIFIED // SUCCESS</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <span className={`text-[9px] uppercase tracking-widest block ${
-                      isLightMode ? "text-[#c08000]/80" : "text-[#f0a000]/60"
-                    }`}>Operational syllabus modules</span>
-                    <p className={`font-sans text-[10px] md:text-[11px] leading-relaxed font-medium ${
-                      isLightMode ? "text-black/70" : "text-white/70"
-                    }`}>
-                      {activeCert.description}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2 md:space-y-2.5 pt-2">
-                    <span className={`text-[9px] uppercase tracking-widest block ${
-                      isLightMode ? "text-[#c08000]/80" : "text-[#f0a000]/60"
-                    }`}>Acquired Competencies</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {activeCert.skills.split(", ").map((skill) => (
-                        <span 
-                          key={skill} 
-                          className={`font-mono text-[8px] border rounded px-2.5 py-1 ${
-                            isLightMode 
-                              ? "text-black border-black/10 bg-black/5" 
-                              : "text-white border-white/10 bg-white/5"
-                          }`}
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className={`relative z-10 border-t pt-3 md:pt-4 flex items-center justify-between mt-4 md:mt-6 ${
-                isLightMode ? "border-black/10" : "border-[#f0a000]/15"
-              }`}>
-                <span className={`text-[8px] uppercase tracking-widest ${isLightMode ? "text-black/40" : "text-white/20"}`}>[ Click outside to seal vault ]</span>
-                <a 
-                  href={activeCert.verification} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className={`font-mono text-[9px] border px-4 py-2 rounded hover:bg-[#f0a000]/15 transition-all uppercase tracking-widest font-bold ${
-                    isLightMode 
-                      ? "text-[#c08000] border-[#c08000]/40 bg-[#c08000]/5 shadow-[0_0_15px_rgba(192,128,0,0.03)]" 
-                      : "text-[#f0a000] border-[#f0a000]/40 bg-[#f0a000]/5 shadow-[0_0_15px_rgba(240,160,0,0.05)]"
-                  }`}
-                >
-                  [ Verify Certificate ]
-                </a>
-              </div>
             </div>
-
-            {/* 2. LEFT VAULT DOOR (Pivots open to the left) */}
-            <div 
-              className={`absolute left-0 top-0 bottom-0 w-1/2 overflow-hidden transition-all duration-[800ms] ease-out z-10 pointer-events-none origin-left border-r ${
-                isLightMode ? "bg-[#ffffff] border-black/10" : "bg-black border-[#f0a000]/25"
-              }`}
-              style={{ 
-                transform: isDeclassified 
-                  ? "rotateY(-95deg) scale(0.95)" 
-                  : "rotateY(0deg) scale(1)",
-                opacity: isDeclassified ? 0 : 1
-              }}
-            >
-              <div className="w-[200%] h-full p-6 md:p-10 relative">
-                <div className={`absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 opacity-50 ${isLightMode ? "border-black/30" : "border-signal/50"}`} />
-                <span className={`font-mono text-[10px] tracking-widest uppercase block mb-8 ${isLightMode ? "text-[#c08000]" : "text-signal"}`}>
-                  SYS.ID // {activeCert.id}
-                </span>
-                <h3 className={`font-display font-bold text-2xl uppercase tracking-wide mb-4 ${isLightMode ? "text-black" : "text-white"}`}>
-                  {activeCert.text}
-                </h3>
-                <p className={`font-sans text-sm uppercase tracking-widest ${isLightMode ? "text-black/50" : "text-white/50"}`}>
-                  Issued by: <span className={isLightMode ? "text-black font-bold" : "text-white font-bold"}>{activeCert.org}</span>
-                </p>
-              </div>
-            </div>
-
-            {/* 3. RIGHT VAULT DOOR (Pivots open to the right) */}
-            <div 
-              className={`absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden transition-all duration-[800ms] ease-out z-10 pointer-events-none origin-right border-l ${
-                isLightMode ? "bg-[#ffffff] border-black/10" : "bg-black border-[#f0a000]/25"
-              }`}
-              style={{ 
-                transform: isDeclassified 
-                  ? "rotateY(95deg) scale(0.95)" 
-                  : "rotateY(0deg) scale(1)",
-                opacity: isDeclassified ? 0 : 1
-              }}
-            >
-              <div className="w-[200%] h-full p-6 md:p-10 relative" style={{ transform: "translateX(-50%)" }}>
-                <div className={`absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 opacity-50 ${isLightMode ? "border-black/30" : "border-signal/50"}`} />
-                <span className={`font-mono text-[10px] tracking-widest uppercase block mb-8 ${isLightMode ? "text-[#c08000]" : "text-signal"}`}>
-                  SYS.ID // {activeCert.id}
-                </span>
-                <h3 className={`font-display font-bold text-2xl uppercase tracking-wide mb-4 ${isLightMode ? "text-black" : "text-white"}`}>
-                  {activeCert.text}
-                </h3>
-                <p className={`font-sans text-sm uppercase tracking-widest ${isLightMode ? "text-black/50" : "text-white/50"}`}>
-                  Issued by: <span className={isLightMode ? "text-black font-bold" : "text-white font-bold"}>{activeCert.org}</span>
-                </p>
-              </div>
-            </div>
-
-          </div>
+          ))}
         </div>
-      )}
-
-      <div 
-        ref={darkMaskRef}
-        className={`hidden lg:block absolute inset-0 z-20 pointer-events-none transition-all duration-300 ${
-          isLightMode ? "bg-[#ffffff]" : "bg-[#020202]"
-        }`}
-        style={{
-          maskImage: `radial-gradient(circle 0px at -1000px -1000px, transparent 0%, black 100%)`,
-          WebkitMaskImage: `radial-gradient(circle 0px at -1000px -1000px, transparent 0%, black 100%)`,
-        }}
-      />
-
-      <div 
-        ref={spotlightRef}
-        className={`hidden lg:block absolute inset-0 pointer-events-none z-30 transition-opacity duration-300 ${
-          isLightMode ? "mix-blend-multiply" : "mix-blend-screen"
-        } ${isHovering ? "opacity-100" : "opacity-0"}`}
-        style={{
-          background: `radial-gradient(circle 0px at -1000px -1000px, rgba(240, 160, 0, 0.15) 0%, rgba(240, 160, 0, 0.05) 40%, transparent 100%)`
-        }}
-      />
+      </div>
     </section>
   );
 }
