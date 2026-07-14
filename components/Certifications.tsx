@@ -50,6 +50,17 @@ export default function Certifications() {
   const lastOpenedIdxRef = useRef<number>(0);
 
   const [mobileCertHighlightIdx, setMobileCertHighlightIdx] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -185,7 +196,9 @@ export default function Certifications() {
         }}
       />
 
-      <div className="relative z-10 w-full h-full section-container py-32 pointer-events-none">
+      <div className={`relative z-10 w-full h-full section-container py-32 ${
+        isMobile ? "pointer-events-auto" : "pointer-events-none"
+      }`}>
         
         <div className="mb-24 text-center">
           <p className="font-mono text-sm text-signal tracking-[0.5em] uppercase mb-4">
@@ -203,7 +216,8 @@ export default function Certifications() {
           {CERTIFICATIONS.map((cert, i) => (
             <div 
               key={i} 
-              onClick={() => handleOpenCard(i)}
+              onPointerDown={(e) => { e.stopPropagation(); handleOpenCard(i); }}
+              onClick={(e) => { e.stopPropagation(); handleOpenCard(i); }}
               className={`relative border p-10 backdrop-blur-sm pointer-events-auto cursor-pointer transition-transform hover:scale-[1.02] lg:mt-16 ${
                 isLightMode 
                   ? "bg-[#ffffff] hover:bg-zinc-50 border-black/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)]" 

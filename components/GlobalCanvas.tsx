@@ -470,15 +470,15 @@ const getShapes = () => {
   // Arc loop at the top: radius 25, centered at (0, 20) (30 points from -30deg to 210deg)
   for (let i = 0; i < 30; i++) {
     const angle = (-30 + (240 * i) / 29) * (Math.PI / 180);
-    const x = Math.cos(angle) * 25;
+    const x = -Math.cos(angle) * 25;
     const y = 20 + Math.sin(angle) * 25;
-    const r = angle * (180 / Math.PI) + 90;
+    const r = 90 - angle * (180 / Math.PI);
     question.push({ x, y, r });
   }
   // Hook curve/connection segment leading to center line (14 points)
   for (let i = 0; i < 14; i++) {
     const t = i / 13;
-    const x = 25 * (1 - t);
+    const x = -25 * (1 - t);
     const y = 20 - 25 * t;
     const r = -45;
     question.push({ x, y, r });
@@ -494,7 +494,7 @@ const getShapes = () => {
   // Bottom circle dot (8 points)
   for (let i = 0; i < 8; i++) {
     const angle = (i / 8) * Math.PI * 2;
-    const x = Math.cos(angle) * 3.5;
+    const x = -Math.cos(angle) * 3.5;
     const y = -40 + Math.sin(angle) * 3.5;
     const r = angle * (180 / Math.PI);
     question.push({ x, y, r });
