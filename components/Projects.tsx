@@ -46,31 +46,31 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
       if (index === 0) {
         // EdgeVision: Lidar scanning grid
         const scanY = Math.sin(frame * 0.04) * (h / 3.5);
-        ctx.fillStyle = isLightMode ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.1)";
+        ctx.fillStyle = isLightMode ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.1)";
         for (let x = -w/3.2; x <= w/3.2; x += 16) {
           for (let y = -h/3.2; y <= h/3.2; y += 16) {
             const dist = Math.abs(y - scanY);
             if (dist < 10) {
               ctx.fillStyle = activeColor;
               ctx.beginPath();
-              ctx.arc(x, y, 2.8, 0, Math.PI * 2);
+              ctx.arc(x, y, 3.8, 0, Math.PI * 2);
               ctx.fill();
-              ctx.strokeStyle = isLightMode ? "rgba(0,51,170,0.2)" : "rgba(0,255,204,0.15)";
-              ctx.lineWidth = 0.5;
+              ctx.strokeStyle = isLightMode ? "rgba(0,51,170,0.3)" : "rgba(0,255,204,0.25)";
+              ctx.lineWidth = 1.0;
               ctx.beginPath();
               ctx.moveTo(0, -h/3.2);
               ctx.lineTo(x, y);
               ctx.stroke();
             } else {
-              ctx.fillStyle = isLightMode ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.12)";
+              ctx.fillStyle = isLightMode ? "rgba(0,0,0,0.22)" : "rgba(255,255,255,0.15)";
               ctx.beginPath();
-              ctx.arc(x, y, 1.2, 0, Math.PI * 2);
+              ctx.arc(x, y, 1.6, 0, Math.PI * 2);
               ctx.fill();
             }
           }
         }
         ctx.strokeStyle = activeColor;
-        ctx.lineWidth = 1.8;
+        ctx.lineWidth = 2.8;
         ctx.beginPath();
         ctx.moveTo(-w/3.2, scanY);
         ctx.lineTo(w/3.2, scanY);
@@ -84,8 +84,8 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
           const r = Math.min(w, h) / 4.2 + Math.sin(frame * 0.06 + i) * 6;
           points.push({ x: Math.cos(a) * r, y: Math.sin(a) * r });
         }
-        ctx.strokeStyle = isLightMode ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.06)";
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = isLightMode ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.1)";
+        ctx.lineWidth = 2.0;
         for (let i = 0; i < points.length; i++) {
           for (let j = i + 1; j < points.length; j++) {
             ctx.beginPath();
@@ -96,24 +96,25 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
         }
         ctx.fillStyle = baseColor;
         ctx.beginPath();
-        ctx.arc(0, 0, 7, 0, Math.PI * 2);
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
         ctx.fill();
         points.forEach((p) => {
           ctx.strokeStyle = activeColor;
+          ctx.lineWidth = 2.0;
           ctx.beginPath();
           ctx.moveTo(0, 0);
           ctx.lineTo(p.x, p.y);
           ctx.stroke();
           ctx.fillStyle = activeColor;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, 6.5, 0, Math.PI * 2);
           ctx.fill();
         });
 
       } else if (index === 2) {
         // Medisync: ECG heartbeat
         ctx.strokeStyle = activeColor;
-        ctx.lineWidth = 2.2;
+        ctx.lineWidth = 3.5;
         ctx.beginPath();
         const startX = -w/2.8;
         const endX = w/2.8;
@@ -135,13 +136,13 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
         const probeX = startX + ((frame * 2.2) % (endX - startX));
         ctx.fillStyle = baseColor;
         ctx.beginPath();
-        ctx.arc(probeX, Math.sin(frame * 0.1) * 2, 5.5, 0, Math.PI * 2);
+        ctx.arc(probeX, Math.sin(frame * 0.1) * 2, 8, 0, Math.PI * 2);
         ctx.fill();
 
       } else if (index === 3) {
         // Card-Orchestration: rotating gears
         ctx.strokeStyle = activeColor;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 2.8;
         const r1 = Math.min(w, h) / 3.4;
         const r2 = r1 / 2;
         ctx.beginPath();
@@ -152,6 +153,7 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
         ctx.stroke();
         ctx.save();
         ctx.rotate(frame * 0.01);
+        ctx.lineWidth = 2.5;
         for (let i = 0; i < 8; i++) {
           ctx.rotate(Math.PI / 4);
           ctx.beginPath();
@@ -163,6 +165,7 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
         ctx.save();
         ctx.rotate(-frame * 0.02);
         ctx.strokeStyle = baseColor;
+        ctx.lineWidth = 2.5;
         for (let i = 0; i < 6; i++) {
           ctx.rotate(Math.PI / 3);
           ctx.beginPath();
@@ -177,7 +180,7 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
         const r1 = Math.min(w, h) / 3.6;
         const r2 = r1 * 0.7;
         const r3 = r1 * 0.4;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 2.8;
         ctx.strokeStyle = activeColor;
         ctx.save();
         ctx.rotate(frame * 0.015);
@@ -217,17 +220,19 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
       } else if (index === 5) {
         // UPI Fraud: Security dome deflection
         ctx.strokeStyle = activeColor;
-        ctx.lineWidth = 1.6;
+        ctx.lineWidth = 2.8;
         const r = Math.min(w, h) / 3.2;
         ctx.beginPath();
         ctx.arc(0, 0, r, Math.PI, 2 * Math.PI);
         ctx.stroke();
         const pulse = (frame % 90) / 90;
         ctx.strokeStyle = isLightMode ? `rgba(0,51,170,${1 - pulse})` : `rgba(0,255,204,${1 - pulse})`;
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
         ctx.arc(0, 0, r * pulse, Math.PI, 2 * Math.PI);
         ctx.stroke();
         ctx.strokeStyle = baseColor;
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
         ctx.moveTo(-w/2.6, 0);
         ctx.lineTo(w/2.6, 0);
@@ -236,13 +241,13 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
         const threatX = r * Math.cos(frame * 0.025 % Math.PI);
         ctx.fillStyle = "red";
         ctx.beginPath();
-        ctx.arc(threatX, threatY, 4.5, 0, Math.PI * 2);
+        ctx.arc(threatX, threatY, 6.5, 0, Math.PI * 2);
         ctx.fill();
 
       } else if (index === 6) {
         // AgriVision: Topography mesh lines
-        ctx.strokeStyle = isLightMode ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.06)";
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = isLightMode ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.06)";
+        ctx.lineWidth = 1.5;
         const rows = 8;
         const cols = 8;
         const cellSize = Math.min(w, h) / 11;
@@ -259,7 +264,7 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
         }
         const scannerX = Math.sin(frame * 0.04) * (w / 3.4);
         ctx.strokeStyle = activeColor;
-        ctx.lineWidth = 2.2;
+        ctx.lineWidth = 3.5;
         ctx.beginPath();
         ctx.moveTo(scannerX, -h/4);
         ctx.lineTo(scannerX, h/4);
@@ -269,8 +274,8 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
         // Adaptive Quantization: Snap grid weights
         const nodesCount = 18;
         const snapGrid = 28;
-        ctx.strokeStyle = isLightMode ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.05)";
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = isLightMode ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.05)";
+        ctx.lineWidth = 1.5;
         for (let x = -w/3; x <= w/3; x += snapGrid) {
           ctx.beginPath();
           ctx.moveTo(x, -h/3.2);
@@ -285,10 +290,11 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
           const activeSnap = (frame % 180) > 90;
           const x = activeSnap ? snapX : rawX;
           ctx.beginPath();
-          ctx.arc(x, rawY, 3.8, 0, Math.PI * 2);
+          ctx.arc(x, rawY, 5.5, 0, Math.PI * 2);
           ctx.fill();
           if (activeSnap) {
             ctx.strokeStyle = baseColor;
+            ctx.lineWidth = 2.0;
             ctx.beginPath();
             ctx.moveTo(rawX, rawY);
             ctx.lineTo(snapX, rawY);
@@ -299,7 +305,7 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
       } else if (index === 8) {
         // Pac-Man: chomper on circular track
         ctx.strokeStyle = baseColor;
-        ctx.lineWidth = 1.8;
+        ctx.lineWidth = 2.8;
         const r = Math.min(w, h) / 3.6;
         ctx.beginPath();
         ctx.arc(0, 0, r, 0, Math.PI * 2);
@@ -310,7 +316,7 @@ function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLigh
         ctx.fillStyle = activeColor;
         ctx.beginPath();
         const chomp = Math.abs(Math.sin(frame * 0.16)) * 0.25;
-        ctx.arc(px, py, 9.5, angle + chomp, angle + Math.PI * 2 - chomp);
+        ctx.arc(px, py, 14, angle + chomp, angle + Math.PI * 2 - chomp);
         ctx.lineTo(px, py);
         ctx.fill();
       }
@@ -2083,7 +2089,9 @@ export default function Projects() {
               </div>
 
               {/* Concept Vector Visualizer Screen */}
-              <div className="relative w-full h-[240px] bg-black/45 border-b border-signal/20 flex items-center justify-center overflow-hidden">
+              <div className={`relative w-full h-[240px] border-b border-signal/20 flex items-center justify-center overflow-hidden transition-colors duration-300 ${
+                isLightMode ? "bg-[#ffffff]" : "bg-black/45"
+              }`}>
                 <MobileConceptVisualizer index={activeIndex} isLightMode={isLightMode} />
                 {/* Holographic scanner scanline */}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00ff66]/1 to-transparent pointer-events-none animate-scanline" style={{ backgroundSize: "100% 4px" }} />

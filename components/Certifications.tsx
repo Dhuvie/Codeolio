@@ -204,10 +204,14 @@ export default function Certifications() {
             <div 
               key={i} 
               onClick={() => handleOpenCard(i)}
-              className={`relative border p-10 backdrop-blur-sm pointer-events-auto cursor-pointer transition-transform hover:scale-[1.02] bg-black hover:bg-black/90 lg:mt-16 ${
+              className={`relative border p-10 backdrop-blur-sm pointer-events-auto cursor-pointer transition-transform hover:scale-[1.02] lg:mt-16 ${
+                isLightMode 
+                  ? "bg-[#ffffff] hover:bg-zinc-50 border-black/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)]" 
+                  : "bg-black hover:bg-black/90 border-white/10"
+              } ${
                 mobileCertHighlightIdx === i 
                   ? "border-[#f0a000] shadow-[0_0_15px_rgba(240,160,0,0.25)]" 
-                  : "border-white/10"
+                  : ""
               }`}
             >
               <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-signal/50 opacity-50" />
@@ -217,15 +221,15 @@ export default function Certifications() {
                 SYS.ID // {cert.id}
               </span>
               
-              <h3 className="font-display font-bold text-2xl text-white uppercase tracking-wide mb-4">
+              <h3 className={`font-display font-bold text-2xl uppercase tracking-wide mb-4 ${isLightMode ? "text-zinc-900" : "text-white"}`}>
                 {cert.text}
               </h3>
               
-              <p className="font-sans text-sm text-white/50 uppercase tracking-widest">
-                Issued by: <span className="text-white font-bold">{cert.org}</span>
+              <p className={`font-sans text-sm uppercase tracking-widest ${isLightMode ? "text-zinc-500" : "text-white/50"}`}>
+                Issued by: <span className={`font-bold ${isLightMode ? "text-zinc-800" : "text-white"}`}>{cert.org}</span>
               </p>
 
-              <div className="mt-12 w-full h-[1px] bg-gradient-to-r from-signal/50 to-transparent" />
+              <div className={`mt-12 w-full h-[1px] ${isLightMode ? "bg-gradient-to-r from-black/15 to-transparent" : "bg-gradient-to-r from-signal/50 to-transparent"}`} />
             </div>
           ))}
         </div>
