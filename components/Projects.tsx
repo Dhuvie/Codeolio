@@ -1411,10 +1411,10 @@ function ProjectVisualizer3D({ index, isExpanded, setIsExpanded }: { index: numb
       
       {/* HUD Info Labels */}
       <div className="absolute top-3 left-3 flex items-center gap-2 bg-black/60 px-3 py-1 border border-white/5 rounded-full backdrop-blur-sm pointer-events-none select-none">
-        <span className="w-2.5 h-2.5 rounded-full bg-signal animate-pulse" />
-        <span className="font-mono text-[9px] text-signal/80 uppercase tracking-widest flex items-center gap-1.5">
+        <span className="w-2.5 h-2.5 rounded-full bg-[#f0a000] animate-pulse" />
+        <span className="font-mono text-[9px] text-[#f0a000] uppercase tracking-widest flex items-center gap-1.5">
           SIM ENVIRONMENT // ACTIVE_MOD_{index + 1}
-          <span className="text-white/40">// INTERACTIVE</span>
+          <span className="text-[#ffffff]/50">// INTERACTIVE</span>
         </span>
       </div>
 
