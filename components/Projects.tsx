@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import SplitTextReveal from "./SplitTextReveal";
@@ -1345,7 +1346,8 @@ function ProjectVisualizer3D({ index, isExpanded, setIsExpanded }: { index: numb
   );
 
   if (isExpanded) {
-    return (
+    if (typeof window === "undefined" || !document.body) return null;
+    return createPortal(
       <div className={`fixed inset-0 w-screen h-screen z-[9999] flex flex-col items-center justify-center p-6 backdrop-blur-lg transition-colors duration-300 ${
         isLightMode ? "bg-[#f4f4f6]/98" : "bg-[#09090b]/98"
       }`}>
@@ -1398,7 +1400,8 @@ function ProjectVisualizer3D({ index, isExpanded, setIsExpanded }: { index: numb
             Direct WebGL overlay active. Cursor interaction controls particle velocity, model bounds, and spatial matrices in real-time.
           </p>
         </div>
-      </div>
+      </div>,
+      document.body
     );
   }
 
