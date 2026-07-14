@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, type ReactNode } from "react";
+import { useRef, useEffect, useState, type ReactNode } from "react";
 import { createMagneticEffect } from "@/lib/animations";
 
 interface MagneticButtonProps {
@@ -23,6 +23,22 @@ export default function MagneticButton({
   external = false,
 }: MagneticButtonProps) {
   const ref = useRef<HTMLAnchorElement & HTMLButtonElement>(null);
+  const [isLightMode, setIsLightMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLightMode(document.documentElement.classList.contains("light"));
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === "class") {
+            setIsLightMode(document.documentElement.classList.contains("light"));
+          }
+        });
+      });
+      observer.observe(document.documentElement, { attributes: true });
+      return () => observer.disconnect();
+    }
+  }, []);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -30,33 +46,35 @@ export default function MagneticButton({
     return cleanup;
   }, [strength]);
 
-  const baseClasses = `
-    inline-flex items-center gap-2 px-6 py-3 rounded-lg
-    font-mono text-sm tracking-wider uppercase
-    transition-colors duration-300 cursor-pointer
-    relative overflow-hidden group
-  `;
-
-  const variantClasses =
-    variant === "primary"
-      ? "text-[#f0a000]"
-      : "text-[#ffffff]";
+  const variantClasses = isLightMode
+    ? (variant === "primary" ? "text-[#c07000] font-black" : "text-[#0c0c0e] font-bold")
+    : (variant === "primary" ? "text-[#f0a000]" : "text-[#ffffff]");
 
   const combinedClasses = `
     inline-flex items-center gap-2 px-8 py-4 rounded-full
     font-util text-sm font-bold tracking-[0.2em] uppercase
     transition-all duration-300 cursor-pointer
     relative overflow-hidden group
-    md:hover:scale-105 md:hover:shadow-[0_0_40px_rgba(240,160,0,0.4),inset_0_0_20px_rgba(240,160,0,0.2)]
+    md:hover:scale-105
+    ${isLightMode 
+      ? "md:hover:shadow-[0_0_25px_rgba(0,0,0,0.06),inset_0_0_15px_rgba(0,0,0,0.03)]" 
+      : "md:hover:shadow-[0_0_40px_rgba(240,160,0,0.4),inset_0_0_20px_rgba(240,160,0,0.2)]"
+    }
     ${variantClasses} ${className}
   `;
 
   const renderContent = () => (
     <>
-      <span className="absolute inset-0 rounded-full bg-[#080808] border border-signal/20 transition-colors duration-300 md:group-hover:border-signal/80 z-0" />
+      <span className={`absolute inset-0 rounded-full border transition-colors duration-300 md:group-hover:border-signal/80 z-0 ${
+        isLightMode 
+          ? "bg-[#eef2f6] border-[#0c0c0e]/15" 
+          : "bg-[#080808] border-signal/20"
+      }`} />
 
       <span 
-        className="absolute inset-0 rounded-full z-0 opacity-10 md:group-hover:opacity-40 transition-opacity duration-500 mix-blend-screen"
+        className={`absolute inset-0 rounded-full z-0 opacity-10 md:group-hover:opacity-40 transition-opacity duration-500 ${
+          isLightMode ? "mix-blend-multiply" : "mix-blend-screen"
+        }`}
         style={{
           backgroundImage: "radial-gradient(var(--signal) 1px, transparent 1px)",
           backgroundSize: "6px 6px"
@@ -64,22 +82,35 @@ export default function MagneticButton({
       />
 
       <span 
-        className="absolute inset-0 opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 z-0 mix-blend-screen"
+        className={`absolute inset-0 opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 z-0 ${
+          isLightMode ? "mix-blend-multiply" : "mix-blend-screen"
+        }`}
         style={{
           background: variant === "primary" 
             ? "radial-gradient(circle at 50% 100%, rgba(240, 160, 0, 0.4), transparent 60%)" 
-            : "radial-gradient(circle at 50% 100%, rgba(255, 255, 255, 0.2), transparent 60%)",
+            : (isLightMode 
+                ? "radial-gradient(circle at 50% 100%, rgba(12, 12, 14, 0.08), transparent 60%)"
+                : "radial-gradient(circle at 50% 100%, rgba(255, 255, 255, 0.2), transparent 60%)"
+              ),
         }}
       />
 
       <span className="absolute inset-0 z-0 overflow-hidden rounded-full">
-        <span className="absolute top-0 bottom-0 left-0 w-[200%] h-full bg-gradient-to-r from-transparent via-signal/30 to-transparent -translate-x-full md:group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+        <span className={`absolute top-0 bottom-0 left-0 w-[200%] h-full bg-gradient-to-r from-transparent -translate-x-full md:group-hover:translate-x-full transition-transform duration-1000 ease-in-out ${
+          isLightMode ? "via-black/5" : "via-signal/30"
+        }`} />
       </span>
 
-      <span className="relative z-20 flex items-center gap-2 overflow-hidden h-full drop-shadow-[0_0_8px_rgba(240,160,0,1.0)]">
+      <span className={`relative z-20 flex items-center gap-2 overflow-hidden h-full ${
+        isLightMode ? "" : "drop-shadow-[0_0_8px_rgba(240,160,0,0.8)]"
+      }`}>
         <span className="flex flex-col transition-transform duration-500 md:group-hover:-translate-y-full">
           <span className="flex items-center justify-center gap-2 h-full">{children}</span>
-          <span className="flex items-center justify-center gap-2 h-full absolute top-full left-0 text-[#ffffff] drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]">{children}</span>
+          <span className={`flex items-center justify-center gap-2 h-full absolute top-full left-0 ${
+            isLightMode 
+              ? "text-black" 
+              : "text-[#ffffff] drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]"
+          }`}>{children}</span>
         </span>
       </span>
     </>

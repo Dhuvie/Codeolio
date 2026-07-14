@@ -757,13 +757,13 @@ const MobileAnimeGrid = () => {
             ty = shape1.y + s.ry * 300 * ease;
             tz = s.rz * 400 * ease;
             tr = shape1.r + s.rRot * ease;
-            op = 1 - (ease * 0.85); // Fade heavily during chaos
+            op = 1 - (ease * 0.45); // Cap morph fade to 0.55 opacity to prevent tinting
         } else if (progress < assembleStart) {
             tx = shape1.x + s.rx * 300;
             ty = shape1.y + s.ry * 300;
             tz = s.rz * 400;
             tr = shape1.r + s.rRot;
-            op = 0.15;
+            op = 0.55; // Keep shapes highly visible and solid during transition
         } else if (progress < assembleEnd) {
             let local = (progress - assembleStart) / (assembleEnd - assembleStart);
             let ease = 1 - Math.pow(1 - local, 3); // Cubic ease out
@@ -777,7 +777,7 @@ const MobileAnimeGrid = () => {
             ty = chaosY + (shape2.y - chaosY) * ease;
             tz = chaosZ + (0 - chaosZ) * ease;
             tr = chaosR + (shape2.r - chaosR) * ease;
-            op = 0.15 + (ease * 0.85);
+            op = 0.55 + (ease * 0.45);
         } else {
             tx = shape2.x; ty = shape2.y; tz = 0; tr = shape2.r;
         }
