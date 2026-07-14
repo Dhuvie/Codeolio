@@ -28,6 +28,20 @@ import MobileConsole from "@/components/MobileConsole";
 
 export default function Home() {
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const enforceMobileTheme = () => {
+        if (window.innerWidth < 768) {
+          document.documentElement.classList.add("light");
+          document.documentElement.classList.remove("dark");
+        }
+      };
+      enforceMobileTheme();
+      window.addEventListener("resize", enforceMobileTheme);
+      return () => {
+        window.removeEventListener("resize", enforceMobileTheme);
+        killAll();
+      };
+    }
     return () => {
       killAll();
     };

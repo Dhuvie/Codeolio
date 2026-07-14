@@ -138,10 +138,10 @@ function NeuralMatrix({ isLightMode, isBatteryPower }: { isLightMode: boolean; i
           cols[i * 3 + 1] = 0.0;
           cols[i * 3 + 2] = 0.0;
         } else {
-          // Outer vortex: very faint grey (blends out on white background)
-          cols[i * 3] = 0.92;
-          cols[i * 3 + 1] = 0.92;
-          cols[i * 3 + 2] = 0.92;
+          // Outer vortex: deep dark blue
+          cols[i * 3] = 0.0;
+          cols[i * 3 + 1] = 0.20;
+          cols[i * 3 + 2] = 0.66;
         }
       } else {
         if (isPhotonRing) {
@@ -654,16 +654,16 @@ const MobileAnimeGrid = () => {
   }, [shards]);
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#0d0b08] overflow-hidden pointer-events-none" style={{ zIndex: 0, perspective: '1000px' }}>
+    <div className="fixed inset-0 w-full h-full bg-[#ffffff] overflow-hidden pointer-events-none" style={{ zIndex: 0, perspective: '1000px' }}>
       
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1a1205] via-[#0d0b08] to-[#050300] opacity-100" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#eef3f9] via-[#ffffff] to-[#ffffff] opacity-100" />
 
       <div 
         className="absolute top-1/2 left-1/2 w-[250px] h-[250px] rounded-full blur-[80px]"
         style={{
-           background: 'radial-gradient(circle, rgba(240,160,0,0.12) 0%, rgba(122,81,0,0.05) 50%, rgba(0,0,0,0) 100%)',
+           background: 'radial-gradient(circle, rgba(0,51,170,0.06) 0%, rgba(0,0,0,0) 70%)',
            transform: 'translate(-50%, -50%)',
-        }}
+         }}
       />
 
       <div 
@@ -680,8 +680,8 @@ const MobileAnimeGrid = () => {
               height: '3px',
               marginLeft: '-7px',
               marginTop: '-1.5px',
-              backgroundColor: s.isOrange ? '#f0a000' : '#f0e8d0',
-              boxShadow: s.isOrange ? '0 0 10px rgba(240,160,0,0.8)' : '0 0 8px rgba(240,232,208,0.5)',
+              backgroundColor: s.isOrange ? '#000000' : '#0033aa',
+              boxShadow: s.isOrange ? '0 0 6px rgba(0,0,0,0.1)' : '0 0 6px rgba(0,51,170,0.15)',
               borderRadius: '2px',
               willChange: 'transform, opacity',
               transform: `translate3d(${s.positions[0].x}px, ${s.positions[0].y}px, 0px) rotate(${s.positions[0].r}deg)`,
