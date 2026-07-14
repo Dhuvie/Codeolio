@@ -123,7 +123,7 @@ export default function CustomCursor() {
 
   return (
     <>
-      <svg className="fixed inset-0 pointer-events-none z-[9998] hidden md:block w-full h-full mix-blend-difference">
+      <svg className="fixed inset-0 pointer-events-none z-[999998] hidden md:block w-full h-full mix-blend-difference">
         {[...Array(TAIL_LENGTH - 1)].map((_, i) => {
           // Taper the width from 8px at the head down to 0 at the tail
           const strokeWidth = 8 * (1 - i / (TAIL_LENGTH - 1));
@@ -143,7 +143,7 @@ export default function CustomCursor() {
       </svg>
       <div 
         ref={cursorRef} 
-        className={`fixed top-0 left-0 w-3 h-3 rounded-full pointer-events-none z-[9999] hidden md:block mix-blend-difference ${
+        className={`fixed top-0 left-0 w-3 h-3 rounded-full pointer-events-none z-[999999] hidden md:block mix-blend-difference ${
           isLightMode 
             ? "bg-white" 
             : "bg-signal shadow-[0_0_12px_rgba(240,160,0,0.8)]"
