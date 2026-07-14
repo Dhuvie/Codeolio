@@ -1346,31 +1346,47 @@ function ProjectVisualizer3D({ index, isExpanded, setIsExpanded }: { index: numb
 
   if (isExpanded) {
     return (
-      <div className="fixed inset-0 w-screen h-screen z-[9999] bg-[#09090b]/98 flex flex-col items-center justify-center p-6 backdrop-blur-lg">
+      <div className={`fixed inset-0 w-screen h-screen z-[9999] flex flex-col items-center justify-center p-6 backdrop-blur-lg transition-colors duration-300 ${
+        isLightMode ? "bg-[#f4f4f6]/98" : "bg-[#09090b]/98"
+      }`}>
         {/* Holographic grid scanlines */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(240,160,0,0.015)_1px,transparent_1px)] bg-[size:100%_4px] pointer-events-none animate-scanline" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.85)_100%)] pointer-events-none" />
+        <div className={`absolute inset-0 pointer-events-none animate-scanline ${
+          isLightMode 
+            ? "bg-[linear-gradient(to_bottom,rgba(0,0,0,0.015)_1px,transparent_1px)]" 
+            : "bg-[linear-gradient(to_bottom,rgba(240,160,0,0.015)_1px,transparent_1px)]"
+        }`} style={{ backgroundSize: "100% 4px" }} />
+        <div className={`absolute inset-0 pointer-events-none ${
+          isLightMode 
+            ? "bg-[radial-gradient(circle_at_center,transparent_40%,rgba(255,255,255,0.75)_100%)]" 
+            : "bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.85)_100%)]"
+        }`} />
         
-        {/* Floating Telemetry Stats */}
-        <div className="absolute top-8 left-8 font-mono text-[10px] text-signal/70 space-y-2 select-none border-l border-signal/20 pl-4 hidden md:block">
-          <p className="text-white font-bold tracking-widest text-xs uppercase">Telemetry Terminal Overlay</p>
-          <p>BUFFER_READ: CACHE_STABLE</p>
-          <p>SYS_CYCLES: 48,190 FLOP/S</p>
-          <p>QUANTIZATION_FACTOR: adaptive_auto</p>
-          <p>FRAME_RENDER: 60_FPS // STRICT</p>
-        </div>
-
-        <div className="absolute top-8 right-8 flex items-center gap-4 z-[10000]">
-          <button 
-            onClick={() => setIsExpanded(false)}
-            className="font-mono text-xs text-[#ff3333] border border-[#ff3333]/30 bg-[#ff3333]/5 px-4 py-2 rounded-md hover:bg-[#ff3333]/15 transition-all duration-300 shadow-[0_0_15px_rgba(255,51,51,0.05)] cursor-pointer"
-          >
-            [ ESCAPE HOLOGRAPHIC OVERLAY ]
-          </button>
+        {/* Telemetry Header Bar (Never overlaps the canvas!) */}
+        <div className="w-[90vw] flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 z-[10000] select-none">
+          {/* Left: Telemetry Stats */}
+          <div className="font-mono text-[10px] text-signal/70 space-y-1.5 select-none border-l border-signal/30 pl-4">
+            <p className="text-ink font-bold tracking-widest text-xs uppercase">Telemetry Terminal Overlay</p>
+            <div className="flex flex-wrap gap-x-6 gap-y-1 text-ink/75">
+              <span>BUFFER_READ: CACHE_STABLE</span>
+              <span>SYS_CYCLES: 48,190 FLOP/S</span>
+              <span>QUANTIZATION_FACTOR: adaptive_auto</span>
+              <span>FRAME_RENDER: 60_FPS // STRICT</span>
+            </div>
+          </div>
+          
+          {/* Right: Escape Button */}
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsExpanded(false)}
+              className="font-mono text-xs text-[#ff3333] border border-[#ff3333]/40 bg-[#ff3333]/5 px-4 py-2 rounded-md hover:bg-[#ff3333]/15 transition-all duration-300 shadow-[0_0_15px_rgba(255,51,51,0.05)] cursor-pointer"
+            >
+              [ ESCAPE HOLOGRAPHIC OVERLAY ]
+            </button>
+          </div>
         </div>
 
         {/* Visualizer view */}
-        <div className="w-[90vw] h-[75vh] border border-signal/20 rounded-xl overflow-hidden bg-black/45 shadow-[0_0_60px_rgba(240,160,0,0.05)] relative">
+        <div className="w-[90vw] h-[65vh] border border-signal/20 rounded-xl overflow-hidden bg-black/45 shadow-[0_0_60px_rgba(240,160,0,0.05)] relative">
           {canvasContent}
         </div>
 
@@ -1378,7 +1394,7 @@ function ProjectVisualizer3D({ index, isExpanded, setIsExpanded }: { index: numb
           <p className="font-mono text-xs text-signal/80 uppercase tracking-widest mb-1">
             Active Workspace Simulation Node {index + 1}
           </p>
-          <p className="text-white/40 text-[11px] font-mono">
+          <p className="text-ink/50 text-[11px] font-mono">
             Direct WebGL overlay active. Cursor interaction controls particle velocity, model bounds, and spatial matrices in real-time.
           </p>
         </div>
