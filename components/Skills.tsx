@@ -202,7 +202,61 @@ export default function Skills() {
     };
   }, []);
 
+  const getCategoryIcon = (index: number) => {
+    switch (index) {
+      case 0:
+        return (
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="16 18 22 12 16 6" />
+            <polyline points="8 6 2 12 8 18" />
+          </svg>
+        );
+      case 1:
+        return (
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="4" />
+            <line x1="12" y1="2" x2="12" y2="4" />
+            <line x1="12" y1="20" x2="12" y2="22" />
+            <line x1="2" y1="12" x2="4" y2="12" />
+            <line x1="20" y1="12" x2="22" y2="12" />
+          </svg>
+        );
+      case 2:
+        return (
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+            <path d="M2 12h20" />
+          </svg>
+        );
+      case 3:
+        return (
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <ellipse cx="12" cy="5" rx="9" ry="3" />
+            <path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+            <path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6" />
+          </svg>
+        );
+      case 4:
+        return (
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="6" y1="3" x2="6" y2="15" />
+            <circle cx="18" cy="6" r="3" />
+            <circle cx="6" cy="18" r="3" />
+            <path d="M18 9a9 9 0 0 1-9 9" />
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
 
+  const getExperienceLabel = (level: number) => {
+    if (level >= 5) return "SENIOR";
+    if (level === 4) return "PRO";
+    return "CORE";
+  };
 
   return (
     <section ref={sectionRef} id="skills" className="relative py-12 overflow-hidden border-b border-signal/15">
@@ -241,7 +295,7 @@ export default function Skills() {
                   key={i}
                   type="button"
                   onClick={() => setActiveIdx(i)}
-                  className={`w-full text-left font-mono text-[10px] md:text-xs px-3.5 py-2.5 rounded-lg border transition-all duration-200 flex items-center justify-between whitespace-nowrap md:whitespace-normal cursor-pointer select-none
+                  className={`w-full text-left font-mono text-[10px] md:text-xs px-3.5 py-2.5 rounded-lg border transition-all duration-200 flex items-center justify-between gap-3 whitespace-nowrap md:whitespace-normal cursor-pointer select-none
                     ${activeIdx === i
                       ? (isLightMode 
                           ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold shadow-md shadow-[#0033aa]/10" 
@@ -255,7 +309,7 @@ export default function Skills() {
                   `}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="opacity-60">0{i + 1}.</span>
+                    <span className="opacity-75">{getCategoryIcon(i)}</span>
                     <span className="tracking-wider">{book.spineTitle}</span>
                   </div>
                   <span className="text-[8px] opacity-50 hidden md:inline">{book.volume}</span>
@@ -290,26 +344,38 @@ export default function Skills() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {BOOKS_DATA[activeIdx].items.map((skill, idx) => (
-                      <div key={idx} className="space-y-1.5 border border-dashed rounded p-3 border-subtle">
+                      <div key={idx} className="space-y-1.5 border border-dashed rounded p-3 border-subtle transition-all duration-300 hover:border-signal/30 dark:hover:border-signal/45">
                         <div className="flex items-center justify-between text-xs font-bold text-ink">
-                          <span>{skill.name}</span>
-                          <span className={`text-[9px] font-mono
-                            ${isLightMode ? "text-[#c07000]" : "text-signal/90"}
+                          <span className="tracking-tight">{skill.name}</span>
+                          <span className={`text-[8.5px] font-mono tracking-wider
+                            ${isLightMode ? "text-[#0033aa]/90" : "text-signal/90"}
                           `}>
-                            LEVEL_{skill.level * 20}%
+                            {getExperienceLabel(skill.level)} // {skill.level * 20}%
                           </span>
                         </div>
                         
-                        {/* Visual Level Progress Bar */}
-                        <div className={`w-full h-1 rounded-full overflow-hidden
-                          ${isLightMode ? "bg-black/10" : "bg-zinc-800"}
-                        `}>
-                          <div 
-                            className={`h-full rounded-full transition-all duration-500
-                              ${isLightMode ? "bg-[#0033aa]" : "bg-signal"}
-                            `}
-                            style={{ width: `${skill.level * 20}%` }}
-                          />
+                        {/* Visual Segmented LED Progress Indicator */}
+                        <div className="flex gap-[3.5px] py-1">
+                          {[...Array(10)].map((_, step) => {
+                            const isLit = step < skill.level * 2;
+                            return (
+                              <div 
+                                key={step} 
+                                className={`h-1.5 flex-1 rounded-[1px] transition-all duration-500
+                                  ${isLit 
+                                    ? (isLightMode 
+                                        ? "bg-[#0033aa]" 
+                                        : "bg-signal shadow-[0_0_5px_rgba(240,160,0,0.5)]"
+                                      ) 
+                                    : (isLightMode 
+                                        ? "bg-black/10" 
+                                        : "bg-zinc-800"
+                                      )
+                                  }
+                                `}
+                              />
+                            );
+                          })}
                         </div>
 
                         <p className="text-[9px] text-ink/50 pl-1 leading-relaxed">
