@@ -76,6 +76,7 @@ const DOSSIERS: JobDossier[] = [
 
 export default function Experience() {
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [isClosingId, setIsClosingId] = useState<number | null>(null);
   const [positions, setPositions] = useState<{ [key: number]: { x: number; y: number; rot: number } }>({});
   const [draggingId, setDraggingId] = useState<number | null>(null);
   
@@ -111,7 +112,7 @@ export default function Experience() {
 
   // Pointer drag triggers (mouse + touch safe)
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>, id: number) => {
-    if (activeId !== null || deskWidth < 850) return;
+    if (activeId !== null || isClosingId !== null || deskWidth < 850) return;
     
     // Only drag if clicking the front cover leaf, avoid input clicks
     const target = e.target as HTMLElement;
@@ -167,13 +168,63 @@ export default function Experience() {
   };
 
   const openFolder = (id: number) => {
-    if (draggingId !== null) return;
+    if (draggingId !== null || isClosingId !== null) return;
     setActiveId(id);
   };
 
   const closeFolder = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    setActiveId(null);
+    const idToClose = activeId;
+    if (idToClose !== null) {
+      playPaperSound("close");
+      setIsClosingId(idToClose);
+      setActiveId(null);
+      setTimeout(() => {
+        setIsClosingId(null);
+      }, 700); // 700ms matches the desk return layout transition
+    }
+  };
+
+  // Procedural audio synthesizer for paper book flipping
+  const playPaperSound = (type: "open" | "close") => {
+    if (typeof window === "undefined") return;
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const bufferSize = audioCtx.sampleRate * 0.35;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      
+      // Generate custom white noise values
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      
+      const noiseSource = audioCtx.createBufferSource();
+      noiseSource.buffer = buffer;
+
+      const lowpassFilter = audioCtx.createBiquadFilter();
+      lowpassFilter.type = "lowpass";
+
+      if (type === "open") {
+        lowpassFilter.frequency.setValueAtTime(550, audioCtx.currentTime);
+        lowpassFilter.frequency.exponentialRampToValueAtTime(1100, audioCtx.currentTime + 0.25);
+      } else {
+        lowpassFilter.frequency.setValueAtTime(950, audioCtx.currentTime);
+        lowpassFilter.frequency.exponentialRampToValueAtTime(320, audioCtx.currentTime + 0.2);
+      }
+
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.32);
+
+      noiseSource.connect(lowpassFilter);
+      lowpassFilter.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      noiseSource.start();
+    } catch (err) {
+      // Audio contexts blocked by security
+    }
   };
 
   const isMobileDesk = deskWidth < 850;
@@ -199,7 +250,7 @@ export default function Experience() {
         <div 
           ref={deskRef}
           className={`relative w-full border border-white/10 bg-[#0d0d11] rounded-3xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.85),inset_0_0_80px_rgba(0,0,0,0.7)] p-6 transition-all duration-300 ${
-            isMobileDesk && activeId === null ? "h-auto min-h-[500px] pb-12" : "h-[620px]"
+            isMobileDesk && activeId === null && isClosingId === null ? "h-auto min-h-[500px] pb-12" : "h-[620px]"
           }`}
         >
           <div className="absolute top-4 left-6 font-mono text-[9px] text-white/20 uppercase tracking-widest pointer-events-none z-10">
@@ -207,7 +258,7 @@ export default function Experience() {
           </div>
 
           {/* Intercept Clicks Outside the Open Dossier to Auto-Close */}
-          {activeId !== null && (
+          {(activeId !== null || isClosingId !== null) && (
             <div 
               onClick={() => closeFolder()}
               className="absolute inset-0 z-30 cursor-pointer bg-black/40 backdrop-blur-[1px] transition-opacity duration-500"
@@ -221,7 +272,7 @@ export default function Experience() {
 
           {/* DUAL RENDER FLOW: RESPONSIVE GRID FOR TABLET/MOBILE VS ABSOLUTE VIEW FOR DESKTOP */}
           {isMobileDesk ? (
-            activeId === null ? (
+            activeId === null && isClosingId === null ? (
               /* RESPONSIVE LAYOUT FOR CLOSED DOSSIERS */
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full pt-12 px-4 justify-items-center z-10 relative">
                 {DOSSIERS.map((d) => (
@@ -267,11 +318,16 @@ export default function Experience() {
               </div>
             ) : (
               /* RESPONSIVE LAYOUT FOR SINGLE OPENED DOSSIER */
-              <div className="w-full h-full flex items-center justify-center pt-8">
+              <div className="w-full h-full flex items-center justify-center pt-8 relative">
                 {(() => {
-                  const activeDossier = DOSSIERS.find((d) => d.id === activeId)!;
+                  const currentOpenId = activeId !== null ? activeId : isClosingId;
+                  const activeDossier = DOSSIERS.find((d) => d.id === currentOpenId)!;
                   return (
-                    <div className="w-full max-w-[800px] min-h-[480px] bg-[#faf8f5] border border-[#dfdbd3] shadow-[0_35px_80px_rgba(0,0,0,0.85)] rounded-md p-5 flex flex-col justify-between relative overflow-hidden z-40 animate-[scaleUpBook_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards]">
+                    <div className={`w-full max-w-[800px] min-h-[480px] bg-[#faf8f5] border border-[#dfdbd3] shadow-[0_35px_80px_rgba(0,0,0,0.85)] rounded-md p-5 flex flex-col justify-between relative overflow-hidden z-40 ${
+                      isClosingId !== null 
+                        ? "animate-[scaleDownBook_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards]" 
+                        : "animate-[scaleUpBook_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                    }`}>
                       <div className="flex flex-col justify-between h-full relative z-10 font-sans text-black pl-5">
                         <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-red-600/20 pointer-events-none" />
                         
@@ -304,12 +360,9 @@ export default function Experience() {
                               </div>
                               <span className="font-mono text-[6px] text-black/40 mt-[2px] font-bold">INV-{8192 + activeDossier.id}A</span>
                             </div>
-                            <button 
-                              onClick={closeFolder}
-                              className="font-mono text-xs text-black border border-black/35 bg-black/5 px-4 py-2 rounded hover:bg-black/15 transition-all cursor-pointer shadow-[0_2px_5px_rgba(0,0,0,0.06)]"
-                            >
-                              [ CLOSE ]
-                            </button>
+                            <span className="font-mono text-[9px] text-black/45 tracking-widest uppercase select-none">
+                              [ Click outside to close ]
+                            </span>
                           </div>
                         </div>
 
@@ -350,6 +403,8 @@ export default function Experience() {
             <>
               {DOSSIERS.map((d) => {
                 const isExpanded = activeId === d.id;
+                const isClosing = isClosingId === d.id;
+                const showDetail = isExpanded || isClosing;
                 const pos = positions[d.id] || { x: d.initialX, y: d.initialY, rot: d.initialRot };
 
                 return (
@@ -368,7 +423,7 @@ export default function Experience() {
                       transform: isExpanded 
                         ? "translate(-50%, -50%) rotateY(180deg) scale(1.0)" 
                         : `rotate(${pos.rot}deg) scale(0.95)`,
-                      zIndex: isExpanded ? 50 : 10 + d.id,
+                      zIndex: isExpanded || isClosing ? 50 : 10 + d.id,
                       transformStyle: "preserve-3d",
                       perspective: "1200px"
                     }}
@@ -457,12 +512,9 @@ export default function Experience() {
                               <span className="font-mono text-[6px] text-black/40 mt-[2px] font-bold">INV-{8192 + d.id}A</span>
                             </div>
 
-                            <button 
-                              onClick={closeFolder}
-                              className="font-mono text-xs text-black border border-black/35 bg-black/5 px-4 py-2 rounded hover:bg-black/15 transition-all cursor-pointer shadow-[0_2px_5px_rgba(0,0,0,0.06)]"
-                            >
-                              [ CLOSE ]
-                            </button>
+                            <span className="font-mono text-[9px] text-black/45 tracking-widest uppercase select-none">
+                              [ Click outside to close ]
+                            </span>
                           </div>
                         </div>
 

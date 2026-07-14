@@ -98,55 +98,61 @@ const BOOKS_DATA = [
     )
   },
   {
-    title: "Mechanics of Databases",
+    title: "Storage Engine Internals",
     spineTitle: "STORAGE INTERNALS",
     volume: "VOL. IV",
-    coverColor: "bg-[#4c1d95] hover:bg-[#5b21b6]", // deep purple
-    textColor: "text-[#f5f3ff]",
-    spineColor: "border-[#2e1065]",
-    ribbonColor: "bg-purple-400",
-    fileName: "DATABASES",
-    height: "h-[85%]",
-    width: "w-14 md:w-16",
-    tilt: "rotate-[2deg]",
+    coverColor: "bg-[#1e3a8a] hover:bg-[#1e40af]", // cobalt blue leather
+    textColor: "text-[#dbeafe]",
+    spineColor: "border-[#172554]",
+    ribbonColor: "bg-blue-400",
+    fileName: "STORAGE",
+    height: "h-[89%]",
+    width: "w-13 md:w-15",
+    tilt: "rotate-[1deg]",
     items: [
-      { name: "PostgreSQL Engine", level: 5, note: "Custom schemas design, triggers & execution analyzer plans." },
-      { name: "Prisma / ORM Tools", level: 5, note: "Migration engines, data relations & schema synchronization." },
-      { name: "MongoDB Structures", level: 4, note: "Document indexes, pipelines aggregation & scale maps." },
-      { name: "Redis Cache Networks", level: 4, note: "Memory data stores, pub/sub queues & session states." }
+      { name: "PostgreSQL Config", level: 5, note: "Query optimization, indexing depth, vacuum & connection pools." },
+      { name: "MongoDB Schema", level: 4, note: "Document aggregation Pipelines, index optimizations & replication shards." },
+      { name: "AWS S3 / DynamoDB", level: 4, note: "Partition keys structure, file storage & throughput provisions." },
+      { name: "Redis Caching Layers", level: 5, note: "Key-value pipelines, eviction structures & pub-sub streams." }
     ],
     svgIllustration: (
-      <svg className="w-full h-full text-[#4c1d95]/15" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2.5">
-        <ellipse cx="50" cy="25" rx="30" ry="12" />
-        <path d="M20,25 L20,50 A30,12 0 0,0 80,50 L80,25" />
-        <path d="M20,50 L20,75 A30,12 0 0,0 80,75 L80,50" />
+      <svg className="w-full h-full text-[#1e3a8a]/15" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <rect x="20" y="15" width="60" height="20" rx="2" />
+        <rect x="20" y="40" width="60" height="20" rx="2" />
+        <rect x="20" y="65" width="60" height="20" rx="2" />
+        <circle cx="30" cy="25" r="2.5" fill="currentColor" />
+        <circle cx="30" cy="50" r="2.5" fill="currentColor" />
+        <circle cx="30" cy="75" r="2.5" fill="currentColor" />
+        <line x1="45" y1="25" x2="70" y2="25" />
+        <line x1="45" y1="50" x2="70" y2="50" />
+        <line x1="45" y1="75" x2="70" y2="75" />
       </svg>
     )
   },
   {
-    title: "Systems & Deployments",
+    title: "System Pipelines & MLOps",
     spineTitle: "SYSTEMS & PIPELINES",
     volume: "VOL. V",
-    coverColor: "bg-[#1e3a8a] hover:bg-[#1e40af]", // navy blue
-    textColor: "text-[#dbeafe]",
-    spineColor: "border-[#172554]",
-    ribbonColor: "bg-blue-400",
-    fileName: "SYSTEMS_TOOLING",
-    height: "h-[90%]",
+    coverColor: "bg-[#374151] hover:bg-[#4b5563]", // charcoal grey
+    textColor: "text-[#f3f4f6]",
+    spineColor: "border-[#1f2937]",
+    ribbonColor: "bg-gray-400",
+    fileName: "SYSTEMS",
+    height: "h-[94%]",
     width: "w-12 md:w-14",
-    tilt: "rotate-0",
+    tilt: "-rotate-[0.5deg]",
     items: [
-      { name: "Docker Containerization", level: 5, note: "Layer isolation, multi-stage compilation & system builds." },
-      { name: "Git & Actions CI/CD", level: 5, note: "Automated pipelines testing, semantic packaging & deployments." },
-      { name: "Linux OS Environments", level: 5, note: "Shell pipelines, daemon management & file setups." },
-      { name: "Low-level Graphics (GLSL)", level: 4, note: "GPU shader pipelines, buffers & matrices calculations." }
+      { name: "Docker Containerization", level: 5, note: "Multi-stage builds, image layers caching & system overlays." },
+      { name: "CI / CD Pipelines", level: 4, note: "GitHub Actions workflow scripting & deployment triggers." },
+      { name: "Cloud Architecture", level: 4, note: "AWS, Vercel edge configs, and serverless runtime systems." },
+      { name: "Linux Bash Scripting", level: 5, note: "Process telemetry, background daemons & logs filtration." }
     ],
     svgIllustration: (
-      <svg className="w-full h-full text-[#1e3a8a]/15" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2.5">
-        <polygon points="50,15 90,38 90,78 50,95 10,78 10,38" />
-        <line x1="10" y1="38" x2="50" y2="55" />
-        <line x1="90" y1="38" x2="50" y2="55" />
-        <line x1="50" y1="95" x2="50" y2="55" />
+      <svg className="w-full h-full text-[#374151]/15" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <rect x="15" y="30" width="25" height="40" rx="2" />
+        <rect x="60" y="30" width="25" height="40" rx="2" />
+        <path d="M40,50 L60,50" />
+        <polyline points="53,44 60,50 53,56" />
         <polyline points="30,26 50,37 70,26" />
       </svg>
     )
@@ -156,7 +162,17 @@ const BOOKS_DATA = [
 export default function Skills() {
   const sectionRef = useRef<HTMLElement>(null);
   const [openBookIdx, setOpenBookIdx] = useState<number | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
   const [isLightMode, setIsLightMode] = useState(false);
+  const lastOpenedBookIdxRef = useRef<number>(0);
+
+  // Keep track of the last opened book index so that the text content
+  // remains rendered and readable during the exit/close animation.
+  useEffect(() => {
+    if (openBookIdx !== null) {
+      lastOpenedBookIdxRef.current = openBookIdx;
+    }
+  }, [openBookIdx]);
 
   // Sync theme
   useEffect(() => {
@@ -246,8 +262,15 @@ export default function Skills() {
 
   const handleCloseBook = () => {
     playPaperSound("close");
-    setOpenBookIdx(null);
+    setIsClosing(true);
+    setTimeout(() => {
+      setOpenBookIdx(null);
+      setIsClosing(false);
+    }, 600); // 600ms matches the closing transition duration
   };
+
+  const activeBookIdx = openBookIdx !== null ? openBookIdx : lastOpenedBookIdxRef.current;
+  const activeBook = BOOKS_DATA[activeBookIdx];
 
   return (
     <section ref={sectionRef} id="skills" className="relative py-12 overflow-hidden border-b border-signal/15">
@@ -258,35 +281,35 @@ export default function Skills() {
         <SplitTextReveal text="Knowledge Library." className="font-display font-semibold text-5xl md:text-6xl mb-16" />
 
         {/* WORKSPACE CASE CONSOLE */}
-        <div 
-          className="cyber-window-skills relative w-full border border-subtle bg-surface/30 rounded-xl overflow-hidden shadow-[0_0_50px_rgba(240,160,0,0.02)] select-none"
-        >
-          {/* Workstation Top Navigation Bar */}
-          <div className="h-11 bg-surface/80 border-b border-subtle flex items-center justify-between px-5">
-            <div className="flex gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#ff3355]/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#00ffcc]/80" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#ffaa00]/80" />
-            </div>
-            <div className="font-mono text-[10px] text-ink/50 uppercase tracking-widest flex items-center gap-4">
-              <span>LIBRARY_ROOT:\\ARCHIVES\\STACK_REGISTERS</span>
-              <span className="text-signal px-2 py-0.5 rounded bg-signal/5 border border-signal/15">
-                ACTIVE_SHELF: {openBookIdx !== null ? BOOKS_DATA[openBookIdx].fileName : "INDEX_PAGE"}
+        <div className={`cyber-window cyber-window-skills w-full border border-subtle transition-colors duration-300 relative
+          ${isLightMode 
+            ? "bg-[#fafafa]/90 shadow-[0_30px_60px_rgba(0,0,0,0.06)]" 
+            : "bg-[#09090b]/80 shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
+          }
+        `}>
+          {/* Decorative Terminal Header */}
+          <div className="window-header flex items-center justify-between px-6 py-4 border-b border-subtle">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-signal/80 animate-pulse" />
+              <span className="font-mono text-[9px] uppercase tracking-widest text-ink/60">
+                LIBRARIAN_CONSOL_V1.9 // KNOWLEDGE_BASE
               </span>
             </div>
-            <div className="w-12" />
+            <div className="font-mono text-[8px] text-ink/40 tracking-wider">
+              {openBookIdx !== null ? "VOL_OPEN // READING" : "VOL_CLOSED // SHELF"}
+            </div>
           </div>
 
           <div className="min-h-[520px] flex items-center justify-center p-6 bg-surface/5 relative">
             
-            {openBookIdx !== null && (
+            {(openBookIdx !== null || isClosing) && (
               <div 
                 onClick={handleCloseBook}
                 className="absolute inset-0 z-10 cursor-pointer bg-black/40 backdrop-blur-[1px] transition-all duration-500 animate-fade-in"
               />
             )}
 
-            {openBookIdx === null ? (
+            {openBookIdx === null && !isClosing ? (
               // 1. HIGH-FIDELITY SKEUOMORPHIC BOOKSHELF VIEW
               <div className="flex flex-col items-center justify-center w-full max-w-3xl mt-4">
                 <span className="font-mono text-[9px] text-ink/40 uppercase tracking-widest mb-6">
@@ -359,40 +382,43 @@ export default function Skills() {
                 </div>
               </div>
             ) : (
-              // 2. DETAILED OPEN BOOK LEDGER SKEUOMORPHIC PAGE VIEW
-              <div className="w-full max-w-4xl relative z-20 animate-[scaleUpBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]">
+              // 2. DETAILED OPEN BOOK LEDGER SKEUOMORPHIC PAGE VIEW (WITH CLOSE ANIMATION Support)
+              <div className={`w-full max-w-4xl relative z-20 ${
+                isClosing 
+                  ? "animate-[scaleDownBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]" 
+                  : "animate-[scaleUpBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+              }`}>
                 
-                {/* Back to Shelf Navigation Link */}
-                <button
-                  onClick={handleCloseBook}
-                  className={`absolute -top-10 left-0 font-mono text-[9px] border px-3 py-1.5 rounded bg-surface hover:bg-ink hover:text-surface transition-all cursor-pointer uppercase tracking-wider z-30
-                    ${isLightMode ? "border-zinc-300 text-zinc-600" : "border-zinc-800 text-zinc-400"}
-                  `}
-                >
-                  [◄] Close Volume & Return to Shelf
-                </button>
+                {/* Back to Shelf HUD Instruction */}
+                <span className="absolute -top-8 left-0 font-mono text-[9px] text-ink/40 uppercase tracking-widest pointer-events-none select-none">
+                  [ Click outside to return volume to shelf ]
+                </span>
 
                 {/* The Hardback leather book spreads underneath */}
                 <div className={`w-full rounded-2xl p-2.5 md:p-4 shadow-2xl relative border-4 border-zinc-950/80
-                  ${BOOKS_DATA[openBookIdx].coverColor}
+                  ${activeBook.coverColor}
                 `}>
                   
                   {/* Two Page Spread Paper (Ivory / Vintage ledger texture) */}
                   <div className="grid grid-cols-1 md:grid-cols-2 bg-[#fcf9f2] rounded-lg overflow-hidden min-h-[440px] relative border border-black/15 shadow-[inset_0_0_40px_rgba(0,0,0,0.06)] text-zinc-900" style={{ perspective: "1500px" }}>
                     
                     {/* Left Page (Conceptual Sketches / Schematics) */}
-                    <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-zinc-300/60 flex flex-col justify-between relative min-h-[380px] origin-right transition-transform duration-[800ms] ease-out animate-[unfoldLeft_0.9s_cubic-bezier(0.16,1,0.3,1)_forwards]">
+                    <div className={`p-6 md:p-8 border-b md:border-b-0 md:border-r border-zinc-300/60 flex flex-col justify-between relative min-h-[380px] origin-right transition-transform duration-[800ms] ease-out ${
+                      isClosing 
+                        ? "animate-[foldLeft_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]" 
+                        : "animate-[unfoldLeft_0.9s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                    }`}>
                       
                       {/* Left Page Header */}
                       <div className="border-b border-zinc-300/80 pb-3 flex justify-between items-end">
-                        <span className="font-serif italic text-xs text-zinc-500 font-bold">{BOOKS_DATA[openBookIdx].volume}</span>
+                        <span className="font-serif italic text-xs text-zinc-500 font-bold">{activeBook.volume}</span>
                         <span className="font-serif text-[10px] uppercase tracking-widest text-zinc-400">specifications</span>
                       </div>
 
                       {/* SVG Conceptual Sketch Grid (Skeuomorphic Blueprint) */}
                       <div className="flex-grow flex items-center justify-center my-6 relative min-h-[160px]">
                         <div className="absolute inset-0 flex items-center justify-center p-4">
-                          {BOOKS_DATA[openBookIdx].svgIllustration}
+                          {activeBook.svgIllustration}
                         </div>
                         <div className="absolute bottom-2 font-mono text-[8px] text-zinc-400 uppercase tracking-widest text-center w-full">
                           Fig 1.1: System abstraction diagram
@@ -409,19 +435,23 @@ export default function Skills() {
                     <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-8 -translate-x-1/2 bg-[linear-gradient(90deg,rgba(0,0,0,0.05)_0%,rgba(0,0,0,0.18)_50%,rgba(0,0,0,0.05)_100%)] pointer-events-none z-10" />
 
                     {/* Right Page (Ledger Skills List) */}
-                    <div className="p-6 md:p-8 flex flex-col justify-between min-h-[380px] origin-left transition-transform duration-[800ms] ease-out animate-[unfoldRight_0.9s_cubic-bezier(0.16,1,0.3,1)_forwards]">
+                    <div className={`p-6 md:p-8 flex flex-col justify-between min-h-[380px] origin-left transition-transform duration-[800ms] ease-out ${
+                      isClosing 
+                        ? "animate-[foldRight_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]" 
+                        : "animate-[unfoldRight_0.9s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                    }`}>
                       
                       {/* Right Page Header */}
                       <div className="border-b border-zinc-300/80 pb-3 flex justify-between items-end">
                         <span className="font-serif text-[11px] font-bold text-zinc-800 uppercase tracking-wider">
-                          {BOOKS_DATA[openBookIdx].title}
+                          {activeBook.title}
                         </span>
                         <span className="font-serif italic text-xs text-zinc-500">folio 42</span>
                       </div>
 
                       {/* Skill ledger elements */}
                       <div className="space-y-4 my-6">
-                        {BOOKS_DATA[openBookIdx].items.map((skill, sIdx) => (
+                        {activeBook.items.map((skill, sIdx) => (
                           <div key={sIdx} className="space-y-1.5">
                             <div className="flex items-center justify-between font-serif">
                               <span className="font-bold text-zinc-850 text-xs">{skill.name}</span>
