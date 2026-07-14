@@ -185,72 +185,108 @@ export default function Certifications() {
       {(expandedCardIdx !== null || isClosing) && (
         <div 
           onClick={handleCloseCard}
-          className="fixed inset-0 w-screen h-screen z-[99999] flex items-center justify-center p-6 bg-black/85 backdrop-blur-sm transition-opacity duration-500 cursor-default"
+          className={`fixed inset-0 w-screen h-screen z-[99999] flex items-center justify-center p-6 backdrop-blur-sm transition-opacity duration-500 cursor-default ${
+            isLightMode ? "bg-black/45" : "bg-black/85"
+          }`}
         >
           {/* Central Vault Box Wrapper */}
           <div 
             onClick={(e) => e.stopPropagation()}
             style={{ perspective: "1500px", transformStyle: "preserve-3d" }}
-            className={`w-[90vw] max-w-[600px] h-[440px] relative overflow-hidden bg-[#0c0c0e] border border-[#f0a000]/30 rounded-lg shadow-2xl transition-all duration-500 ${
+            className={`w-[90vw] max-w-[600px] h-[440px] relative overflow-hidden rounded-lg shadow-2xl transition-all duration-500 ${
+              isLightMode 
+                ? "bg-[#fafafc] border border-black/10" 
+                : "bg-[#0c0c0e] border border-[#f0a000]/30"
+            } ${
               isClosing 
                 ? "animate-[scaleDownBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]" 
                 : "animate-[scaleUpBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]"
             }`}
           >
             {/* 1. REVEALED CENTRAL CORE (UNDER THE DOORS) */}
-            <div className="absolute inset-0 z-0 p-8 bg-[#040406] flex flex-col justify-between overflow-y-auto font-mono text-xs">
+            <div className={`absolute inset-0 z-0 p-8 flex flex-col justify-between overflow-y-auto font-mono text-xs ${
+              isLightMode ? "bg-[#f4f4f7] text-[#0c0c0e]" : "bg-[#040406] text-white"
+            }`}>
               {/* Gold backing aura */}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(240,160,0,0.06)_0%,transparent_75%)] pointer-events-none" />
+              <div 
+                className="absolute inset-0 pointer-events-none" 
+                style={{
+                  background: isLightMode 
+                    ? "radial-gradient(circle at center, rgba(192, 128, 0, 0.04) 0%, transparent 75%)" 
+                    : "radial-gradient(circle at center, rgba(240, 160, 0, 0.06) 0%, transparent 75%)"
+                }}
+              />
 
               <div className="relative z-10">
                 {/* Header status bar */}
-                <div className="flex items-center justify-between border-b border-[#f0a000]/25 pb-3 mb-4 text-[9px]">
+                <div className={`flex items-center justify-between border-b pb-3 mb-4 text-[9px] ${
+                  isLightMode ? "border-black/15" : "border-[#f0a000]/25"
+                }`}>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#f0a000] animate-ping" />
-                    <span className="text-[#f0a000] tracking-widest uppercase font-bold">
+                    <span className={`w-1.5 h-1.5 rounded-full animate-ping ${isLightMode ? "bg-[#c08000]" : "bg-[#f0a000]"}`} />
+                    <span className={`tracking-widest uppercase font-bold ${isLightMode ? "text-[#c08000]" : "text-[#f0a000]"}`}>
                       SECURE_VAULT_NODE // SHIELD_ACTIVE
                     </span>
                   </div>
-                  <span className="text-white/40">
+                  <span className={isLightMode ? "text-black/50" : "text-white/40"}>
                     HASH: {activeCert.hash}
                   </span>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <span className="text-[9px] text-[#f0a000]/60 uppercase tracking-widest block mb-0.5">Title of Registry</span>
-                    <h3 className="font-display font-bold text-xl md:text-2xl text-white uppercase tracking-wide leading-tight">
+                    <span className={`text-[9px] uppercase tracking-widest block mb-0.5 ${
+                      isLightMode ? "text-[#c08000]/80" : "text-[#f0a000]/60"
+                    }`}>Title of Registry</span>
+                    <h3 className={`font-display font-bold text-xl md:text-2xl uppercase tracking-wide leading-tight ${
+                      isLightMode ? "text-black" : "text-white"
+                    }`}>
                       {activeCert.text}
                     </h3>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 border-y border-white/5 py-4 my-2">
-                    <div className="space-y-1.5 border-r border-white/5 pr-4">
-                      <span className="text-[9px] text-white/30 uppercase tracking-wider block">Credential Authority</span>
-                      <p className="text-white font-bold text-xs uppercase font-sans">{activeCert.org}</p>
-                      <span className="text-[9px] text-white/30 uppercase tracking-wider block mt-2">Issued Date</span>
-                      <p className="text-white/80 font-bold text-[10px]">{activeCert.issued}</p>
+                  <div className={`grid grid-cols-2 gap-4 border-y py-4 my-2 ${
+                    isLightMode ? "border-black/10" : "border-white/5"
+                  }`}>
+                    <div className={`space-y-1.5 border-r pr-4 ${isLightMode ? "border-black/10" : "border-white/5"}`}>
+                      <span className={`text-[9px] uppercase tracking-wider block ${isLightMode ? "text-black/40" : "text-white/30"}`}>Credential Authority</span>
+                      <p className={`font-bold text-xs uppercase font-sans ${isLightMode ? "text-black" : "text-white"}`}>{activeCert.org}</p>
+                      <span className={`text-[9px] uppercase tracking-wider block mt-2 ${isLightMode ? "text-black/40" : "text-white/30"}`}>Issued Date</span>
+                      <p className={`font-bold text-[10px] ${isLightMode ? "text-black/80" : "text-white/80"}`}>{activeCert.issued}</p>
                     </div>
                     <div className="space-y-1.5 pl-2">
-                      <span className="text-[9px] text-white/30 uppercase tracking-wider block">System registry code</span>
-                      <p className="text-[#f0a000] font-bold text-xs">{activeCert.id}</p>
-                      <span className="text-[9px] text-white/30 uppercase tracking-wider block mt-2">Status validation</span>
-                      <p className="text-green-400 font-bold text-[10px] uppercase">VERIFIED // SUCCESS</p>
+                      <span className={`text-[9px] uppercase tracking-wider block ${isLightMode ? "text-black/40" : "text-white/30"}`}>System registry code</span>
+                      <p className={`font-bold text-xs ${isLightMode ? "text-[#c08000]" : "text-[#f0a000]"}`}>{activeCert.id}</p>
+                      <span className={`text-[9px] uppercase tracking-wider block mt-2 ${isLightMode ? "text-black/40" : "text-white/30"}`}>Status validation</span>
+                      <p className={`font-bold text-[10px] uppercase ${isLightMode ? "text-green-700" : "text-green-400"}`}>VERIFIED // SUCCESS</p>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <span className="text-[9px] text-[#f0a000]/60 uppercase tracking-widest block">Operational syllabus modules</span>
-                    <p className="font-sans text-[11px] text-white/70 leading-relaxed font-medium">
+                    <span className={`text-[9px] uppercase tracking-widest block ${
+                      isLightMode ? "text-[#c08000]/80" : "text-[#f0a000]/60"
+                    }`}>Operational syllabus modules</span>
+                    <p className={`font-sans text-[11px] leading-relaxed font-medium ${
+                      isLightMode ? "text-black/70" : "text-white/70"
+                    }`}>
                       {activeCert.description}
                     </p>
                   </div>
 
                   <div className="space-y-2.5 pt-2">
-                    <span className="text-[9px] text-[#f0a000]/60 uppercase tracking-widest block">Acquired Competencies</span>
+                    <span className={`text-[9px] uppercase tracking-widest block ${
+                      isLightMode ? "text-[#c08000]/80" : "text-[#f0a000]/60"
+                    }`}>Acquired Competencies</span>
                     <div className="flex flex-wrap gap-1.5">
                       {activeCert.skills.split(", ").map((skill) => (
-                        <span key={skill} className="font-mono text-[8px] text-white border border-white/10 bg-white/5 rounded px-2.5 py-1">
+                        <span 
+                          key={skill} 
+                          className={`font-mono text-[8px] border rounded px-2.5 py-1 ${
+                            isLightMode 
+                              ? "text-black border-black/10 bg-black/5" 
+                              : "text-white border-white/10 bg-white/5"
+                          }`}
+                        >
                           {skill}
                         </span>
                       ))}
@@ -259,13 +295,19 @@ export default function Certifications() {
                 </div>
               </div>
 
-              <div className="relative z-10 border-t border-[#f0a000]/15 pt-4 flex items-center justify-between mt-6">
-                <span className="text-[8px] text-white/20 uppercase tracking-widest">[ Click outside to seal vault ]</span>
+              <div className={`relative z-10 border-t pt-4 flex items-center justify-between mt-6 ${
+                isLightMode ? "border-black/10" : "border-[#f0a000]/15"
+              }`}>
+                <span className={`text-[8px] uppercase tracking-widest ${isLightMode ? "text-black/40" : "text-white/20"}`}>[ Click outside to seal vault ]</span>
                 <a 
                   href={activeCert.verification} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="font-mono text-[9px] text-[#f0a000] border border-[#f0a000]/40 bg-[#f0a000]/5 px-4 py-2 rounded hover:bg-[#f0a000]/15 transition-all uppercase tracking-widest font-bold shadow-[0_0_15px_rgba(240,160,0,0.05)]"
+                  className={`font-mono text-[9px] border px-4 py-2 rounded hover:bg-[#f0a000]/15 transition-all uppercase tracking-widest font-bold ${
+                    isLightMode 
+                      ? "text-[#c08000] border-[#c08000]/40 bg-[#c08000]/5 shadow-[0_0_15px_rgba(192,128,0,0.03)]" 
+                      : "text-[#f0a000] border-[#f0a000]/40 bg-[#f0a000]/5 shadow-[0_0_15px_rgba(240,160,0,0.05)]"
+                  }`}
                 >
                   [ Verify Certificate ]
                 </a>
@@ -274,7 +316,9 @@ export default function Certifications() {
 
             {/* 2. LEFT VAULT DOOR (Pivots open to the left) */}
             <div 
-              className="absolute left-0 top-0 bottom-0 w-1/2 bg-black border-r border-[#f0a000]/25 overflow-hidden transition-all duration-[800ms] ease-out z-10 pointer-events-none origin-left"
+              className={`absolute left-0 top-0 bottom-0 w-1/2 overflow-hidden transition-all duration-[800ms] ease-out z-10 pointer-events-none origin-left border-r ${
+                isLightMode ? "bg-[#ffffff] border-black/10" : "bg-black border-[#f0a000]/25"
+              }`}
               style={{ 
                 transform: isDeclassified 
                   ? "rotateY(-95deg) scale(0.95)" 
@@ -283,22 +327,24 @@ export default function Certifications() {
               }}
             >
               <div className="w-[600px] h-full p-10 relative">
-                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-signal/50 opacity-50" />
-                <span className="font-mono text-[10px] tracking-widest text-signal uppercase block mb-8">
+                <div className={`absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 opacity-50 ${isLightMode ? "border-black/30" : "border-signal/50"}`} />
+                <span className={`font-mono text-[10px] tracking-widest uppercase block mb-8 ${isLightMode ? "text-[#c08000]" : "text-signal"}`}>
                   SYS.ID // {activeCert.id}
                 </span>
-                <h3 className="font-display font-bold text-2xl text-white uppercase tracking-wide mb-4">
+                <h3 className={`font-display font-bold text-2xl uppercase tracking-wide mb-4 ${isLightMode ? "text-black" : "text-white"}`}>
                   {activeCert.text}
                 </h3>
-                <p className="font-sans text-sm text-white/50 uppercase tracking-widest">
-                  Issued by: <span className="text-white font-bold">{activeCert.org}</span>
+                <p className={`font-sans text-sm uppercase tracking-widest ${isLightMode ? "text-black/50" : "text-white/50"}`}>
+                  Issued by: <span className={isLightMode ? "text-black font-bold" : "text-white font-bold"}>{activeCert.org}</span>
                 </p>
               </div>
             </div>
 
             {/* 3. RIGHT VAULT DOOR (Pivots open to the right) */}
             <div 
-              className="absolute right-0 top-0 bottom-0 w-1/2 bg-black border-l border-[#f0a000]/25 overflow-hidden transition-all duration-[800ms] ease-out z-10 pointer-events-none origin-right"
+              className={`absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden transition-all duration-[800ms] ease-out z-10 pointer-events-none origin-right border-l ${
+                isLightMode ? "bg-[#ffffff] border-black/10" : "bg-black border-[#f0a000]/25"
+              }`}
               style={{ 
                 transform: isDeclassified 
                   ? "rotateY(95deg) scale(0.95)" 
@@ -307,15 +353,15 @@ export default function Certifications() {
               }}
             >
               <div className="w-[600px] h-full p-10 relative" style={{ transform: "translateX(-300px)" }}>
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-signal/50 opacity-50" style={{ transform: "translateX(300px)" }} />
-                <span className="font-mono text-[10px] tracking-widest text-signal uppercase block mb-8">
+                <div className={`absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 opacity-50 ${isLightMode ? "border-black/30" : "border-signal/50"}`} style={{ transform: "translateX(300px)" }} />
+                <span className={`font-mono text-[10px] tracking-widest uppercase block mb-8 ${isLightMode ? "text-[#c08000]" : "text-signal"}`}>
                   SYS.ID // {activeCert.id}
                 </span>
-                <h3 className="font-display font-bold text-2xl text-white uppercase tracking-wide mb-4">
+                <h3 className={`font-display font-bold text-2xl uppercase tracking-wide mb-4 ${isLightMode ? "text-black" : "text-white"}`}>
                   {activeCert.text}
                 </h3>
-                <p className="font-sans text-sm text-white/50 uppercase tracking-widest">
-                  Issued by: <span className="text-white font-bold">{activeCert.org}</span>
+                <p className={`font-sans text-sm uppercase tracking-widest ${isLightMode ? "text-black/50" : "text-white/50"}`}>
+                  Issued by: <span className={isLightMode ? "text-black font-bold" : "text-white font-bold"}>{activeCert.org}</span>
                 </p>
               </div>
             </div>
