@@ -1,15 +1,13 @@
 "use client";
 
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo, useEffect, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, Bloom, ChromaticAberration, Vignette, Noise } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { prefersReducedMotion } from "@/lib/animations";
 
 const isMobile = typeof window !== "undefined" ? window.innerWidth < 768 : false;
-const PARTICLE_COUNT = isMobile ? 120 : 600; // Drastically drop particle count on mobile for maximum physics performance
-const MAX_DISTANCE = isMobile ? 12.0 : 5.5; // Huge connection distance on mobile so it still forms a cohesive web
-const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
+const PARTICLE_COUNT = isMobile ? 100 : 320; // Drastically drop particle count for maximum physics loop performance
 
 const pointVertexShader = `
 attribute float aSize;
@@ -23,6 +21,7 @@ void main() {
 `;
 
 const pointFragmentShader = `
+uniform bool uIsLightMode;
 varying vec3 vColor;
 void main() {
     float dist = length(gl_PointCoord - vec2(0.5));
@@ -31,15 +30,24 @@ void main() {
     float intensity = 1.0 - (dist * 2.0);
     intensity = pow(intensity, 1.5);
     
-    vec3 coreColor = mix(vColor, vec3(1.0), pow(intensity, 3.0));
-    gl_FragColor = vec4(coreColor, intensity * 0.9);
+    vec3 mixColor = uIsLightMode ? vec3(0.0) : vec3(1.0);
+    vec3 coreColor = mix(vColor, mixColor, pow(intensity, 3.0));
+    
+    // Proper black mode has high-density ink dots instead of blurry gray rings
+    float alpha = uIsLightMode ? (intensity > 0.12 ? 0.95 : 0.0) : (intensity * 0.9);
+    gl_FragColor = vec4(coreColor, alpha);
 }
 `;
 
-function NeuralMatrix() {
+function NeuralMatrix({ isLightMode, isBatteryPower }: { isLightMode: boolean; isBatteryPower: boolean }) {
   const pointsRef = useRef<THREE.Points>(null);
   const linesRef = useRef<THREE.LineSegments>(null);
   const { camera } = useThree();
+  const maxDistance = isMobile ? 12.0 : (isLightMode ? 3.8 : 5.5);
+  const maxDistanceSq = maxDistance * maxDistance;
+
+  const lastFrameTime = useRef(0);
+  const activeCount = isMobile ? 120 : (isBatteryPower ? 220 : PARTICLE_COUNT);
 
   const { positions, basePositions, velocities, colors, sizes, angles, radii } = useMemo(() => {
     const pos = new Float32Array(PARTICLE_COUNT * 3);
@@ -101,6 +109,9 @@ function NeuralMatrix() {
 
   const pointShaderMaterial = useMemo(() => {
     return new THREE.ShaderMaterial({
+      uniforms: {
+        uIsLightMode: { value: false }
+      },
       vertexShader: pointVertexShader,
       fragmentShader: pointFragmentShader,
       transparent: true,
@@ -109,6 +120,59 @@ function NeuralMatrix() {
       vertexColors: true,
     });
   }, []);
+
+  // Update dynamic colors and blending on theme toggle
+  useEffect(() => {
+    if (!pointsRef.current) return;
+    const geom = pointsRef.current.geometry;
+    const colorAttr = geom.getAttribute("color") as THREE.BufferAttribute;
+    if (!colorAttr) return;
+
+    const cols = colorAttr.array as Float32Array;
+    for (let i = 0; i < activeCount; i++) {
+      const radius = radii[i];
+      const isPhotonRing = radius < 7.0;
+      if (isLightMode) {
+        if (isPhotonRing) {
+          // Inner core (hidden vault): deep ink black
+          cols[i * 3] = 0.0;
+          cols[i * 3 + 1] = 0.0;
+          cols[i * 3 + 2] = 0.0;
+        } else {
+          // Outer vortex: very faint grey (blends out on white background)
+          cols[i * 3] = 0.92;
+          cols[i * 3 + 1] = 0.92;
+          cols[i * 3 + 2] = 0.92;
+        }
+      } else {
+        if (isPhotonRing) {
+          const mixVal = Math.random();
+          cols[i * 3] = 1.0; 
+          cols[i * 3 + 1] = mixVal > 0.5 ? 1.0 : 0.8; 
+          cols[i * 3 + 2] = mixVal > 0.8 ? 0.8 : 0.2; 
+        } else {
+          cols[i * 3] = 1.0; 
+          cols[i * 3 + 1] = 0.4 + Math.random() * 0.4; 
+          cols[i * 3 + 2] = 0.0;
+        }
+      }
+    }
+    colorAttr.needsUpdate = true;
+
+    if (pointShaderMaterial) {
+      pointShaderMaterial.uniforms.uIsLightMode.value = isLightMode;
+      pointShaderMaterial.blending = isLightMode ? THREE.NormalBlending : THREE.AdditiveBlending;
+      pointShaderMaterial.needsUpdate = true;
+    }
+
+    if (linesRef.current) {
+      const mat = linesRef.current.material as THREE.LineBasicMaterial;
+      if (mat) {
+        mat.blending = isLightMode ? THREE.NormalBlending : THREE.AdditiveBlending;
+        mat.needsUpdate = true;
+      }
+    }
+  }, [isLightMode, radii, pointShaderMaterial]);
 
   const globalMouse = useRef(new THREE.Vector3(0, 0, 0));
   const targetMouse = useRef(new THREE.Vector2(0, 0));
@@ -163,6 +227,12 @@ function NeuralMatrix() {
 
     const time = state.clock.getElapsedTime();
 
+    if (isBatteryPower) {
+      const frameDelta = time - lastFrameTime.current;
+      if (frameDelta < 1 / 35) return;
+      lastFrameTime.current = time;
+    }
+
     if (!hasInteracted.current) {
       targetMouse.current.x = Math.sin(time * 0.4) * 0.4;
       targetMouse.current.y = Math.sin(time * 0.8) * 0.2;
@@ -211,7 +281,7 @@ function NeuralMatrix() {
       linesRef.current.rotation.y = pointsRef.current.rotation.y;
     }
 
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
+    for (let i = 0; i < activeCount; i++) {
       const i3 = i * 3;
       
       angles[i] += velocities[i];
@@ -266,48 +336,62 @@ function NeuralMatrix() {
         }
       }
 
-      for (let j = i + 1; j < PARTICLE_COUNT; j++) {
+      for (let j = i + 1; j < activeCount; j++) {
         const j3 = j * 3;
         
         const dx2 = posArray[i3] - posArray[j3];
-        if (Math.abs(dx2) > MAX_DISTANCE) continue;
+        if (Math.abs(dx2) > maxDistance) continue;
         
         const dy2 = posArray[i3 + 1] - posArray[j3 + 1];
-        if (Math.abs(dy2) > MAX_DISTANCE) continue;
+        if (Math.abs(dy2) > maxDistance) continue;
         
         const dz2 = posArray[i3 + 2] - posArray[j3 + 2];
-        if (Math.abs(dz2) > MAX_DISTANCE) continue;
+        if (Math.abs(dz2) > maxDistance) continue;
 
         const distSq = dx2 * dx2 + dy2 * dy2 + dz2 * dz2;
 
-        if (distSq < MAX_DISTANCE_SQ) {
+        if (distSq < maxDistanceSq) {
           const dist = Math.sqrt(distSq);
           
           const pulse = (Math.sin(time * 3.0 + i * 0.1) + 1.0) * 0.5 + 0.2;
-          const alpha = (1.0 - dist / MAX_DISTANCE) * pulse * 0.8;
+          const maxAlpha = isLightMode ? 0.56 : 0.8;
+          const alpha = (1.0 - dist / maxDistance) * pulse * maxAlpha;
           
           linePositions[lineIndex * 3] = posArray[i3];
           linePositions[lineIndex * 3 + 1] = posArray[i3 + 1];
           linePositions[lineIndex * 3 + 2] = posArray[i3 + 2];
           
-          lineColors[lineIndex * 3] = colors[i3] * alpha;
-          lineColors[lineIndex * 3 + 1] = colors[i3 + 1] * alpha;
-          lineColors[lineIndex * 3 + 2] = colors[i3 + 2] * alpha;
+          if (isLightMode) {
+            lineColors[lineIndex * 3] = 1.0 - (1.0 - colors[i3]) * alpha;
+            lineColors[lineIndex * 3 + 1] = 1.0 - (1.0 - colors[i3 + 1]) * alpha;
+            lineColors[lineIndex * 3 + 2] = 1.0 - (1.0 - colors[i3 + 2]) * alpha;
+          } else {
+            lineColors[lineIndex * 3] = colors[i3] * alpha;
+            lineColors[lineIndex * 3 + 1] = colors[i3 + 1] * alpha;
+            lineColors[lineIndex * 3 + 2] = colors[i3 + 2] * alpha;
+          }
           lineIndex++;
-
+ 
           linePositions[lineIndex * 3] = posArray[j3];
           linePositions[lineIndex * 3 + 1] = posArray[j3 + 1];
           linePositions[lineIndex * 3 + 2] = posArray[j3 + 2];
           
-          lineColors[lineIndex * 3] = colors[j3] * alpha;
-          lineColors[lineIndex * 3 + 1] = colors[j3 + 1] * alpha;
-          lineColors[lineIndex * 3 + 2] = colors[j3 + 2] * alpha;
+          if (isLightMode) {
+            lineColors[lineIndex * 3] = 1.0 - (1.0 - colors[j3]) * alpha;
+            lineColors[lineIndex * 3 + 1] = 1.0 - (1.0 - colors[j3 + 1]) * alpha;
+            lineColors[lineIndex * 3 + 2] = 1.0 - (1.0 - colors[j3 + 2]) * alpha;
+          } else {
+            lineColors[lineIndex * 3] = colors[j3] * alpha;
+            lineColors[lineIndex * 3 + 1] = colors[j3 + 1] * alpha;
+            lineColors[lineIndex * 3 + 2] = colors[j3 + 2] * alpha;
+          }
           lineIndex++;
         }
       }
     }
 
     positionsAttr.needsUpdate = true;
+    pointsRef.current.geometry.setDrawRange(0, activeCount);
     linePosAttr.needsUpdate = true;
     lineColAttr.needsUpdate = true;
     lineGeometry.setDrawRange(0, lineIndex);
@@ -366,7 +450,7 @@ function NeuralMatrix() {
         <primitive object={pointShaderMaterial} attach="material" />
       </points>
       <lineSegments ref={linesRef} geometry={lineGeometry}>
-        <lineBasicMaterial vertexColors transparent opacity={0.4} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <lineBasicMaterial vertexColors transparent opacity={isLightMode ? 0.52 : 0.4} blending={isLightMode ? THREE.NormalBlending : THREE.AdditiveBlending} depthWrite={false} />
       </lineSegments>
     </group>
   );
@@ -611,28 +695,63 @@ const MobileAnimeGrid = () => {
 };
 
 export default function GlobalCanvas() {
+  const [isBatteryPower, setIsBatteryPower] = useState(false);
+  const [isLightMode, setIsLightMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLightMode(document.documentElement.classList.contains("light"));
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === "class") {
+            setIsLightMode(document.documentElement.classList.contains("light"));
+          }
+        });
+      });
+      observer.observe(document.documentElement, { attributes: true });
+      return () => observer.disconnect();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && "getBattery" in navigator) {
+      (navigator as any).getBattery().then((battery: any) => {
+        const updateBatteryStatus = () => {
+          setIsBatteryPower(!battery.charging);
+        };
+        updateBatteryStatus();
+        battery.addEventListener("chargingchange", updateBatteryStatus);
+        return () => {
+          battery.removeEventListener("chargingchange", updateBatteryStatus);
+        };
+      });
+    }
+  }, []);
+
   if (isMobile) {
     return <MobileAnimeGrid />;
   }
 
   return (
     <div 
-      className="fixed inset-0 w-full h-full pointer-events-none" 
-      style={{ zIndex: 0, opacity: 0.55 }} 
+      className="fixed inset-0 w-full h-full pointer-events-none transition-opacity duration-500" 
+      style={{ zIndex: 0, opacity: isLightMode ? 0.98 : 0.55 }} 
       aria-hidden="true"
     >
       <Canvas
         camera={{ position: [0, 0, 15], fov: 45 }}
         gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
-        dpr={[1, 1.5]}
+        dpr={isBatteryPower ? 1.0 : [1, 1.5]}
       >
-        <NeuralMatrix />
-        <EffectComposer>
-          <Bloom luminanceThreshold={0.4} luminanceSmoothing={0.9} intensity={1.8} mipmapBlur />
-          <ChromaticAberration offset={new THREE.Vector2(0.002, 0.002)} />
-          <Noise opacity={0.03} />
-          <Vignette eskil={false} offset={0.1} darkness={1.1} />
-        </EffectComposer>
+        <NeuralMatrix isLightMode={isLightMode} isBatteryPower={isBatteryPower} />
+        {!isBatteryPower && !isLightMode && (
+          <EffectComposer>
+            <Bloom luminanceThreshold={0.4} luminanceSmoothing={0.9} intensity={1.8} mipmapBlur />
+            <ChromaticAberration offset={new THREE.Vector2(0.002, 0.002)} />
+            <Noise opacity={0.03} />
+            <Vignette eskil={false} offset={0.1} darkness={1.1} />
+          </EffectComposer>
+        )}
       </Canvas>
     </div>
   );

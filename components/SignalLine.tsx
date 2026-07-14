@@ -30,11 +30,12 @@ export default function SignalLine() {
         const secHeight = rect.height;
         
         const x = (i % 2 === 0) ? width * 0.96 : width * 0.04;
+        const offset = Math.min(60, secHeight * 0.1);
         
         points.push({ 
           x, 
-          topY: topY + secHeight * 0.15, 
-          bottomY: bottomY - secHeight * 0.15, 
+          topY: topY + offset, 
+          bottomY: bottomY - offset, 
           centerY: topY + secHeight / 2,
           id: el.getAttribute("data-section") || "" 
         });

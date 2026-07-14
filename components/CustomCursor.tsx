@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { prefersReducedMotion } from "@/lib/animations";
 
@@ -13,6 +13,23 @@ export default function CustomCursor() {
   const mouse = useRef({ x: -1000, y: -1000 });
   const dotsState = useRef(Array(TAIL_LENGTH).fill(null).map(() => ({ x: -1000, y: -1000 })));
   const isHovering = useRef(false);
+
+  const [isLightMode, setIsLightMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLightMode(document.documentElement.classList.contains("light"));
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === "class") {
+            setIsLightMode(document.documentElement.classList.contains("light"));
+          }
+        });
+      });
+      observer.observe(document.documentElement, { attributes: true });
+      return () => observer.disconnect();
+    }
+  }, []);
 
   useEffect(() => {
     if (!cursorRef.current || linesRef.current.length === 0) return;
@@ -41,10 +58,12 @@ export default function CustomCursor() {
         target.classList.contains("cursor-grab")
       ) {
         isHovering.current = true;
-        gsap.to(cursorRef.current, { scale: 3, backgroundColor: "rgba(240, 160, 0, 0.4)", duration: 0.3, ease: "power3.out" });
+        const hoverBg = isLightMode ? "rgba(255, 255, 255, 0.4)" : "rgba(240, 160, 0, 0.4)";
+        gsap.to(cursorRef.current, { scale: 3, backgroundColor: hoverBg, duration: 0.3, ease: "power3.out" });
       } else {
         isHovering.current = false;
-        gsap.to(cursorRef.current, { scale: 1, backgroundColor: "var(--signal)", duration: 0.3, ease: "power3.out", opacity: 1 });
+        const baseBg = isLightMode ? "#ffffff" : "var(--signal)";
+        gsap.to(cursorRef.current, { scale: 1, backgroundColor: baseBg, duration: 0.3, ease: "power3.out", opacity: 1 });
       }
     };
 
@@ -100,11 +119,11 @@ export default function CustomCursor() {
       document.head.removeChild(style);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [isLightMode]);
 
   return (
     <>
-      <svg className="fixed inset-0 pointer-events-none z-[9998] hidden md:block mix-blend-difference w-full h-full">
+      <svg className="fixed inset-0 pointer-events-none z-[9998] hidden md:block w-full h-full mix-blend-difference">
         {[...Array(TAIL_LENGTH - 1)].map((_, i) => {
           // Taper the width from 8px at the head down to 0 at the tail
           const strokeWidth = 8 * (1 - i / (TAIL_LENGTH - 1));
@@ -114,7 +133,7 @@ export default function CustomCursor() {
             <line
               key={i}
               ref={(el) => { linesRef.current[i] = el; }}
-              stroke="var(--signal)"
+              stroke={isLightMode ? "#ffffff" : "var(--signal)"}
               strokeWidth={Math.max(0.5, strokeWidth)}
               strokeLinecap="round"
               opacity={opacity}
@@ -124,7 +143,11 @@ export default function CustomCursor() {
       </svg>
       <div 
         ref={cursorRef} 
-        className="fixed top-0 left-0 w-3 h-3 rounded-full bg-signal shadow-[0_0_12px_rgba(240,160,0,0.8)] pointer-events-none z-[9999] hidden md:block mix-blend-difference"
+        className={`fixed top-0 left-0 w-3 h-3 rounded-full pointer-events-none z-[9999] hidden md:block mix-blend-difference ${
+          isLightMode 
+            ? "bg-white" 
+            : "bg-signal shadow-[0_0_12px_rgba(240,160,0,0.8)]"
+        }`}
         style={{ 
           marginLeft: '-6px', 
           marginTop: '-6px',

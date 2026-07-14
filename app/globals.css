@@ -36,6 +36,221 @@
   --signal-line-width: 2px;
   --signal-line-left: clamp(1rem, 3vw, 3rem);
   --nav-height: 4rem;
+
+  /* Hero Gradients */
+  --hero-grad-0: rgba(13, 11, 8, 0.94);
+  --hero-grad-32: rgba(13, 11, 8, 0.78);
+  --hero-grad-62: rgba(13, 11, 8, 0.28);
+  --hero-grad-100: rgba(13, 11, 8, 0.08);
+  --hero-grad-mob-0: rgba(13, 11, 8, 0.85);
+  --hero-grad-mob-40: rgba(13, 11, 8, 0.4);
+  --hero-grad-mob-100: rgba(13, 11, 8, 0);
+}
+
+html.light {
+  --bg: #ffffff;
+  --surface: #f4f4f6;
+  --ink: #0c0c0e;
+  --muted: #5a5a62;
+  --signal: #0c0c0e;
+  --signal-dim: #3a3a42;
+  --signal-glow: rgba(12, 12, 14, 0.06);
+  --signal-glow-strong: rgba(12, 12, 14, 0.12);
+
+  /* Hero Gradients */
+  --hero-grad-0: rgba(255, 255, 255, 0.94);
+  --hero-grad-32: rgba(255, 255, 255, 0.78);
+  --hero-grad-62: rgba(255, 255, 255, 0.28);
+  --hero-grad-100: rgba(255, 255, 255, 0.08);
+  --hero-grad-mob-0: rgba(255, 255, 255, 0.85);
+  --hero-grad-mob-40: rgba(255, 255, 255, 0.4);
+  --hero-grad-mob-100: rgba(255, 255, 255, 0);
+}
+
+.light .nav-scrolled {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  border-bottom: 1px solid rgba(12, 12, 14, 0.08) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .bg-\[\#050505\] {
+  background-color: var(--surface) !important;
+}
+
+.light .bg-\[\#030303\] {
+  background-color: var(--bg) !important;
+}
+
+.light .bg-\[\#080808\] {
+  background-color: var(--surface) !important;
+}
+
+.light .bg-\[\#0d0d11\] {
+  background-color: var(--surface) !important;
+}
+
+.light .bg-\[\#121216\] {
+  background-color: var(--bg) !important;
+}
+
+.light .bg-gradient-to-b.from-\[\#101014\].to-\[\#08080a\] {
+  background: linear-gradient(to bottom, var(--surface), var(--bg)) !important;
+}
+
+.light .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light .border-white\/5 {
+  border-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.light .text-white\/10 {
+  color: rgba(12, 12, 14, 0.1) !important;
+}
+
+.light .text-white\/20 {
+  color: rgba(12, 12, 14, 0.25) !important;
+}
+
+.light .text-white\/30 {
+  color: rgba(12, 12, 14, 0.38) !important;
+}
+
+.light .text-white\/40 {
+  color: rgba(12, 12, 14, 0.5) !important;
+}
+
+.light .text-white\/50 {
+  color: rgba(12, 12, 14, 0.58) !important;
+}
+
+.light .text-white\/60 {
+  color: rgba(12, 12, 14, 0.66) !important;
+}
+
+.light .text-white\/70 {
+  color: rgba(12, 12, 14, 0.74) !important;
+}
+
+.light .text-white\/80 {
+  color: rgba(12, 12, 14, 0.82) !important;
+}
+
+.light .text-white\/90 {
+  color: rgba(12, 12, 14, 0.9) !important;
+}
+
+.light .text-white {
+  color: #0c0c0e !important;
+}
+
+/* Restore original white colors inside containers that remain dark in light mode */
+.light [class*="bg-black"] .text-white\/10,
+.light [class*="bg-black\/"] .text-white\/10,
+.light [class*="bg-[#0d"] .text-white\/10,
+.light [class*="bg-[#0c"] .text-white\/10,
+.light .cave-hint .text-white\/10 {
+  color: rgba(255, 255, 255, 0.1) !important;
+}
+.light [class*="bg-black"] .text-white\/20,
+.light [class*="bg-black\/"] .text-white\/20,
+.light [class*="bg-[#0d"] .text-white\/20,
+.light [class*="bg-[#0c"] .text-white\/20,
+.light .cave-hint .text-white\/20 {
+  color: rgba(255, 255, 255, 0.25) !important;
+}
+.light [class*="bg-black"] .text-white\/30,
+.light [class*="bg-black\/"] .text-white\/30,
+.light [class*="bg-[#0d"] .text-white\/30,
+.light [class*="bg-[#0c"] .text-white\/30,
+.light .cave-hint .text-white\/30 {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+.light [class*="bg-black"] .text-white\/40,
+.light [class*="bg-black\/"] .text-white\/40,
+.light [class*="bg-[#0d"] .text-white\/40,
+.light [class*="bg-[#0c"] .text-white\/40,
+.light .cave-hint .text-white\/40 {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+.light [class*="bg-black"] .text-white\/50,
+.light [class*="bg-black\/"] .text-white\/50,
+.light [class*="bg-[#0d"] .text-white\/50,
+.light [class*="bg-[#0c"] .text-white\/50,
+.light .cave-hint .text-white\/50 {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+.light [class*="bg-black"] .text-white\/60,
+.light [class*="bg-black\/"] .text-white\/60,
+.light [class*="bg-[#0d"] .text-white\/60,
+.light [class*="bg-[#0c"] .text-white\/60,
+.light .cave-hint .text-white\/60 {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+.light [class*="bg-black"] .text-white\/70,
+.light [class*="bg-black\/"] .text-white\/70,
+.light [class*="bg-[#0d"] .text-white\/70,
+.light [class*="bg-[#0c"] .text-white\/70,
+.light .cave-hint .text-white\/70 {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+.light [class*="bg-black"] .text-white\/80,
+.light [class*="bg-black\/"] .text-white\/80,
+.light [class*="bg-[#0d"] .text-white\/80,
+.light [class*="bg-[#0c"] .text-white\/80,
+.light .cave-hint .text-white\/80 {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+.light [class*="bg-black"] .text-white\/90,
+.light [class*="bg-black\/"] .text-white\/90,
+.light [class*="bg-[#0d"] .text-white\/90,
+.light [class*="bg-[#0c"] .text-white\/90,
+.light .cave-hint .text-white\/90 {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+.light [class*="bg-black"] .text-white,
+.light [class*="bg-black\/"] .text-white,
+.light [class*="bg-[#0d"] .text-white,
+.light [class*="bg-[#0c"] .text-white,
+.light .cave-hint .text-white {
+  color: #ffffff !important;
+}
+
+/* Light theme stats cards and tooltip fixes */
+.light .stat-card-pulse .text-muted {
+  color: #3a3a42 !important;
+}
+.light .cave-hint span {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+.light .text-glow-ambient {
+  color: var(--ink) !important;
+  text-shadow: none !important;
+}
+
+.light .bg-surface\/20 {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+.light .bg-surface\/30 {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+.light .bg-surface\/40 {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.light .bg-surface\/95 {
+  background-color: #ffffff !important;
+}
+
+.light .bg-surface\/98 {
+  background-color: #ffffff !important;
+}
+
+.light .shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* ===================================================
@@ -749,4 +964,51 @@ h1, h2, h3, h4 {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* ===================================================
+   PROJECTS SIDEBAR CLASS CUSTOMS
+   =================================================== */
+.project-sidebar-btn {
+  border-color: transparent;
+  color: var(--ink);
+  opacity: 0.6;
+  background-color: transparent;
+}
+.project-sidebar-btn:hover {
+  color: var(--ink);
+  opacity: 1.0;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.light .project-sidebar-btn:hover {
+  background-color: rgba(12, 12, 14, 0.05);
+}
+.project-sidebar-btn.active {
+  background-color: rgba(240, 160, 0, 0.1) !important;
+  border-color: var(--signal) !important;
+  color: var(--signal) !important;
+  opacity: 1.0 !important;
+  box-shadow: 0 0 15px rgba(240, 160, 0, 0.1) !important;
+}
+
+.border-subtle {
+  border-color: rgba(240, 232, 208, 0.06);
+}
+.light .border-subtle {
+  border-color: rgba(12, 12, 14, 0.06) !important;
+}
+
+/* ===================================================
+   LIQUID RIPPLE THEME TRANSITION REVEAL (VIEW TRANSITIONS)
+   =================================================== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none !important;
+  mix-blend-mode: normal !important;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 9999;
 }

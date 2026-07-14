@@ -106,7 +106,7 @@ function LedgerBlock({ ach, index }: { ach: typeof ACHIEVEMENTS[0], index: numbe
               <span className="font-mono text-sm text-signal font-bold mb-1 uppercase tracking-widest">
                 <ScrambleText text={ach.place} trigger={isHovered} />
               </span>
-              <span className="font-mono text-xs text-white/80 mb-3 uppercase tracking-wider">
+              <span className="font-mono text-xs text-ink/80 mb-3 uppercase tracking-wider">
                 <ScrambleText text={`@ ${ach.event}`} trigger={isHovered} />
               </span>
               
@@ -123,7 +123,7 @@ function LedgerBlock({ ach, index }: { ach: typeof ACHIEVEMENTS[0], index: numbe
             <span className="font-mono text-sm text-signal font-bold mb-1 uppercase tracking-widest">
               {ach.place}
             </span>
-            <span className="font-mono text-xs text-white/80 mb-3 uppercase tracking-wider">
+            <span className="font-mono text-xs text-ink/80 mb-3 uppercase tracking-wider">
               @ {ach.event}
             </span>
             

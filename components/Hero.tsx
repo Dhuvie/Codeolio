@@ -132,13 +132,13 @@ export default function Hero() {
           className="absolute inset-0 pointer-events-none hidden md:block"
           style={{
             background:
-              "linear-gradient(108deg, rgba(13,11,8,0.94) 0%, rgba(13,11,8,0.78) 32%, rgba(13,11,8,0.28) 62%, rgba(13,11,8,0.08) 100%)",
+              "linear-gradient(108deg, var(--hero-grad-0) 0%, var(--hero-grad-32) 32%, var(--hero-grad-62) 62%, var(--hero-grad-100) 100%)",
           }}
         />
         <div
           className="absolute inset-0 pointer-events-none md:hidden"
           style={{
-            background: "linear-gradient(180deg, rgba(13,11,8,0.85) 0%, rgba(13,11,8,0.4) 40%, rgba(13,11,8,0) 100%)",
+            background: "linear-gradient(180deg, var(--hero-grad-mob-0) 0%, var(--hero-grad-mob-40) 40%, var(--hero-grad-mob-100) 100%)",
           }}
         />
       </div>
@@ -228,7 +228,9 @@ export default function Hero() {
                 text="a" 
                 className="gradient-text-animated drop-shadow-[0_0_18px_rgba(240,160,0,0.8)] drop-shadow-[0_0_40px_rgba(240,160,0,0.4)]" 
               />
-              <TextDecoder text="j" className="text-ink" />
+              <span id="dot-j-bajaj" className="inline-block">
+                <TextDecoder text="j" className="text-ink" />
+              </span>
             </div>
           </div>
         </h1>

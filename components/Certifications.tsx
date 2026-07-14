@@ -16,6 +16,23 @@ export default function Certifications() {
   const darkMaskRef = useRef<HTMLDivElement>(null);
   const spotlightRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const [isLightMode, setIsLightMode] = useState(false);
+
+  // Sync isLightMode with document class list
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLightMode(document.documentElement.classList.contains("light"));
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === "class") {
+            setIsLightMode(document.documentElement.classList.contains("light"));
+          }
+        });
+      });
+      observer.observe(document.documentElement, { attributes: true });
+      return () => observer.disconnect();
+    }
+  }, []);
 
   useEffect(() => {
     if (prefersReducedMotion() || !containerRef.current) return;
@@ -26,11 +43,17 @@ export default function Certifications() {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
+      // Transparent cutout reveal coordinates
       const maskStr = `radial-gradient(circle 400px at ${x}px ${y}px, transparent 0%, black 100%)`;
       darkMaskRef.current.style.maskImage = maskStr;
       darkMaskRef.current.style.webkitMaskImage = maskStr;
 
-      spotlightRef.current.style.background = `radial-gradient(circle 400px at ${x}px ${y}px, rgba(240, 160, 0, 0.15) 0%, rgba(240, 160, 0, 0.05) 40%, transparent 100%)`;
+      // In light mode, apply a dark multiplier shadow sweep; in dark mode, a bright gold spotlight
+      if (document.documentElement.classList.contains("light")) {
+        spotlightRef.current.style.background = `radial-gradient(circle 400px at ${x}px ${y}px, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.01) 40%, transparent 100%)`;
+      } else {
+        spotlightRef.current.style.background = `radial-gradient(circle 400px at ${x}px ${y}px, rgba(240, 160, 0, 0.15) 0%, rgba(240, 160, 0, 0.05) 40%, transparent 100%)`;
+      }
     };
 
     const container = containerRef.current;
@@ -42,14 +65,18 @@ export default function Certifications() {
     <section 
       id="certifications" 
       ref={containerRef}
-      className="relative w-full min-h-[900px] bg-transparent md:bg-[#020202] overflow-hidden z-10 cursor-crosshair border-y border-white/5"
+      className={`relative w-full min-h-[900px] overflow-hidden z-10 cursor-crosshair border-y transition-colors duration-300 ${
+        isLightMode ? "bg-[#ffffff] border-black/5" : "bg-[#020202] border-white/5"
+      }`}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       <div 
         className="absolute inset-0 z-0 opacity-20 pointer-events-none"
         style={{
-          backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
+          backgroundImage: isLightMode
+            ? `linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px)`
+            : `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
           backgroundSize: '40px 40px'
         }}
       />
@@ -60,7 +87,7 @@ export default function Certifications() {
           <p className="font-mono text-sm text-signal tracking-[0.5em] uppercase mb-4">
             {"// Verified Credentials"}
           </p>
-          <h2 className="font-display font-semibold text-5xl md:text-7xl text-white tracking-tighter">
+          <h2 className="font-display font-semibold text-5xl md:text-7xl text-ink tracking-tighter">
             Hidden Vault.
           </h2>
           <p className="font-mono text-xs text-signal/60 tracking-widest mt-6 uppercase animate-pulse">
@@ -72,7 +99,11 @@ export default function Certifications() {
           {CERTIFICATIONS.map((cert, i) => (
             <div 
               key={i} 
-              className={`relative border border-white/10 p-10 bg-white/[0.02] backdrop-blur-sm pointer-events-auto transition-transform hover:scale-[1.02] hover:bg-white/[0.05] ${i % 2 === 0 ? "lg:mt-16" : ""} ${i === 4 ? "md:col-span-2 lg:col-span-1 lg:mt-32" : ""}`}
+              className={`relative border p-10 backdrop-blur-sm pointer-events-auto transition-transform hover:scale-[1.02] ${
+                isLightMode 
+                  ? "border-black/10 bg-black/[0.01] hover:bg-black/[0.03]" 
+                  : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+              } ${i % 2 === 0 ? "lg:mt-16" : ""} ${i === 4 ? "md:col-span-2 lg:col-span-1 lg:mt-32" : ""}`}
             >
               <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-signal/50 opacity-50" />
               <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-signal/50 opacity-50" />
@@ -81,12 +112,12 @@ export default function Certifications() {
                 SYS.ID // {cert.id}
               </span>
               
-              <h3 className="font-display font-bold text-2xl text-white uppercase tracking-wide mb-4">
+              <h3 className="font-display font-bold text-2xl text-ink uppercase tracking-wide mb-4">
                 {cert.text}
               </h3>
               
-              <p className="font-sans text-sm text-white/50 uppercase tracking-widest">
-                Issued by: <span className="text-white font-bold">{cert.org}</span>
+              <p className="font-sans text-sm text-ink/50 uppercase tracking-widest">
+                Issued by: <span className="text-ink font-bold">{cert.org}</span>
               </p>
 
               <div className="mt-12 w-full h-[1px] bg-gradient-to-r from-signal/50 to-transparent" />
@@ -97,7 +128,9 @@ export default function Certifications() {
 
       <div 
         ref={darkMaskRef}
-        className={`hidden lg:block absolute inset-0 bg-[#020202] z-20 pointer-events-none transition-opacity duration-700 ${isHovering ? "opacity-100" : "opacity-100"}`}
+        className={`hidden lg:block absolute inset-0 z-20 pointer-events-none transition-all duration-300 ${
+          isLightMode ? "bg-[#ffffff]" : "bg-[#020202]"
+        }`}
         style={{
           maskImage: `radial-gradient(circle 0px at -1000px -1000px, transparent 0%, black 100%)`,
           WebkitMaskImage: `radial-gradient(circle 0px at -1000px -1000px, transparent 0%, black 100%)`,
@@ -106,7 +139,9 @@ export default function Certifications() {
 
       <div 
         ref={spotlightRef}
-        className={`hidden lg:block absolute inset-0 pointer-events-none z-30 transition-opacity duration-300 mix-blend-screen ${isHovering ? "opacity-100" : "opacity-0"}`}
+        className={`hidden lg:block absolute inset-0 pointer-events-none z-30 transition-opacity duration-300 ${
+          isLightMode ? "mix-blend-multiply" : "mix-blend-screen"
+        } ${isHovering ? "opacity-100" : "opacity-0"}`}
         style={{
           background: `radial-gradient(circle 0px at -1000px -1000px, rgba(240, 160, 0, 0.15) 0%, rgba(240, 160, 0, 0.05) 40%, transparent 100%)`
         }}
