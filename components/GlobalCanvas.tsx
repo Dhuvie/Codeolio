@@ -2,7 +2,6 @@
 
 import { useRef, useMemo, useEffect, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { EffectComposer, Bloom, ChromaticAberration, Vignette, Noise } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { prefersReducedMotion } from "@/lib/animations";
 
@@ -741,17 +740,9 @@ export default function GlobalCanvas() {
       <Canvas
         camera={{ position: [0, 0, 15], fov: 45 }}
         gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
-        dpr={isBatteryPower ? 1.0 : [1, 1.5]}
+        dpr={isBatteryPower ? 1.0 : [1, 1.2]}
       >
         <NeuralMatrix isLightMode={isLightMode} isBatteryPower={isBatteryPower} />
-        {!isBatteryPower && !isLightMode && (
-          <EffectComposer>
-            <Bloom luminanceThreshold={0.4} luminanceSmoothing={0.9} intensity={1.8} mipmapBlur />
-            <ChromaticAberration offset={new THREE.Vector2(0.002, 0.002)} />
-            <Noise opacity={0.03} />
-            <Vignette eskil={false} offset={0.1} darkness={1.1} />
-          </EffectComposer>
-        )}
       </Canvas>
     </div>
   );

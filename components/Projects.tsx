@@ -1320,8 +1320,7 @@ function ProjectVisualizer3D({ index, isExpanded, setIsExpanded }: { index: numb
   const canvasContent = (
     <Canvas 
       camera={{ position: [0, 0, 4.5], fov: 45 }} 
-      shadows
-      dpr={isBatteryPower ? 1.0 : [1, 1.5]}
+      dpr={isBatteryPower ? 1.0 : [1, 1.2]}
       gl={{ powerPreference: "high-performance", antialias: !isBatteryPower }}
     >
       {/* Dynamic background color matching light mode white or dark mode charcoal */}
@@ -1329,7 +1328,7 @@ function ProjectVisualizer3D({ index, isExpanded, setIsExpanded }: { index: numb
 
       {/* Extremely Bright Studio Lighting Rig (No dark spots) */}
       <ambientLight intensity={isLightMode ? 2.2 : 1.8} />
-      <directionalLight position={[5, 10, 5]} intensity={2.5} castShadow />
+      <directionalLight position={[5, 10, 5]} intensity={2.5} />
       <pointLight position={[-5, 5, -5]} intensity={2.0} color="#ffffff" />
       <spotLight position={[0, 5, 0]} intensity={3.0} />
       
