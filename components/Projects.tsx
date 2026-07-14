@@ -1406,7 +1406,7 @@ function ProjectVisualizer3D({ index, isExpanded, setIsExpanded }: { index: numb
   }
 
   return (
-    <div className="w-full h-full relative overflow-hidden bg-black/10">
+    <div className="w-full h-full relative overflow-hidden bg-transparent">
       {canvasContent}
       
       {/* HUD Info Labels */}
@@ -1755,8 +1755,8 @@ export default function Projects() {
               </div>
 
               {/* 3D Visualizer block */}
-              <div className="flex-grow w-full relative min-h-[300px] lg:min-h-none border border-signal/15 rounded-lg overflow-hidden bg-black/45 backdrop-blur-md">
-                {mounted && isVisible ? (
+              <div className="flex-grow w-full relative min-h-[300px] lg:min-h-none border border-signal/15 rounded-lg overflow-hidden bg-black/45">
+                {mounted ? (
                   <ProjectVisualizer3D index={activeIndex} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center font-mono text-xs text-signal/40 gap-2">
