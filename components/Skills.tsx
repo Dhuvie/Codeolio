@@ -166,6 +166,57 @@ export default function Skills() {
   const [isLightMode, setIsLightMode] = useState(false);
   const lastOpenedBookIdxRef = useRef<number>(0);
 
+  // Mobile swipeable shelf states
+  const [isMobileShelf, setIsMobileShelf] = useState(false);
+  const [mobileActiveIdx, setMobileActiveIdx] = useState(2);
+  const [shelfDragOffset, setShelfDragOffset] = useState(0);
+  const [isDraggingShelf, setIsDraggingShelf] = useState(false);
+
+  const shelfDragStart = useRef(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleResize = () => {
+      setIsMobileShelf(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const handleShelfPointerDown = (e: React.PointerEvent) => {
+    shelfDragStart.current = e.clientX;
+    setIsDraggingShelf(true);
+    setShelfDragOffset(0);
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handleShelfPointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingShelf) return;
+    const dx = e.clientX - shelfDragStart.current;
+    setShelfDragOffset(dx);
+  };
+
+  const handleShelfPointerUp = (e: React.PointerEvent) => {
+    if (!isDraggingShelf) return;
+    setIsDraggingShelf(false);
+    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+
+    const dx = e.clientX - shelfDragStart.current;
+    if (Math.abs(dx) > 40) {
+      if (dx < 0) {
+        setMobileActiveIdx((prev) => Math.min(BOOKS_DATA.length - 1, prev + 1));
+      } else {
+        setMobileActiveIdx((prev) => Math.max(0, prev - 1));
+      }
+    } else {
+      if (Math.abs(dx) < 8) {
+        handleOpenBook(mobileActiveIdx);
+      }
+    }
+    setShelfDragOffset(0);
+  };
+
   // Keep track of the last opened book index so that the text content
   // remains rendered and readable during the exit/close animation.
   useEffect(() => {
@@ -311,68 +362,161 @@ export default function Skills() {
 
             {openBookIdx === null && !isClosing ? (
               // 1. HIGH-FIDELITY SKEUOMORPHIC BOOKSHELF VIEW
-              <div className="flex flex-col items-center justify-center w-full max-w-3xl mt-4">
+              <div className="flex flex-col items-center justify-center w-full max-w-3xl mt-4 select-none">
                 <span className="font-mono text-[9px] text-ink/40 uppercase tracking-widest mb-6">
                   Select a volume to study engineering registers
                 </span>
 
-                {/* The Wooden/Steel Bookshelf Platform */}
-                <div className={`relative w-full max-w-2xl h-80 rounded-lg border-b-8 border-r-4 border-l-4 p-4 flex items-end justify-center gap-4 md:gap-6 shadow-xl
-                  ${isLightMode 
-                    ? "bg-[#efebe4] border-[#8b7355] shadow-[0_20px_40px_rgba(0,0,0,0.08)]" 
-                    : "bg-[#18181b] border-[#3f3f46] shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
-                  }
-                `}>
-                  {/* Top inner shelf shadow depth */}
-                  <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.15)_0%,transparent_20%)] pointer-events-none" />
+                {isMobileShelf ? (
+                  /* 3D CYLINDRICAL ROTATING BOOKSHELF CAROUSEL FOR MOBILE DEVICES */
+                  <div 
+                    onPointerDown={handleShelfPointerDown}
+                    onPointerMove={handleShelfPointerMove}
+                    onPointerUp={handleShelfPointerUp}
+                    className={`relative w-full max-w-sm h-80 rounded-lg border-b-8 border-r-4 border-l-4 p-4 overflow-hidden flex items-end justify-center shadow-xl select-none touch-none
+                      ${isLightMode 
+                        ? "bg-[#efebe4] border-[#8b7355] shadow-[0_20px_40px_rgba(0,0,0,0.08)]" 
+                        : "bg-[#18181b] border-[#3f3f46] shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
+                      }
+                    `}
+                    style={{ perspective: "1000px", transformStyle: "preserve-3d" }}
+                  >
+                    {/* Top inner shelf shadow depth */}
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.15)_0%,transparent_20%)] pointer-events-none z-20" />
 
-                  {BOOKS_DATA.map((book, i) => (
-                    <div
-                      key={i}
-                      onClick={() => handleOpenBook(i)}
-                      className={`relative ${book.height} ${book.width} ${book.tilt} ${book.coverColor} rounded-t border-t-2 border-r border-l shadow-[2px_-2px_10px_rgba(0,0,0,0.3)] transition-all duration-300 cursor-pointer group flex flex-col justify-between items-center py-6 px-1 md:px-2
-                        ${book.spineColor}
-                        hover:-translate-y-6 hover:shadow-[5px_-5px_18px_rgba(0,0,0,0.4)]
-                      `}
-                    >
-                      {/* Spine Cylindrical Lighting Shading Overlay */}
-                      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.35)_0%,rgba(255,255,255,0.05)_20%,rgba(255,255,255,0.05)_50%,rgba(0,0,0,0.45)_100%)] pointer-events-none rounded-t" />
+                    <div className="absolute inset-0 flex items-end justify-center w-full h-[85%] pb-2" style={{ transformStyle: "preserve-3d" }}>
+                      {BOOKS_DATA.map((book, i) => {
+                        const diff = i - mobileActiveIdx;
+                        const isCenter = diff === 0;
 
-                      {/* Spine Ribs (Raised bands) */}
-                      <div className="absolute top-[18%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
-                      <div className="absolute top-[40%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
-                      <div className="absolute top-[62%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
-                      <div className="absolute top-[82%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
+                        // Cylindrical 3D positioning
+                        const xOffset = diff * 58 + shelfDragOffset * 0.4;
+                        const rotateYVal = diff * 32 + shelfDragOffset * 0.15;
+                        const zOffset = -Math.abs(diff) * 45;
+                        const scaleVal = 1 - Math.abs(diff) * 0.15;
+                        const opacityVal = 1 - Math.abs(diff) * 0.35;
+                        const zIndexVal = 10 - Math.abs(diff);
 
-                      {/* Gold Foil Scroll Ornaments */}
-                      <div className="absolute top-2.5 left-1 right-1 h-1.5 border-t border-b border-amber-400/40 pointer-events-none" />
-                      <div className="absolute bottom-2.5 left-1 right-1 h-1.5 border-t border-b border-amber-400/40 pointer-events-none" />
+                        return (
+                          <div
+                            key={i}
+                            style={{
+                              position: "absolute",
+                              left: "50%",
+                              transform: `translateX(calc(-50% + ${xOffset}px)) translateZ(${zOffset}px) rotateY(${rotateYVal}deg) scale(${scaleVal})`,
+                              zIndex: zIndexVal,
+                              opacity: opacityVal,
+                              transition: isDraggingShelf ? "none" : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
+                              touchAction: "none"
+                            }}
+                            className={`bottom-0 ${book.height} w-14 ${book.coverColor} rounded-t border-t-2 border-r border-l shadow-[2px_-2px_10px_rgba(0,0,0,0.3)] flex flex-col justify-between items-center py-6 px-2
+                              ${book.spineColor}
+                            `}
+                          >
+                            {/* Spine Cylindrical Lighting Shading Overlay */}
+                            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.35)_0%,rgba(255,255,255,0.05)_20%,rgba(255,255,255,0.05)_50%,rgba(0,0,0,0.45)_100%)] pointer-events-none rounded-t" />
 
-                      {/* Gold Book volume number */}
-                      <div className={`font-serif text-[7px] md:text-[8px] font-bold tracking-widest text-center z-10 ${book.textColor}`}>
-                        {book.volume}
-                      </div>
+                            {/* Spine Ribs (Raised bands) */}
+                            <div className="absolute top-[18%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
+                            <div className="absolute top-[40%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
+                            <div className="absolute top-[62%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
+                            <div className="absolute top-[82%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
 
-                      {/* Title block banner inside spine */}
-                      <div className="w-[85%] bg-black/30 border border-amber-400/20 rounded py-2 px-0.5 flex items-center justify-center z-10 shadow-inner">
-                        <span 
-                          className="font-serif text-[7px] md:text-[8px] font-bold tracking-widest uppercase text-center block text-amber-100/90 whitespace-nowrap"
-                          style={{ writingMode: "vertical-rl" }}
-                        >
-                          {book.spineTitle}
-                        </span>
-                      </div>
+                            {/* Gold Foil Scroll Ornaments */}
+                            <div className="absolute top-2.5 left-1 right-1 h-1.5 border-t border-b border-amber-400/40 pointer-events-none" />
+                            <div className="absolute bottom-2.5 left-1 right-1 h-1.5 border-t border-b border-amber-400/40 pointer-events-none" />
 
-                      {/* Bookmark Ribbon Hanging Out */}
-                      <div className={`absolute bottom-0 w-2.5 h-6 rounded-b shadow ${book.ribbonColor} translate-y-3.5 group-hover:translate-y-4 transition-all z-10`} />
+                            {/* Gold Book volume number */}
+                            <div className={`font-serif text-[8px] font-bold tracking-widest text-center z-10 ${book.textColor}`}>
+                              {book.volume}
+                            </div>
 
-                      {/* Metadata label */}
-                      <div className="border border-white/15 px-1 py-0.2 rounded-sm bg-black/35 z-10">
-                        <span className="font-mono text-[6px] text-white/50">{book.fileName.slice(0, 3)}</span>
-                      </div>
+                            {/* Title block banner inside spine */}
+                            <div className="w-[85%] bg-black/30 border border-amber-400/20 rounded py-2 px-0.5 flex items-center justify-center z-10 shadow-inner">
+                              <span 
+                                className="font-serif text-[8px] font-bold tracking-widest uppercase text-center block text-amber-100/90 whitespace-nowrap"
+                                style={{ writingMode: "vertical-rl" }}
+                              >
+                                {book.spineTitle}
+                              </span>
+                            </div>
+
+                            {/* Bookmark Ribbon Hanging Out */}
+                            <div className={`absolute bottom-0 w-2.5 h-6 rounded-b shadow ${book.ribbonColor} translate-y-3.5 z-10`} />
+
+                            {/* Metadata label */}
+                            <div className="border border-white/15 px-1 py-0.2 rounded-sm bg-black/35 z-10">
+                              <span className="font-mono text-[6px] text-white/50">{book.fileName.slice(0, 3)}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  ))}
-                </div>
+
+                    {/* Instruction overlay */}
+                    <div className="absolute bottom-2 left-0 right-0 text-center font-mono text-[8px] text-[#f0a000] uppercase tracking-widest animate-pulse pointer-events-none z-30">
+                      [ Swipe shelf to rotate volumes // Tap center to study ]
+                    </div>
+                  </div>
+                ) : (
+                  /* THE WOODEN/STEEL BOOKSHELF PLATFORM FOR DESKTOP */
+                  <div className={`relative w-full max-w-2xl h-80 rounded-lg border-b-8 border-r-4 border-l-4 p-4 flex items-end justify-center gap-4 md:gap-6 shadow-xl
+                    ${isLightMode 
+                      ? "bg-[#efebe4] border-[#8b7355] shadow-[0_20px_40px_rgba(0,0,0,0.08)]" 
+                      : "bg-[#18181b] border-[#3f3f46] shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
+                    }
+                  `}>
+                    {/* Top inner shelf shadow depth */}
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.15)_0%,transparent_20%)] pointer-events-none" />
+
+                    {BOOKS_DATA.map((book, i) => (
+                      <div
+                        key={i}
+                        onClick={() => handleOpenBook(i)}
+                        className={`relative ${book.height} ${book.width} ${book.tilt} ${book.coverColor} rounded-t border-t-2 border-r border-l shadow-[2px_-2px_10px_rgba(0,0,0,0.3)] transition-all duration-300 cursor-pointer group flex flex-col justify-between items-center py-6 px-1 md:px-2
+                          ${book.spineColor}
+                          hover:-translate-y-6 hover:shadow-[5px_-5px_18px_rgba(0,0,0,0.4)]
+                        `}
+                      >
+                        {/* Spine Cylindrical Lighting Shading Overlay */}
+                        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.35)_0%,rgba(255,255,255,0.05)_20%,rgba(255,255,255,0.05)_50%,rgba(0,0,0,0.45)_100%)] pointer-events-none rounded-t" />
+
+                        {/* Spine Ribs (Raised bands) */}
+                        <div className="absolute top-[18%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
+                        <div className="absolute top-[40%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
+                        <div className="absolute top-[62%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
+                        <div className="absolute top-[82%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
+
+                        {/* Gold Foil Scroll Ornaments */}
+                        <div className="absolute top-2.5 left-1 right-1 h-1.5 border-t border-b border-amber-400/40 pointer-events-none" />
+                        <div className="absolute bottom-2.5 left-1 right-1 h-1.5 border-t border-b border-amber-400/40 pointer-events-none" />
+
+                        {/* Gold Book volume number */}
+                        <div className={`font-serif text-[7px] md:text-[8px] font-bold tracking-widest text-center z-10 ${book.textColor}`}>
+                          {book.volume}
+                        </div>
+
+                        {/* Title block banner inside spine */}
+                        <div className="w-[85%] bg-black/30 border border-amber-400/20 rounded py-2 px-0.5 flex items-center justify-center z-10 shadow-inner">
+                          <span 
+                            className="font-serif text-[7px] md:text-[8px] font-bold tracking-widest uppercase text-center block text-amber-100/90 whitespace-nowrap"
+                            style={{ writingMode: "vertical-rl" }}
+                          >
+                            {book.spineTitle}
+                          </span>
+                        </div>
+
+                        {/* Bookmark Ribbon Hanging Out */}
+                        <div className={`absolute bottom-0 w-2.5 h-6 rounded-b shadow ${book.ribbonColor} translate-y-3.5 group-hover:translate-y-4 transition-all z-10`} />
+
+                        {/* Metadata label */}
+                        <div className="border border-white/15 px-1 py-0.2 rounded-sm bg-black/35 z-10">
+                          <span className="font-mono text-[6px] text-white/50">{book.fileName.slice(0, 3)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 
                 {/* Brass plaque under shelf */}
                 <div className={`mt-8 px-5 py-1.5 border rounded-md font-mono text-[9px] uppercase tracking-widest

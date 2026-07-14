@@ -28,6 +28,20 @@ export default function Contact() {
   const [isSelfDestructing, setIsSelfDestructing] = useState(false);
   const [destructCount, setDestructCount] = useState(5);
 
+  // Mobile responsive terminal states
+  const [isMobile, setIsMobile] = useState(false);
+  const [showManualInput, setShowManualInput] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Matrix Rain State
   const [isMatrixActive, setIsMatrixActive] = useState(false);
 
@@ -701,31 +715,95 @@ export default function Contact() {
             </div>
 
             {/* Input CLI interface line */}
-            <form 
-              onSubmit={handleFormSubmit} 
-              className="flex items-center gap-2 border-t border-subtle p-3.5 bg-surface/40 z-20"
-            >
-              <span className="text-signal font-bold select-none">
-                {gameState === "rpg" ? "[RPG] guest@dhruv-os:~$" : "guest@dhruv-os:~$"}
-              </span>
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputVal}
-                onKeyDown={handleKeyDown}
-                onChange={(e) => setInputVal(e.target.value)}
-                className={`flex-grow bg-transparent outline-none text-xs font-mono caret-signal placeholder-ink/20
-                  ${isLightMode ? "text-zinc-800" : "text-white"}
-                `}
-                placeholder={gameState === "rpg" ? "type game move (north, fight, stat, quit)..." : "type command (help, play, matrix, neofetch)..."}
-              />
-              <button 
-                type="submit" 
-                className="text-[9px] border border-subtle px-2 py-1 rounded bg-surface hover:bg-ink hover:text-surface transition-all cursor-pointer font-bold select-none uppercase tracking-widest text-ink/75"
+            {isMobile && !showManualInput ? (
+              /* CYBERNETIC TOUCH COMMAND DECK FOR MOBILE SCREENS */
+              gameState === "rpg" ? (
+                <div className="flex flex-col border-t border-subtle bg-surface/30 p-4 gap-3 select-none z-20">
+                  <div className="flex items-center justify-between text-[8px] font-mono text-signal/60 uppercase tracking-widest font-bold">
+                    <span>[ Touch Navigator Shield // Active ]</span>
+                    <button 
+                      type="button"
+                      onClick={() => setShowManualInput(true)}
+                      className="underline hover:text-signal transition-all"
+                    >
+                      [ Override CLI ]
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <button type="button" onClick={() => runCommand("north")} className="text-[9px] font-mono border border-signal/30 p-2 rounded bg-signal/5 hover:bg-signal/15 text-signal font-bold uppercase transition-all">Go North</button>
+                    <button type="button" onClick={() => runCommand("south")} className="text-[9px] font-mono border border-signal/30 p-2 rounded bg-signal/5 hover:bg-signal/15 text-signal font-bold uppercase transition-all">Go South</button>
+                    <button type="button" onClick={() => runCommand("east")} className="text-[9px] font-mono border border-signal/30 p-2 rounded bg-signal/5 hover:bg-signal/15 text-signal font-bold uppercase transition-all">Go East</button>
+                    <button type="button" onClick={() => runCommand("west")} className="text-[9px] font-mono border border-signal/30 p-2 rounded bg-signal/5 hover:bg-signal/15 text-signal font-bold uppercase transition-all">Go West</button>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <button type="button" onClick={() => runCommand("fight")} className="text-[9px] font-mono border border-red-500/30 p-2 rounded bg-red-500/5 hover:bg-red-500/15 text-red-500 font-bold uppercase transition-all">Fight</button>
+                    <button type="button" onClick={() => runCommand("stat")} className="text-[9px] font-mono border border-amber-500/30 p-2 rounded bg-amber-500/5 hover:bg-amber-500/15 text-amber-500 font-bold uppercase transition-all">Stats</button>
+                    <button type="button" onClick={() => runCommand("look")} className="text-[9px] font-mono border border-[#00ffcc]/30 p-2 rounded bg-[#00ffcc]/5 hover:bg-[#00ffcc]/15 text-[#00ffcc] font-bold uppercase transition-all">Look</button>
+                    <button type="button" onClick={() => runCommand("quit")} className="text-[9px] font-mono border border-zinc-500/30 p-2 rounded bg-zinc-500/5 hover:bg-zinc-500/15 text-zinc-400 font-bold uppercase transition-all">Quit</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col border-t border-subtle bg-surface/30 p-4 gap-3 select-none z-20">
+                  <div className="flex items-center justify-between text-[8px] font-mono text-signal/60 uppercase tracking-widest font-bold">
+                    <span>[ Touch Command Deck // Active ]</span>
+                    <button 
+                      type="button"
+                      onClick={() => setShowManualInput(true)}
+                      className="underline hover:text-signal transition-all"
+                    >
+                      [ Override CLI ]
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <button type="button" onClick={() => runCommand("help")} className="text-[9px] font-mono border border-signal/30 p-2 rounded bg-signal/5 hover:bg-signal/15 text-signal font-bold uppercase transition-all">Help</button>
+                    <button type="button" onClick={() => runCommand("about")} className="text-[9px] font-mono border border-signal/30 p-2 rounded bg-signal/5 hover:bg-signal/15 text-signal font-bold uppercase transition-all">About</button>
+                    <button type="button" onClick={() => runCommand("projects")} className="text-[9px] font-mono border border-[#00ffcc]/30 p-2 rounded bg-[#00ffcc]/5 hover:bg-[#00ffcc]/15 text-[#00ffcc] font-bold uppercase transition-all">Projects</button>
+                    <button type="button" onClick={() => runCommand("skills")} className="text-[9px] font-mono border border-[#00ffcc]/30 p-2 rounded bg-[#00ffcc]/5 hover:bg-[#00ffcc]/15 text-[#00ffcc] font-bold uppercase transition-all">Skills</button>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <button type="button" onClick={() => runCommand("neofetch")} className="text-[9px] font-mono border border-zinc-500/30 p-2 rounded bg-zinc-500/5 hover:bg-zinc-500/15 text-zinc-400 font-bold uppercase transition-all">Neofetch</button>
+                    <button type="button" onClick={() => runCommand("matrix")} className="text-[9px] font-mono border border-signal/30 p-2 rounded bg-signal/5 hover:bg-signal/15 text-signal font-bold uppercase transition-all">Matrix</button>
+                    <button type="button" onClick={() => runCommand("play")} className="text-[9px] font-mono border border-amber-500/30 p-2 rounded bg-amber-500/5 hover:bg-amber-500/15 text-amber-500 font-bold uppercase transition-all">Play RPG</button>
+                    <button type="button" onClick={() => runCommand("clear")} className="text-[9px] font-mono border border-zinc-700/30 p-2 rounded bg-zinc-700/5 hover:bg-zinc-700/15 text-zinc-500 font-bold uppercase transition-all">Clear</button>
+                  </div>
+                </div>
+              )
+            ) : (
+              <form 
+                onSubmit={handleFormSubmit} 
+                className="flex items-center gap-2 border-t border-subtle p-3.5 bg-surface/40 z-20"
               >
-                execute
-              </button>
-            </form>
+                {isMobile && (
+                  <button 
+                    type="button"
+                    onClick={() => setShowManualInput(false)}
+                    className="mr-2 text-[9px] border border-subtle px-1.5 py-0.5 rounded text-ink/50 font-bold hover:text-signal transition-all"
+                  >
+                    &lt; Back
+                  </button>
+                )}
+                <span className="text-signal font-bold select-none text-[10px] md:text-xs">
+                  {gameState === "rpg" ? "[RPG] guest@dhruv-os:~$" : "guest@dhruv-os:~$"}
+                </span>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputVal}
+                  onKeyDown={handleKeyDown}
+                  onChange={(e) => setInputVal(e.target.value)}
+                  className={`flex-grow bg-transparent outline-none text-xs font-mono caret-signal placeholder-ink/20
+                    ${isLightMode ? "text-zinc-800" : "text-white"}
+                  `}
+                  placeholder={gameState === "rpg" ? "type game move..." : "type command..."}
+                />
+                <button 
+                  type="submit" 
+                  className="text-[9px] border border-subtle px-2 py-1 rounded bg-surface hover:bg-ink hover:text-surface transition-all cursor-pointer font-bold select-none uppercase tracking-widest text-ink/75"
+                >
+                  execute
+                </button>
+              </form>
+            )}
           </div>
 
           {/* Social communication grids */}

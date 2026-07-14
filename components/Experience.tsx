@@ -80,6 +80,59 @@ export default function Experience() {
   const [positions, setPositions] = useState<{ [key: number]: { x: number; y: number; rot: number } }>({});
   const [draggingId, setDraggingId] = useState<number | null>(null);
   
+  // Mobile swipeable deck states
+  const [cardOrder, setCardOrder] = useState<number[]>([0, 1, 2]);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [draggingCardId, setDraggingCardId] = useState<number | null>(null);
+  const [swipedCardId, setSwipedCardId] = useState<number | null>(null);
+  const [swipeDirection, setSwipeDirection] = useState(0);
+
+  const cardDragStart = useRef({ x: 0, y: 0 });
+
+  const handleCardPointerDown = (e: React.PointerEvent, id: number) => {
+    if (activeId !== null) return;
+    cardDragStart.current = { x: e.clientX, y: e.clientY };
+    setDraggingCardId(id);
+    setDragOffset({ x: 0, y: 0 });
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handleCardPointerMove = (e: React.PointerEvent) => {
+    if (draggingCardId === null) return;
+    const dx = e.clientX - cardDragStart.current.x;
+    const dy = e.clientY - cardDragStart.current.y;
+    setDragOffset({ x: dx, y: dy });
+  };
+
+  const handleCardPointerUp = (e: React.PointerEvent, id: number) => {
+    if (draggingCardId === null) return;
+    setDraggingCardId(null);
+    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+
+    const dx = e.clientX - cardDragStart.current.x;
+    const dy = e.clientY - cardDragStart.current.y;
+
+    if (Math.abs(dx) > 90) {
+      setSwipedCardId(id);
+      setSwipeDirection(dx > 0 ? 1 : -1);
+      setTimeout(() => {
+        setCardOrder((prev) => {
+          const next = prev.filter((cid) => cid !== id);
+          return [...next, id];
+        });
+        setSwipedCardId(null);
+        setSwipeDirection(0);
+        setDragOffset({ x: 0, y: 0 });
+      }, 300);
+    } else {
+      setDragOffset({ x: 0, y: 0 });
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 8) {
+        openFolder(id);
+      }
+    }
+  };
+  
   const pointerStart = useRef({ x: 0, y: 0 });
   const elementStart = useRef({ x: 0, y: 0, rot: 0 });
   const lastMousePos = useRef({ x: 0, y: 0 });
@@ -274,47 +327,88 @@ export default function Experience() {
           {isMobileDesk ? (
             activeId === null && isClosingId === null ? (
               /* RESPONSIVE LAYOUT FOR CLOSED DOSSIERS */
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full pt-12 px-4 justify-items-center z-10 relative">
-                {DOSSIERS.map((d) => (
-                  <div
-                    key={d.id}
-                    onClick={() => openFolder(d.id)}
-                    className="w-56 h-72 border border-[#d2ab5b]/35 bg-gradient-to-br from-[#e6c280] to-[#cba355] shadow-[0_15px_30px_rgba(0,0,0,0.5)] cursor-pointer rounded-md p-6 flex flex-col justify-between overflow-hidden hover:scale-105 transition-all duration-300"
-                  >
-                    {/* CLOSED KRAFT PAPER MANILA COVER */}
-                    <div className="flex flex-col justify-between h-full font-mono text-[#4a3416] select-none pointer-events-none relative">
-                      <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-[#b38f45] to-[#cba355] border-r border-[#a8823b] -ml-6 -my-6 rounded-l" />
-                      <div className="absolute left-2 right-2 top-1/4 h-[1px] bg-[#dfb96c] opacity-60" />
-                      <div className="absolute left-2 right-2 top-3/4 h-[1px] bg-[#dfb96c] opacity-60" />
-                      
-                      <div className="absolute bottom-12 right-0 w-16 h-16 rounded-full border border-[#4a3416]/12 flex items-center justify-center opacity-30 rotate-[22deg]">
-                        <span className="font-mono text-[6px] text-center uppercase tracking-widest font-black leading-none text-[#4a3416]/50">
-                          DEPT<br/>OF<br/>SYS
-                        </span>
-                      </div>
+              /* RESPONSIVE LAYOUT FOR CLOSED DOSSIERS (SWIPEABLE STACK DECK) */
+              <div className="relative w-full h-[380px] flex items-center justify-center pt-8 select-none">
+                {DOSSIERS.map((d) => {
+                  const idx = cardOrder.indexOf(d.id);
+                  const isTop = idx === 0;
+                  const isSwiping = swipedCardId === d.id;
+                  const isDragging = draggingCardId === d.id;
 
-                      <div>
-                        <div className="w-16 h-4 bg-[#e6c280] rounded-t border-t border-x border-[#cba355] -mt-5 -ml-1 flex items-center justify-center relative">
-                          <span className="text-[7px] text-[#4a3416]/50 font-bold">FILE_{d.id + 1}</span>
-                          <div className="absolute -top-1 right-2 w-[8px] h-[20px] border border-[#a6a6af] rounded-full opacity-80 rotate-[15deg]" />
-                        </div>
-                        <div className="w-full h-[1px] bg-[#cba355] mb-4" />
+                  let transformStr = "";
+                  let zIndexVal = 10 - idx;
+                  let opacityVal = 1;
+
+                  if (isSwiping) {
+                    transformStr = `translate(calc(-50% + ${swipeDirection * 350}px), calc(-50% + ${dragOffset.y}px)) rotate(${swipeDirection * 35}deg) scale(0.95)`;
+                    opacityVal = 0;
+                  } else if (isDragging) {
+                    transformStr = `translate(calc(-50% + ${dragOffset.x}px), calc(-50% + ${dragOffset.y}px)) rotate(${dragOffset.x * 0.08}deg) scale(1.02)`;
+                  } else {
+                    const rotVal = idx === 0 ? -4 : idx === 1 ? 3 : -1;
+                    const yOffset = idx * 10;
+                    const scaleVal = 1 - idx * 0.05;
+                    transformStr = `translate(-50%, calc(-50% + ${yOffset}px)) rotate(${rotVal}deg) scale(${scaleVal})`;
+                    opacityVal = idx > 2 ? 0 : 1 - idx * 0.15;
+                  }
+
+                  return (
+                    <div
+                      key={d.id}
+                      onPointerDown={(e) => handleCardPointerDown(e, d.id)}
+                      onPointerMove={handleCardPointerMove}
+                      onPointerUp={(e) => handleCardPointerUp(e, d.id)}
+                      style={{
+                        left: "50%",
+                        top: "50%",
+                        transform: transformStr,
+                        zIndex: zIndexVal,
+                        opacity: opacityVal,
+                        transition: isDragging ? "none" : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
+                        touchAction: "none"
+                      }}
+                      className="absolute w-56 h-72 border border-[#d2ab5b]/35 bg-gradient-to-br from-[#e6c280] to-[#cba355] shadow-[0_15px_30px_rgba(0,0,0,0.5)] cursor-grab active:cursor-grabbing rounded-md p-6 flex flex-col justify-between overflow-hidden"
+                    >
+                      {/* CLOSED KRAFT PAPER MANILA COVER */}
+                      <div className="flex flex-col justify-between h-full font-mono text-[#4a3416] select-none pointer-events-none relative">
+                        <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-[#b38f45] to-[#cba355] border-r border-[#a8823b] -ml-6 -my-6 rounded-l" />
+                        <div className="absolute left-2 right-2 top-1/4 h-[1px] bg-[#dfb96c] opacity-60" />
+                        <div className="absolute left-2 right-2 top-3/4 h-[1px] bg-[#dfb96c] opacity-60" />
                         
-                        <span className="text-[8px] text-[#3d2910]/60 tracking-widest uppercase block mb-1 font-bold">
-                          REGISTRY DOSSIER
-                        </span>
-                        <h4 className="text-sm font-bold text-white tracking-tight uppercase leading-snug drop-shadow-sm">
-                          {d.company}
-                        </h4>
-                      </div>
+                        <div className="absolute bottom-12 right-0 w-16 h-16 rounded-full border border-[#4a3416]/12 flex items-center justify-center opacity-30 rotate-[22deg]">
+                          <span className="font-mono text-[6px] text-center uppercase tracking-widest font-black leading-none text-[#4a3416]/50">
+                            DEPT<br/>OF<br/>SYS
+                          </span>
+                        </div>
 
-                      <div className="border-t border-[#cba355] pt-3 flex items-center justify-between text-[9px] font-bold">
-                        <span className="text-[#3b270a]">{d.period.split(" ")[0]}</span>
-                        <span className="text-[#4a3416]/60 tracking-wider">[DECRYPT]</span>
+                        <div>
+                          <div className="w-16 h-4 bg-[#e6c280] rounded-t border-t border-x border-[#cba355] -mt-5 -ml-1 flex items-center justify-center relative">
+                            <span className="text-[7px] text-[#4a3416]/50 font-bold">FILE_{d.id + 1}</span>
+                            <div className="absolute -top-1 right-2 w-[8px] h-[20px] border border-[#a6a6af] rounded-full opacity-80 rotate-[15deg]" />
+                          </div>
+                          <div className="w-full h-[1px] bg-[#cba355] mb-4" />
+                          
+                          <span className="text-[8px] text-[#3d2910]/60 tracking-widest uppercase block mb-1 font-bold">
+                            REGISTRY DOSSIER
+                          </span>
+                          <h4 className="text-sm font-bold text-white tracking-tight uppercase leading-snug drop-shadow-sm">
+                            {d.company}
+                          </h4>
+                        </div>
+
+                        <div className="border-t border-[#cba355] pt-3 flex items-center justify-between text-[9px] font-bold">
+                          <span className="text-[#3b270a]">{d.period.split(" ")[0]}</span>
+                          <span className="text-[#4a3416]/60 tracking-wider">[SWIPE / TAP]</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+
+                {/* Instruction banner */}
+                <div className="absolute bottom-2 left-0 right-0 text-center font-mono text-[8px] text-[#f0a000] tracking-widest uppercase animate-pulse select-none pointer-events-none">
+                  [ Swipe folder left/right to browse deck // Tap to decrypt ]
+                </div>
               </div>
             ) : (
               /* RESPONSIVE LAYOUT FOR SINGLE OPENED DOSSIER */
