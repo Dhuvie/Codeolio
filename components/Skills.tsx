@@ -395,254 +395,75 @@ export default function Skills() {
             </div>
           </div>
 
-          <div className="min-h-[520px] flex items-center justify-center p-6 bg-surface/5 relative">
-            
-            {(openBookIdx !== null || isClosing) && (
-              <div 
-                onClick={handleCloseBook}
-                className="absolute inset-0 z-10 cursor-pointer bg-black/40 backdrop-blur-[1px] transition-all duration-500 animate-fade-in"
-              />
-            )}
-
-            {openBookIdx === null && !isClosing ? (
-              // 1. HIGH-FIDELITY SKEUOMORPHIC BOOKSHELF VIEW
-              <div className="flex flex-col items-center justify-center w-full max-w-3xl mt-4 select-none">
-                <span className="font-mono text-[9px] text-ink/40 uppercase tracking-widest mb-6">
-                  Select a volume to study engineering registers
-                </span>
-
-                {isMobileShelf ? (
-                  /* HIGH-DENSITY DEPLOYED SKILLS DIRECTORY FOR MOBILE DEVICES */
-                  <div className="w-full flex flex-col gap-6 text-left select-none pointer-events-auto">
-                    {BOOKS_DATA.map((book, i) => (
-                      <div 
-                        key={i}
-                        className={`border rounded-lg p-5 font-mono transition-colors duration-300
-                          ${isLightMode 
-                            ? "bg-[#eef2f6] border-[#0c0c0e]/15 shadow-sm" 
-                            : "bg-zinc-900/60 border-zinc-800 shadow-md"
-                          }
-                        `}
-                      >
-                        <div className={`text-xs font-bold uppercase mb-4 pb-1 border-b tracking-wider flex justify-between
-                          ${isLightMode ? "text-[#0033aa] border-[#0033aa]/10" : "text-signal border-signal/15"}
-                        `}>
-                          <span>[ NODE 0{i + 1} // {book.spineTitle} ]</span>
-                          <span className="text-[8px] opacity-55">{book.volume}</span>
-                        </div>
-
-                        <div className="space-y-5">
-                          {book.items.map((skill, idx) => (
-                            <div key={idx} className="space-y-1.5">
-                              <div className="flex items-center justify-between text-xs font-bold text-ink">
-                                <span>{skill.name}</span>
-                                <span className={`text-[9px] font-mono
-                                  ${isLightMode ? "text-[#c07000]" : "text-signal/90"}
-                                `}>
-                                  LEVEL_{skill.level * 20}%
-                                </span>
-                              </div>
-                              
-                              {/* Visual Level Progress Bar */}
-                              <div className={`w-full h-1.5 rounded-full overflow-hidden
-                                ${isLightMode ? "bg-black/10" : "bg-zinc-800"}
-                              `}>
-                                <div 
-                                  className={`h-full rounded-full transition-all duration-500
-                                    ${isLightMode ? "bg-[#0033aa]" : "bg-signal"}
-                                  `}
-                                  style={{ width: `${skill.level * 20}%` }}
-                                />
-                              </div>
-
-                              <p className="text-[9px] text-ink/50 pl-1 leading-relaxed">
-                                - {skill.note}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  /* THE WOODEN/STEEL BOOKSHELF PLATFORM FOR DESKTOP */
-                  <div className={`relative w-full max-w-2xl h-80 rounded-lg border-b-8 border-r-4 border-l-4 p-4 flex items-end justify-center gap-4 md:gap-6 shadow-xl
+          <div className="w-full p-6 bg-surface/5 relative pointer-events-auto">
+            {/* GRID DIRECTORY SHOWCASE */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left select-none">
+              {BOOKS_DATA.map((book, i) => (
+                <div 
+                  key={i}
+                  className={`border rounded-lg p-5 font-mono transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] lg:hover:scale-[1.01]
                     ${isLightMode 
-                      ? "bg-[#efebe4] border-[#8b7355] shadow-[0_20px_40px_rgba(0,0,0,0.08)]" 
-                      : "bg-[#18181b] border-[#3f3f46] shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
+                      ? "bg-[#ffffff] border-[#0c0c0e]/10 shadow-sm" 
+                      : "bg-[#0c0c0e]/60 border-zinc-800 shadow-md"
                     }
+                  `}
+                >
+                  <div className={`text-xs font-bold uppercase mb-4 pb-2 border-b tracking-wider flex justify-between items-center
+                    ${isLightMode ? "text-[#0033aa] border-black/5" : "text-signal border-white/5"}
                   `}>
-                    {/* Top inner shelf shadow depth */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.15)_0%,transparent_20%)] pointer-events-none" />
+                    <div className="flex items-center gap-2">
+                      <span className={`w-1.5 h-1.5 rounded-full ${isLightMode ? "bg-[#0033aa]" : "bg-signal"} animate-pulse`} />
+                      <span>[ MODULE_0{i + 1} // {book.spineTitle} ]</span>
+                    </div>
+                    <span className={`text-[8px] font-bold ${isLightMode ? "text-zinc-400" : "text-white/30"}`}>{book.volume}</span>
+                  </div>
 
-                    {BOOKS_DATA.map((book, i) => (
-                      <div
-                        key={i}
-                        onClick={() => handleOpenBook(i)}
-                        className={`relative ${book.height} ${book.width} ${book.tilt} ${book.coverColor} rounded-t border-t-2 border-r border-l shadow-[2px_-2px_10px_rgba(0,0,0,0.3)] transition-all duration-300 cursor-pointer group flex flex-col justify-between items-center py-6 px-1 md:px-2
-                          ${book.spineColor}
-                          hover:-translate-y-6 hover:shadow-[5px_-5px_18px_rgba(0,0,0,0.4)]
-                        `}
-                      >
-                        {/* Spine Cylindrical Lighting Shading Overlay */}
-                        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.35)_0%,rgba(255,255,255,0.05)_20%,rgba(255,255,255,0.05)_50%,rgba(0,0,0,0.45)_100%)] pointer-events-none rounded-t" />
+                  <p className={`text-[10px] leading-relaxed mb-4 min-h-[40px] ${isLightMode ? "text-zinc-500" : "text-white/50"}`}>
+                    Technical registry of {book.title.toLowerCase()} and operational runtime architectures compiled during production.
+                  </p>
 
-                        {/* Spine Ribs (Raised bands) */}
-                        <div className="absolute top-[18%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
-                        <div className="absolute top-[40%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
-                        <div className="absolute top-[62%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
-                        <div className="absolute top-[82%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
-
-                        {/* Gold Foil Scroll Ornaments */}
-                        <div className="absolute top-2.5 left-1 right-1 h-1.5 border-t border-b border-amber-400/40 pointer-events-none" />
-                        <div className="absolute bottom-2.5 left-1 right-1 h-1.5 border-t border-b border-amber-400/40 pointer-events-none" />
-
-                        {/* Gold Book volume number */}
-                        <div className={`font-serif text-[7px] md:text-[8px] font-bold tracking-widest text-center z-10 ${book.textColor}`}>
-                          {book.volume}
-                        </div>
-
-                        {/* Title block banner inside spine */}
-                        <div className="w-[85%] bg-black/30 border border-amber-400/20 rounded py-2 px-0.5 flex items-center justify-center z-10 shadow-inner">
-                          <span 
-                            className="font-serif text-[7px] md:text-[8px] font-bold tracking-widest uppercase text-center block text-amber-100/90 whitespace-nowrap"
-                            style={{ writingMode: "vertical-rl" }}
-                          >
-                            {book.spineTitle}
+                  <div className="space-y-4">
+                    {book.items.map((skill, idx) => (
+                      <div key={idx} className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs font-bold text-ink">
+                          <span>{skill.name}</span>
+                          <span className={`text-[9px] font-mono
+                            ${isLightMode ? "text-[#c07000]" : "text-signal/90"}
+                          `}>
+                            LEVEL_{skill.level * 20}%
                           </span>
                         </div>
-
-                        {/* Bookmark Ribbon Hanging Out */}
-                        <div className={`absolute bottom-0 w-2.5 h-6 rounded-b shadow ${book.ribbonColor} translate-y-3.5 group-hover:translate-y-4 transition-all z-10`} />
-
-                        {/* Metadata label */}
-                        <div className="border border-white/15 px-1 py-0.2 rounded-sm bg-black/35 z-10">
-                          <span className="font-mono text-[6px] text-white/50">{book.fileName.slice(0, 3)}</span>
+                        
+                        {/* Visual Level Progress Bar */}
+                        <div className={`w-full h-1.5 rounded-full overflow-hidden
+                          ${isLightMode ? "bg-black/10" : "bg-zinc-800"}
+                        `}>
+                          <div 
+                            className={`h-full rounded-full transition-all duration-500
+                              ${isLightMode ? "bg-[#0033aa]" : "bg-signal"}
+                            `}
+                            style={{ width: `${skill.level * 20}%` }}
+                          />
                         </div>
+
+                        <p className="text-[9px] text-ink/50 pl-1 leading-relaxed">
+                          - {skill.note}
+                        </p>
                       </div>
                     ))}
                   </div>
-                )}
-                
-                {/* Brass plaque under shelf */}
-                <div className={`mt-8 px-5 py-1.5 border rounded-md font-mono text-[9px] uppercase tracking-widest
-                  ${isLightMode ? "border-zinc-300 bg-white text-zinc-600" : "border-zinc-800 bg-zinc-900/60 text-zinc-400"}
-                `}>
-                  Dhuvie Knowledge Archives // Library Edition
                 </div>
+              ))}
+            </div>
+
+            {/* Plaque under grid */}
+            <div className="flex justify-center mt-8">
+              <div className={`px-5 py-1.5 border rounded-md font-mono text-[9px] uppercase tracking-widest
+                ${isLightMode ? "border-zinc-300 bg-white text-zinc-600" : "border-zinc-800 bg-zinc-900/60 text-zinc-400"}
+              `}>
+                Dhuvie Knowledge Archives // Directory Edition
               </div>
-            ) : (
-              // 2. DETAILED OPEN BOOK LEDGER SKEUOMORPHIC PAGE VIEW (WITH CLOSE ANIMATION Support)
-              <div className={`w-full max-w-4xl relative z-20 ${
-                isClosing 
-                  ? "animate-[scaleDownBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]" 
-                  : "animate-[scaleUpBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]"
-              }`}>
-                
-                {/* Back to Shelf HUD Instruction */}
-                <span className="absolute -top-8 left-0 font-mono text-[9px] text-ink/40 uppercase tracking-widest pointer-events-none select-none">
-                  [ Click outside to return volume to shelf ]
-                </span>
-
-                {/* The Hardback leather book spreads underneath */}
-                <div className={`w-full rounded-2xl p-2.5 md:p-4 shadow-2xl relative border-4 border-zinc-950/80
-                  ${activeBook.coverColor}
-                `}>
-                  
-                  {/* Two Page Spread Paper (Ivory / Vintage ledger texture) */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 bg-[#fcf9f2] rounded-lg overflow-hidden min-h-[440px] relative border border-black/15 shadow-[inset_0_0_40px_rgba(0,0,0,0.06)] text-zinc-900" style={{ perspective: "1500px" }}>
-                    
-                    {/* Left Page (Conceptual Sketches / Schematics) */}
-                    <div className={`p-6 md:p-8 border-b md:border-b-0 md:border-r border-zinc-300/60 flex flex-col justify-between relative min-h-[380px] origin-right transition-transform duration-[800ms] ease-out ${
-                      isClosing 
-                        ? "animate-[foldLeft_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]" 
-                        : "animate-[unfoldLeft_0.9s_cubic-bezier(0.16,1,0.3,1)_forwards]"
-                    }`}>
-                      
-                      {/* Left Page Header */}
-                      <div className="border-b border-zinc-300/80 pb-3 flex justify-between items-end">
-                        <span className="font-serif italic text-xs text-zinc-500 font-bold">{activeBook.volume}</span>
-                        <span className="font-serif text-[10px] uppercase tracking-widest text-zinc-400">specifications</span>
-                      </div>
-
-                      {/* SVG Conceptual Sketch Grid (Skeuomorphic Blueprint) */}
-                      <div className="flex-grow flex items-center justify-center my-6 relative min-h-[160px]">
-                        <div className="absolute inset-0 flex items-center justify-center p-4">
-                          {activeBook.svgIllustration}
-                        </div>
-                        <div className="absolute bottom-2 font-mono text-[8px] text-zinc-400 uppercase tracking-widest text-center w-full">
-                          Fig 1.1: System abstraction diagram
-                        </div>
-                      </div>
-
-                      {/* Page description */}
-                      <div className="font-serif text-xs leading-relaxed text-zinc-700 italic border-t border-zinc-200 pt-4">
-                        This volume archives the operational technical registries, benchmarks, and architectural designs compiled during production.
-                      </div>
-                    </div>
-
-                    {/* Book Central crease line shadows */}
-                    <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-8 -translate-x-1/2 bg-[linear-gradient(90deg,rgba(0,0,0,0.05)_0%,rgba(0,0,0,0.18)_50%,rgba(0,0,0,0.05)_100%)] pointer-events-none z-10" />
-
-                    {/* Right Page (Ledger Skills List) */}
-                    <div className={`p-6 md:p-8 flex flex-col justify-between min-h-[380px] origin-left transition-transform duration-[800ms] ease-out ${
-                      isClosing 
-                        ? "animate-[foldRight_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]" 
-                        : "animate-[unfoldRight_0.9s_cubic-bezier(0.16,1,0.3,1)_forwards]"
-                    }`}>
-                      
-                      {/* Right Page Header */}
-                      <div className="border-b border-zinc-300/80 pb-3 flex justify-between items-end">
-                        <span className="font-serif text-[11px] font-bold text-zinc-800 uppercase tracking-wider">
-                          {activeBook.title}
-                        </span>
-                        <span className="font-serif italic text-xs text-zinc-500">folio 42</span>
-                      </div>
-
-                      {/* Skill ledger elements */}
-                      <div className="space-y-4 my-6">
-                        {activeBook.items.map((skill, sIdx) => (
-                          <div key={sIdx} className="space-y-1.5">
-                            <div className="flex items-center justify-between font-serif">
-                              <span className="font-bold text-zinc-850 text-xs">{skill.name}</span>
-                              
-                              {/* Ledger style checkbox metrics */}
-                              <div className="flex gap-1">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <div
-                                    key={star}
-                                    className={`w-3.5 h-3.5 border border-zinc-400 rounded-sm flex items-center justify-center text-[8px] font-bold
-                                      ${star <= skill.level 
-                                        ? "bg-zinc-850 text-white border-zinc-900" 
-                                        : "bg-transparent text-transparent"
-                                      }
-                                    `}
-                                  >
-                                    ✓
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                            <p className="font-mono text-[9px] text-zinc-500 pl-2 leading-relaxed">
-                              - {skill.note}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Hand-drawn ink marginal note */}
-                      <div className="border-t border-zinc-200/80 pt-4 flex items-center justify-between">
-                        <span className="font-mono text-[8px] text-zinc-400">ledger seal // verified</span>
-                        <span className="font-handwritten text-xs text-blue-800 rotate-[-2deg] opacity-75">
-                          Production deploy verified!
-                        </span>
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
