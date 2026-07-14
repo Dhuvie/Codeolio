@@ -412,94 +412,168 @@ export default function Skills() {
                 </span>
 
                 {isMobileShelf ? (
-                  /* 3D CYLINDRICAL ROTATING BOOKSHELF CAROUSEL FOR MOBILE DEVICES */
-                  <div 
-                    onPointerDown={handleShelfPointerDown}
-                    onPointerMove={handleShelfPointerMove}
-                    onPointerUp={handleShelfPointerUp}
-                    className={`relative w-full max-w-sm h-80 rounded-lg border-b-8 border-r-4 border-l-4 p-4 overflow-hidden flex items-end justify-center shadow-xl select-none touch-none
-                      ${isLightMode 
-                        ? "bg-[#efebe4] border-[#8b7355] shadow-[0_20px_40px_rgba(0,0,0,0.08)]" 
-                        : "bg-[#18181b] border-[#3f3f46] shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
-                      }
-                    `}
-                    style={{ perspective: "1000px", transformStyle: "preserve-3d" }}
-                  >
-                    {/* Top inner shelf shadow depth */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.15)_0%,transparent_20%)] pointer-events-none z-20" />
+                  /* CYBERNETIC SILICON CHIP NODE MATRIX FOR MOBILE DEVICES */
+                  <div className="w-full flex flex-col gap-6 select-none">
+                    <div className="relative w-full max-w-[340px] mx-auto h-[220px] bg-black/10 rounded-xl border border-signal/15 p-4 flex items-center justify-center backdrop-blur-sm overflow-hidden">
+                      {/* SVG Background traces connecting core CPU and peripheral chip nodes */}
+                      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" fill="none">
+                        <line x1="50" y1="50" x2="50" y2="20" stroke={mobileActiveIdx === 0 ? "var(--signal)" : "rgba(128,128,128,0.2)"} strokeWidth={mobileActiveIdx === 0 ? "1.5" : "0.8"} />
+                        <line x1="50" y1="50" x2="80" y2="35" stroke={mobileActiveIdx === 1 ? "var(--signal)" : "rgba(128,128,128,0.2)"} strokeWidth={mobileActiveIdx === 1 ? "1.5" : "0.8"} />
+                        <line x1="50" y1="50" x2="70" y2="75" stroke={mobileActiveIdx === 2 ? "var(--signal)" : "rgba(128,128,128,0.2)"} strokeWidth={mobileActiveIdx === 2 ? "1.5" : "0.8"} />
+                        <line x1="50" y1="50" x2="30" y2="75" stroke={mobileActiveIdx === 3 ? "var(--signal)" : "rgba(128,128,128,0.2)"} strokeWidth={mobileActiveIdx === 3 ? "1.5" : "0.8"} />
+                        <line x1="50" y1="50" x2="20" y2="35" stroke={mobileActiveIdx === 4 ? "var(--signal)" : "rgba(128,128,128,0.2)"} strokeWidth={mobileActiveIdx === 4 ? "1.5" : "0.8"} />
+                      </svg>
 
-                    <div className="absolute inset-0 flex items-end justify-center w-full h-[85%] pb-2" style={{ transformStyle: "preserve-3d" }}>
-                      {BOOKS_DATA.map((book, i) => {
-                        const diff = i - mobileActiveIdx;
-                        const isCenter = diff === 0;
+                      {/* Central core CPU button node */}
+                      <button 
+                        type="button"
+                        className={`absolute w-14 h-14 rounded-lg flex flex-col items-center justify-center border font-mono text-[8px] z-20 shadow-md transition-all duration-300
+                          ${isLightMode 
+                            ? "bg-[#ffffff] border-[#0c0c0e]/20 text-[#0c0c0e] shadow-[#0033aa]/5" 
+                            : "bg-[#080808] border-signal/30 text-signal shadow-signal/10"
+                          }
+                        `}
+                        style={{ left: "calc(50% - 28px)", top: "calc(50% - 28px)" }}
+                        disabled
+                      >
+                        <span className="font-black animate-pulse">CPU</span>
+                        <span className="text-[6px] opacity-60">DHRUV-OS</span>
+                      </button>
 
-                        // Cylindrical 3D positioning
-                        const xOffset = diff * 58 + shelfDragOffset * 0.4;
-                        const rotateYVal = diff * 32 + shelfDragOffset * 0.15;
-                        const zOffset = -Math.abs(diff) * 45;
-                        const scaleVal = 1 - Math.abs(diff) * 0.15;
-                        const opacityVal = 1 - Math.abs(diff) * 0.35;
-                        const zIndexVal = 10 - Math.abs(diff);
+                      {/* Peripheral nodes */}
+                      <button
+                        type="button"
+                        onClick={() => setMobileActiveIdx(0)}
+                        className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-20 transition-all duration-300 shadow active:scale-95 cursor-pointer
+                          ${mobileActiveIdx === 0
+                            ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
+                            : (isLightMode ? "bg-[#ffffff] border-[#0c0c0e]/15 text-[#0c0c0e]/70" : "bg-[#18181b] border-zinc-700 text-zinc-400")
+                          }
+                        `}
+                        style={{ left: "calc(50% - 24px)", top: "10px" }}
+                      >
+                        <span className="text-[12px] mb-0.5">📂</span>
+                        <span>SYNTAX</span>
+                      </button>
 
-                        return (
-                          <div
-                            key={i}
-                            style={{
-                              position: "absolute",
-                              left: "50%",
-                              transform: `translateX(calc(-50% + ${xOffset}px)) translateZ(${zOffset}px) rotateY(${rotateYVal}deg) scale(${scaleVal})`,
-                              zIndex: zIndexVal,
-                              opacity: opacityVal,
-                              transition: isDraggingShelf ? "none" : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
-                              touchAction: "none"
-                            }}
-                            className={`bottom-0 ${book.height} w-14 ${book.coverColor} rounded-t border-t-2 border-r border-l shadow-[2px_-2px_10px_rgba(0,0,0,0.3)] flex flex-col justify-between items-center py-6 px-2
-                              ${book.spineColor}
-                            `}
-                          >
-                            {/* Spine Cylindrical Lighting Shading Overlay */}
-                            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.35)_0%,rgba(255,255,255,0.05)_20%,rgba(255,255,255,0.05)_50%,rgba(0,0,0,0.45)_100%)] pointer-events-none rounded-t" />
+                      <button
+                        type="button"
+                        onClick={() => setMobileActiveIdx(1)}
+                        className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-20 transition-all duration-300 shadow active:scale-95 cursor-pointer
+                          ${mobileActiveIdx === 1
+                            ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
+                            : (isLightMode ? "bg-[#ffffff] border-[#0c0c0e]/15 text-[#0c0c0e]/70" : "bg-[#18181b] border-zinc-700 text-zinc-400")
+                          }
+                        `}
+                        style={{ right: "12px", top: "45px" }}
+                      >
+                        <span className="text-[12px] mb-0.5">🧠</span>
+                        <span>COG_MCH</span>
+                      </button>
 
-                            {/* Spine Ribs (Raised bands) */}
-                            <div className="absolute top-[18%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
-                            <div className="absolute top-[40%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
-                            <div className="absolute top-[62%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
-                            <div className="absolute top-[82%] left-0 right-0 h-[2px] bg-black/45 border-b border-white/5 pointer-events-none" />
+                      <button
+                        type="button"
+                        onClick={() => setMobileActiveIdx(2)}
+                        className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-20 transition-all duration-300 shadow active:scale-95 cursor-pointer
+                          ${mobileActiveIdx === 2
+                            ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
+                            : (isLightMode ? "bg-[#ffffff] border-[#0c0c0e]/15 text-[#0c0c0e]/70" : "bg-[#18181b] border-zinc-700 text-zinc-400")
+                          }
+                        `}
+                        style={{ right: "45px", bottom: "15px" }}
+                      >
+                        <span className="text-[12px] mb-0.5">🌐</span>
+                        <span>DIST_WEB</span>
+                      </button>
 
-                            {/* Gold Foil Scroll Ornaments */}
-                            <div className="absolute top-2.5 left-1 right-1 h-1.5 border-t border-b border-amber-400/40 pointer-events-none" />
-                            <div className="absolute bottom-2.5 left-1 right-1 h-1.5 border-t border-b border-amber-400/40 pointer-events-none" />
+                      <button
+                        type="button"
+                        onClick={() => setMobileActiveIdx(3)}
+                        className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-20 transition-all duration-300 shadow active:scale-95 cursor-pointer
+                          ${mobileActiveIdx === 3
+                            ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
+                            : (isLightMode ? "bg-[#ffffff] border-[#0c0c0e]/15 text-[#0c0c0e]/70" : "bg-[#18181b] border-zinc-700 text-zinc-400")
+                          }
+                        `}
+                        style={{ left: "45px", bottom: "15px" }}
+                      >
+                        <span className="text-[12px] mb-0.5">💾</span>
+                        <span>STORAGE</span>
+                      </button>
 
-                            {/* Gold Book volume number */}
-                            <div className={`font-serif text-[8px] font-bold tracking-widest text-center z-10 ${book.textColor}`}>
-                              {book.volume}
-                            </div>
-
-                            {/* Title block banner inside spine */}
-                            <div className="w-[85%] bg-black/30 border border-amber-400/20 rounded py-2 px-0.5 flex items-center justify-center z-10 shadow-inner">
-                              <span 
-                                className="font-serif text-[8px] font-bold tracking-widest uppercase text-center block text-amber-100/90 whitespace-nowrap"
-                                style={{ writingMode: "vertical-rl" }}
-                              >
-                                {book.spineTitle}
-                              </span>
-                            </div>
-
-                            {/* Bookmark Ribbon Hanging Out */}
-                            <div className={`absolute bottom-0 w-2.5 h-6 rounded-b shadow ${book.ribbonColor} translate-y-3.5 z-10`} />
-
-                            {/* Metadata label */}
-                            <div className="border border-white/15 px-1 py-0.2 rounded-sm bg-black/35 z-10">
-                              <span className="font-mono text-[6px] text-white/50">{book.fileName.slice(0, 3)}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
+                      <button
+                        type="button"
+                        onClick={() => setMobileActiveIdx(4)}
+                        className={`absolute w-12 h-12 rounded-full border flex flex-col items-center justify-center font-mono text-[7px] z-20 transition-all duration-300 shadow active:scale-95 cursor-pointer
+                          ${mobileActiveIdx === 4
+                            ? (isLightMode ? "bg-[#0033aa] border-[#0033aa] text-white font-extrabold" : "bg-signal border-signal text-[#000000] font-black shadow-lg shadow-signal/25")
+                            : (isLightMode ? "bg-[#ffffff] border-[#0c0c0e]/15 text-[#0c0c0e]/70" : "bg-[#18181b] border-zinc-700 text-zinc-400")
+                          }
+                        `}
+                        style={{ left: "12px", top: "45px" }}
+                      >
+                        <span className="text-[12px] mb-0.5">🛠️</span>
+                        <span>SYSTEMS</span>
+                      </button>
                     </div>
 
-                    {/* Instruction overlay */}
-                    <div className="absolute bottom-2 left-0 right-0 text-center font-mono text-[8px] text-[#f0a000] uppercase tracking-widest animate-pulse pointer-events-none z-30">
-                      [ Swipe shelf to rotate volumes // Tap center to study ]
+                    {/* HUD Skill Terminal Readout below node block */}
+                    <div className={`border rounded-lg p-4 font-mono select-none transition-colors duration-300
+                      ${isLightMode 
+                        ? "bg-[#eef2f6] border-[#0c0c0e]/15 shadow-sm" 
+                        : "bg-black/85 border-[#00ffcc]/15 shadow-[inset_0_0_20px_rgba(0,255,204,0.02)]"
+                      }
+                    `}>
+                      <div className={`text-[10px] font-bold uppercase mb-4 pb-1 border-b tracking-wider flex justify-between
+                        ${isLightMode ? "text-[#0033aa] border-[#0033aa]/10" : "text-signal border-signal/15"}
+                      `}>
+                        <span>[ KNOWLEDGE NODE // {BOOKS_DATA[mobileActiveIdx].spineTitle} ]</span>
+                        <span className="animate-pulse">STREAMING</span>
+                      </div>
+
+                      <div className="space-y-4">
+                        {BOOKS_DATA[mobileActiveIdx].items.map((skill, idx) => (
+                          <div key={idx} className="space-y-1.5">
+                            <div className="flex items-center justify-between text-xs font-bold text-ink">
+                              <span>{skill.name}</span>
+                              <span className={`text-[9px] font-mono
+                                ${isLightMode ? "text-[#c07000]" : "text-signal/90"}
+                              `}>
+                                LEVEL_{skill.level * 20}%
+                              </span>
+                            </div>
+                            
+                            {/* Visual Level Progress Bar */}
+                            <div className={`w-full h-1.5 rounded-full overflow-hidden
+                              ${isLightMode ? "bg-black/10" : "bg-zinc-800"}
+                            `}>
+                              <div 
+                                className={`h-full rounded-full transition-all duration-500
+                                  ${isLightMode ? "bg-[#0033aa]" : "bg-signal"}
+                                `}
+                                style={{ width: `${skill.level * 20}%` }}
+                              />
+                            </div>
+
+                            <p className="text-[9px] text-ink/50 pl-1 leading-relaxed">
+                              - {skill.note}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="pt-4 border-t border-subtle mt-4 flex items-center justify-between text-[8px] text-ink/40 font-bold uppercase">
+                        <span>VERIFIED_OK // CHECKSUM_VALID</span>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenBook(mobileActiveIdx)}
+                          className={`underline hover:text-signal transition-all cursor-pointer text-[9px]
+                            ${isLightMode ? "text-[#0033aa]" : "text-signal"}
+                          `}
+                        >
+                          [ Full Archives Ledger ]
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ) : (

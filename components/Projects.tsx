@@ -10,6 +10,325 @@ import MagneticButton from "./MagneticButton";
 // Bypasses TypeScript SVG/R3F HTML <line> tag conflict
 const Line = "line" as any;
 
+function MobileConceptVisualizer({ index, isLightMode }: { index: number; isLightMode: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationId: number;
+    let frame = 0;
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * (window.devicePixelRatio || 1);
+      canvas.height = rect.height * (window.devicePixelRatio || 1);
+      ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const draw = () => {
+      const w = canvas.width / (window.devicePixelRatio || 1);
+      const h = canvas.height / (window.devicePixelRatio || 1);
+      ctx.clearRect(0, 0, w, h);
+      frame++;
+
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+
+      const activeColor = isLightMode ? "#0033aa" : "#00ffcc";
+      const baseColor = isLightMode ? "#000000" : "#ffaa00";
+
+      if (index === 0) {
+        // EdgeVision: Lidar scanning grid
+        const scanY = Math.sin(frame * 0.04) * (h / 3.5);
+        ctx.fillStyle = isLightMode ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.1)";
+        for (let x = -w/3.2; x <= w/3.2; x += 16) {
+          for (let y = -h/3.2; y <= h/3.2; y += 16) {
+            const dist = Math.abs(y - scanY);
+            if (dist < 10) {
+              ctx.fillStyle = activeColor;
+              ctx.beginPath();
+              ctx.arc(x, y, 2.8, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.strokeStyle = isLightMode ? "rgba(0,51,170,0.2)" : "rgba(0,255,204,0.15)";
+              ctx.lineWidth = 0.5;
+              ctx.beginPath();
+              ctx.moveTo(0, -h/3.2);
+              ctx.lineTo(x, y);
+              ctx.stroke();
+            } else {
+              ctx.fillStyle = isLightMode ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.12)";
+              ctx.beginPath();
+              ctx.arc(x, y, 1.2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
+        ctx.strokeStyle = activeColor;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(-w/3.2, scanY);
+        ctx.lineTo(w/3.2, scanY);
+        ctx.stroke();
+
+      } else if (index === 1) {
+        // AutoForge: training network
+        const points = [];
+        for (let i = 0; i < 6; i++) {
+          const a = (i / 6) * Math.PI * 2 + frame * 0.012;
+          const r = Math.min(w, h) / 4.2 + Math.sin(frame * 0.06 + i) * 6;
+          points.push({ x: Math.cos(a) * r, y: Math.sin(a) * r });
+        }
+        ctx.strokeStyle = isLightMode ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.06)";
+        ctx.lineWidth = 1;
+        for (let i = 0; i < points.length; i++) {
+          for (let j = i + 1; j < points.length; j++) {
+            ctx.beginPath();
+            ctx.moveTo(points[i].x, points[i].y);
+            ctx.lineTo(points[j].x, points[j].y);
+            ctx.stroke();
+          }
+        }
+        ctx.fillStyle = baseColor;
+        ctx.beginPath();
+        ctx.arc(0, 0, 7, 0, Math.PI * 2);
+        ctx.fill();
+        points.forEach((p) => {
+          ctx.strokeStyle = activeColor;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(p.x, p.y);
+          ctx.stroke();
+          ctx.fillStyle = activeColor;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+      } else if (index === 2) {
+        // Medisync: ECG heartbeat
+        ctx.strokeStyle = activeColor;
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        const startX = -w/2.8;
+        const endX = w/2.8;
+        for (let x = startX; x <= endX; x++) {
+          const phase = (x - startX) / (endX - startX);
+          let y = 0;
+          const ecgTime = (frame * 1.6 + x) % 180;
+          if (ecgTime > 70 && ecgTime < 78) {
+            y = (ecgTime - 70) * -4.5;
+          } else if (ecgTime >= 78 && ecgTime < 92) {
+            y = -36 + (ecgTime - 78) * 6;
+          } else if (ecgTime >= 92 && ecgTime < 105) {
+            y = 48 - (ecgTime - 92) * 3.7;
+          }
+          if (x === startX) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        const probeX = startX + ((frame * 2.2) % (endX - startX));
+        ctx.fillStyle = baseColor;
+        ctx.beginPath();
+        ctx.arc(probeX, Math.sin(frame * 0.1) * 2, 5.5, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else if (index === 3) {
+        // Card-Orchestration: rotating gears
+        ctx.strokeStyle = activeColor;
+        ctx.lineWidth = 1.5;
+        const r1 = Math.min(w, h) / 3.4;
+        const r2 = r1 / 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, r1, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, 0, r2, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.save();
+        ctx.rotate(frame * 0.01);
+        for (let i = 0; i < 8; i++) {
+          ctx.rotate(Math.PI / 4);
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(r1, 0);
+          ctx.stroke();
+        }
+        ctx.restore();
+        ctx.save();
+        ctx.rotate(-frame * 0.02);
+        ctx.strokeStyle = baseColor;
+        for (let i = 0; i < 6; i++) {
+          ctx.rotate(Math.PI / 3);
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(r2, 0);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+      } else if (index === 4) {
+        // Astra Ledger: Cryptex Ring consensus
+        const r1 = Math.min(w, h) / 3.6;
+        const r2 = r1 * 0.7;
+        const r3 = r1 * 0.4;
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = activeColor;
+        ctx.save();
+        ctx.rotate(frame * 0.015);
+        ctx.beginPath();
+        ctx.arc(0, 0, r1, 0, Math.PI * 2);
+        ctx.stroke();
+        for (let i = 0; i < 12; i++) {
+          ctx.rotate(Math.PI / 6);
+          ctx.beginPath();
+          ctx.moveTo(r1 - 4, 0);
+          ctx.lineTo(r1 + 4, 0);
+          ctx.stroke();
+        }
+        ctx.restore();
+        ctx.strokeStyle = baseColor;
+        ctx.save();
+        ctx.rotate(-frame * 0.02);
+        ctx.beginPath();
+        ctx.arc(0, 0, r2, 0, Math.PI * 2);
+        ctx.stroke();
+        for (let i = 0; i < 8; i++) {
+          ctx.rotate(Math.PI / 4);
+          ctx.beginPath();
+          ctx.moveTo(r2 - 3, 0);
+          ctx.lineTo(r2 + 3, 0);
+          ctx.stroke();
+        }
+        ctx.restore();
+        ctx.strokeStyle = activeColor;
+        ctx.save();
+        ctx.rotate(frame * 0.03);
+        ctx.beginPath();
+        ctx.arc(0, 0, r3, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+      } else if (index === 5) {
+        // UPI Fraud: Security dome deflection
+        ctx.strokeStyle = activeColor;
+        ctx.lineWidth = 1.6;
+        const r = Math.min(w, h) / 3.2;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, Math.PI, 2 * Math.PI);
+        ctx.stroke();
+        const pulse = (frame % 90) / 90;
+        ctx.strokeStyle = isLightMode ? `rgba(0,51,170,${1 - pulse})` : `rgba(0,255,204,${1 - pulse})`;
+        ctx.beginPath();
+        ctx.arc(0, 0, r * pulse, Math.PI, 2 * Math.PI);
+        ctx.stroke();
+        ctx.strokeStyle = baseColor;
+        ctx.beginPath();
+        ctx.moveTo(-w/2.6, 0);
+        ctx.lineTo(w/2.6, 0);
+        ctx.stroke();
+        const threatY = -r * Math.sin(frame * 0.025 % Math.PI);
+        const threatX = r * Math.cos(frame * 0.025 % Math.PI);
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.arc(threatX, threatY, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else if (index === 6) {
+        // AgriVision: Topography mesh lines
+        ctx.strokeStyle = isLightMode ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.06)";
+        ctx.lineWidth = 1;
+        const rows = 8;
+        const cols = 8;
+        const cellSize = Math.min(w, h) / 11;
+        for (let i = -rows/2; i <= rows/2; i++) {
+          ctx.beginPath();
+          for (let j = -cols/2; j <= cols/2; j++) {
+            const z = Math.sin(i * 0.85 + frame * 0.035) * Math.cos(j * 0.85 + frame * 0.035) * 12;
+            const x = j * cellSize;
+            const y = i * cellSize + z;
+            if (j === -cols/2) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+        const scannerX = Math.sin(frame * 0.04) * (w / 3.4);
+        ctx.strokeStyle = activeColor;
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(scannerX, -h/4);
+        ctx.lineTo(scannerX, h/4);
+        ctx.stroke();
+
+      } else if (index === 7) {
+        // Adaptive Quantization: Snap grid weights
+        const nodesCount = 18;
+        const snapGrid = 28;
+        ctx.strokeStyle = isLightMode ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.05)";
+        ctx.lineWidth = 1;
+        for (let x = -w/3; x <= w/3; x += snapGrid) {
+          ctx.beginPath();
+          ctx.moveTo(x, -h/3.2);
+          ctx.lineTo(x, h/3.2);
+          ctx.stroke();
+        }
+        ctx.fillStyle = activeColor;
+        for (let i = 0; i < nodesCount; i++) {
+          const rawX = Math.sin(frame * 0.012 + i) * (w / 3.4);
+          const rawY = Math.cos(frame * 0.012 + i * 2) * (h / 4.2);
+          const snapX = Math.round(rawX / snapGrid) * snapGrid;
+          const activeSnap = (frame % 180) > 90;
+          const x = activeSnap ? snapX : rawX;
+          ctx.beginPath();
+          ctx.arc(x, rawY, 3.8, 0, Math.PI * 2);
+          ctx.fill();
+          if (activeSnap) {
+            ctx.strokeStyle = baseColor;
+            ctx.beginPath();
+            ctx.moveTo(rawX, rawY);
+            ctx.lineTo(snapX, rawY);
+            ctx.stroke();
+          }
+        }
+
+      } else if (index === 8) {
+        // Pac-Man: chomper on circular track
+        ctx.strokeStyle = baseColor;
+        ctx.lineWidth = 1.8;
+        const r = Math.min(w, h) / 3.6;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.stroke();
+        const angle = frame * 0.016;
+        const px = Math.cos(angle) * r;
+        const py = Math.sin(angle) * r;
+        ctx.fillStyle = activeColor;
+        ctx.beginPath();
+        const chomp = Math.abs(Math.sin(frame * 0.16)) * 0.25;
+        ctx.arc(px, py, 9.5, angle + chomp, angle + Math.PI * 2 - chomp);
+        ctx.lineTo(px, py);
+        ctx.fill();
+      }
+
+      ctx.restore();
+      animationId = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener("resize", resize);
+    };
+  }, [index, isLightMode]);
+
+  return <canvas ref={canvasRef} className="w-full h-full block bg-transparent" />;
+}
+
 // ===================================================
 // Premium Glowing Concept-Aligned 3D Simulations
 // ===================================================
@@ -1604,6 +1923,34 @@ export default function Projects() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
+  const [isLightMode, setIsLightMode] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLightMode(document.documentElement.classList.contains("light"));
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === "class") {
+            setIsLightMode(document.documentElement.classList.contains("light"));
+          }
+        });
+      });
+      observer.observe(document.documentElement, { attributes: true });
+      return () => observer.disconnect();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth < 1024);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -1708,244 +2055,335 @@ export default function Projects() {
       </div>
 
       <div className="w-[96%] max-w-[1720px] mx-auto relative z-20">
-        {/* Terminal Wrapper Card */}
-        <div className="border border-signal/20 bg-surface/30 backdrop-blur-md rounded-xl overflow-hidden shadow-[0_0_50px_rgba(240,160,0,0.03)]">
-          
-          {/* Futuristic Terminal Title Bar */}
-          <div className="border-b border-signal/20 bg-surface/80 px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-red-500/80" />
-              <span className="w-3 h-3 rounded-full bg-yellow-500/80" />
-              <span className="w-3 h-3 rounded-full bg-green-500/80" />
-              <span className="font-mono text-xs text-white/50 ml-4 hidden md:inline">
-                user@dhruv:~/workspace/portfolio/projects/
-              </span>
-              <span className="font-mono text-xs text-white/50 ml-2 md:hidden">
-                ~/projects/
-              </span>
-            </div>
-            <div className="font-mono text-[10px] text-signal/80 uppercase tracking-widest bg-signal/10 px-3 py-1 rounded border border-signal/20">
-              SYS RUNTIME: ACTIVE
-            </div>
-          </div>
-
-          {/* Mobile Tab Switcher Bar */}
-          <div className="lg:hidden flex border-b border-signal/20 bg-surface/40 select-none">
-            <button
-              type="button"
-              onClick={() => setActiveTab("explorer")}
-              className={`flex-1 py-3 font-mono text-xs text-center border-r border-signal/15 uppercase tracking-widest font-bold transition-all ${
-                activeTab === "explorer" ? "bg-signal/10 text-signal border-b-2 border-b-signal" : "text-ink/60 hover:text-ink"
-              }`}
-            >
-              [ 📂 explorer ]
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("telemetry")}
-              className={`flex-1 py-3 font-mono text-xs text-center border-r border-signal/15 uppercase tracking-widest font-bold transition-all ${
-                activeTab === "telemetry" ? "bg-signal/10 text-signal border-b-2 border-b-signal" : "text-ink/60 hover:text-ink"
-              }`}
-            >
-              [ 👁️ telemetry ]
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("specs")}
-              className={`flex-1 py-3 font-mono text-xs text-center uppercase tracking-widest font-bold transition-all ${
-                activeTab === "specs" ? "bg-signal/10 text-signal border-b-2 border-b-signal" : "text-ink/60 hover:text-ink"
-              }`}
-            >
-              [ 📝 specs ]
-            </button>
-          </div>
-
-          {/* Main workspace layout - Three-Column Developer IDE workstation */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[640px]">
-            
-            {/* Left Column: File Navigator Sidebar (lg:col-span-4) */}
-            <div className={`lg:col-span-4 border-b lg:border-b-0 lg:border-r border-signal/20 bg-surface/20 p-5 flex flex-col justify-between ${
-              activeTab === "explorer" ? "flex" : "hidden lg:flex"
-            }`}>
-              <div>
-                <div className="font-mono text-xs text-ink/40 uppercase tracking-widest mb-6 pb-2 border-b border-subtle flex items-center justify-between">
-                  <span>PROJECT DIRECTORY</span>
-                  <span>v1.0.4</span>
+        {isMobileView ? (
+          /* MOBILE UNIFIED SCREEN PROJECT TELEMETRY DECK */
+          <div className="flex flex-col gap-4">
+            <div className="border border-signal/20 bg-surface/30 backdrop-blur-md rounded-xl overflow-hidden shadow-lg">
+              
+              {/* Title Header with Navigation Buttons */}
+              <div className="border-b border-signal/20 bg-surface/80 px-4 py-3 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setActiveIndex((prev) => (prev > 0 ? prev - 1 : PROJECTS.length - 1))}
+                  className="text-signal hover:text-white font-mono text-xs px-2.5 py-1.5 border border-signal/20 rounded bg-surface/40 hover:bg-signal/10 transition-all active:scale-95 cursor-pointer"
+                >
+                  &lt; PREV
+                </button>
+                <div className="text-center font-mono select-none">
+                  <div className="text-[8px] text-signal/50 uppercase tracking-widest font-black">[ PROJECT {activeIndex + 1} OF {PROJECTS.length} ]</div>
+                  <div className="text-xs font-bold text-white uppercase tracking-tight truncate max-w-[150px]">{activeProject.title}</div>
                 </div>
-                
-                <div className="space-y-4">
-                  <div className="font-mono text-xs text-signal/60 flex items-center gap-2 select-none">
-                    <span>📁</span>
-                    <span>src/portfolio/projects/</span>
+                <button
+                  type="button"
+                  onClick={() => setActiveIndex((prev) => (prev < PROJECTS.length - 1 ? prev + 1 : 0))}
+                  className="text-signal hover:text-white font-mono text-xs px-2.5 py-1.5 border border-signal/20 rounded bg-surface/40 hover:bg-signal/10 transition-all active:scale-95 cursor-pointer"
+                >
+                  NEXT &gt;
+                </button>
+              </div>
+
+              {/* Concept Vector Visualizer Screen */}
+              <div className="relative w-full h-[240px] bg-black/45 border-b border-signal/20 flex items-center justify-center overflow-hidden">
+                <MobileConceptVisualizer index={activeIndex} isLightMode={isLightMode} />
+                {/* Holographic scanner scanline */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00ff66]/1 to-transparent pointer-events-none animate-scanline" style={{ backgroundSize: "100% 4px" }} />
+              </div>
+
+              {/* Terminal log panel */}
+              <div ref={consoleContainerRef} className="bg-black/95 border-b border-signal/20 p-3 font-mono text-[9px] text-[#00ff66] min-h-[100px] max-h-[110px] overflow-y-auto relative select-none">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00ff66]/2 to-transparent pointer-events-none animate-scanline" />
+                <div className="space-y-1">
+                  <div className="text-[#00ff66]/40 uppercase text-[8px] tracking-wider mb-1 border-b border-[#00ff66]/15 pb-0.5 flex justify-between">
+                    <span>TELEMETRY STREAMS</span>
+                    <span>OK</span>
                   </div>
-                  
-                  <nav className="pl-4 space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
-                    {PROJECTS.map((project, idx) => (
-                      <button
-                        key={project.title}
-                        onClick={() => {
-                          setActiveIndex(idx);
-                          setActiveTab("telemetry");
-                        }}
-                        className={`w-full text-left font-mono text-xs md:text-sm py-2.5 px-3.5 rounded flex items-center justify-between transition-all duration-300 border project-sidebar-btn ${
-                          activeIndex === idx ? "active" : ""
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] opacity-75">
-                            {activeIndex === idx ? "⚡" : "📄"}
-                          </span>
-                          <span className="truncate max-w-[140px] lg:max-w-none">
-                            {project.fileName}
-                          </span>
-                        </div>
-                        <span className={`text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded ${
-                          project.status === "MONITORING"
-                            ? "text-[#ff3333] bg-[#ff3333]/10"
-                            : project.status === "EXECUTING"
-                            ? "text-cyan-400 bg-cyan-400/10"
-                            : "text-green-400 bg-green-400/10"
-                        }`}>
-                          {project.status}
-                        </span>
-                      </button>
-                    ))}
-                  </nav>
-                </div>
-              </div>
- 
-              {/* Bottom statistics panel */}
-              <div className="mt-8 pt-6 border-t border-subtle space-y-2.5 font-mono text-xs text-ink/50">
-                <div className="flex items-center justify-between">
-                  <span>COMPILER:</span>
-                  <span className="text-ink">Clang 16.0.0-w64</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>CPU PROFILE:</span>
-                  <span className="text-ink">ARM Cortex-M/D1</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>SYSTEM PORT:</span>
-                  <span className="text-ink">Telemetry Dev0</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Center Column: Immersive 3D Simulation Viewport & Telemetry Output (lg:col-span-4) */}
-            <div className={`lg:col-span-4 border-b lg:border-b-0 lg:border-r border-signal/20 bg-black/15 p-6 flex flex-col justify-between gap-6 min-h-[450px] lg:min-h-none ${
-              activeTab === "telemetry" ? "flex" : "hidden lg:flex"
-            }`}>
-              <div className="font-mono text-xs text-ink/60 uppercase tracking-widest pb-2 border-b border-white/5 flex items-center justify-between">
-                <span>SIMULATION WORKSPACE</span>
-                <span>TELEMETRY_ON</span>
-              </div>
-
-              {/* 3D Visualizer block */}
-              <div className="flex-grow w-full relative min-h-[300px] lg:min-h-none border border-signal/15 rounded-lg overflow-hidden bg-black/45">
-                {mounted ? (
-                  <ProjectVisualizer3D index={activeIndex} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center font-mono text-xs text-signal/40 gap-2">
-                    <span className="animate-pulse">● SIMULATION SUSPENDED</span>
-                    <span className="text-[9px] opacity-60">SCROLL TO PROJECTS TO ACTIVATE</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Console Log Terminal */}
-              <div ref={consoleContainerRef} className="bg-black/95 border border-[#00ff66]/20 rounded-lg p-4 font-mono text-[11px] text-[#00ff66] min-h-[140px] max-h-[160px] overflow-y-auto flex flex-col justify-start relative shadow-[inset_0_0_20px_rgba(0,255,102,0.03)] select-none">
-                
-                {/* Flashing scanline effect for console */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00ff66]/1 to-transparent pointer-events-none animate-scanline" />
-                
-                <div className="flex-grow space-y-1">
-                  <div className="text-[#00ff66]/40 uppercase text-[9px] tracking-wider mb-2 border-b border-[#00ff66]/15 pb-1 flex items-center justify-between">
-                    <span>CONSOLE TELEMETRY OUTPUT</span>
-                    <span>STREAMING</span>
-                  </div>
-
                   {terminalLogs.map((log, i) => (
-                    <div key={i} className="flex gap-2">
-                      <span className="text-[#00ff66]/50">&gt;</span>
-                      <p className="leading-4">{log}</p>
+                    <div key={i} className="flex gap-1.5">
+                      <span className="text-[#00ff66]/40">&gt;</span>
+                      <p className="leading-3">{log}</p>
                     </div>
                   ))}
-                  
                   {terminalLogs.length < activeProject.logs.length && (
-                    <div className="flex gap-2 items-center text-[#00ff66]/60">
-                      <span className="text-[#00ff66]/50">&gt;</span>
-                      <div className="w-1.5 h-3 bg-[#00ff66] animate-pulse" />
+                    <div className="flex gap-1.5 items-center text-[#00ff66]/60">
+                      <span className="text-[#00ff66]/40">&gt;</span>
+                      <div className="w-1 h-2.5 bg-[#00ff66] animate-pulse" />
                     </div>
                   )}
                 </div>
               </div>
+
+              {/* Specs details panel */}
+              <div className="p-5 space-y-4">
+                <div>
+                  <span className="font-mono text-[8px] text-signal/50 uppercase tracking-widest block mb-0.5">[ Subtitle Registry ]</span>
+                  <h4 className="text-sm font-bold text-white uppercase tracking-tight">{activeProject.subtitle}</h4>
+                </div>
+                <div>
+                  <span className="font-mono text-[8px] text-signal/50 uppercase tracking-widest block mb-0.5">[ Description Details ]</span>
+                  <p className="font-sans text-[11px] leading-relaxed text-ink/75 font-medium">{activeProject.description}</p>
+                </div>
+
+                {/* Tech pills */}
+                <div>
+                  <span className="font-mono text-[8px] text-signal/50 uppercase tracking-widest block mb-1">[ Developer Stack ]</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {activeProject.tech.map((t) => (
+                      <span key={t} className="text-[9px] font-mono border border-signal/20 bg-signal/5 px-2 py-0.5 rounded text-signal font-bold uppercase">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* GitHub link button */}
+                <div className="pt-2">
+                  <MagneticButton href={activeProject.github} variant="primary" external className="w-full justify-center py-3">
+                    Access Repository Code
+                  </MagneticButton>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* DESKTOP DEVELOPER IDE WORKSPACE */
+          <div className="border border-signal/20 bg-surface/30 backdrop-blur-md rounded-xl overflow-hidden shadow-[0_0_50px_rgba(240,160,0,0.03)]">
+            
+            {/* Futuristic Terminal Title Bar */}
+            <div className="border-b border-signal/20 bg-surface/80 px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-red-500/80" />
+                <span className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                <span className="w-3 h-3 rounded-full bg-green-500/80" />
+                <span className="font-mono text-xs text-white/50 ml-4 hidden md:inline">
+                  user@dhruv:~/workspace/portfolio/projects/
+                </span>
+                <span className="font-mono text-xs text-white/50 ml-2 md:hidden">
+                  ~/projects/
+                </span>
+              </div>
+              <div className="font-mono text-[10px] text-signal/80 uppercase tracking-widest bg-signal/10 px-3 py-1 rounded border border-signal/20">
+                SYS RUNTIME: ACTIVE
+              </div>
             </div>
 
-            {/* Right Column: Spec Metrics & Description details (lg:col-span-4) */}
-            <div className={`lg:col-span-4 p-6 md:p-8 flex flex-col justify-between gap-6 bg-surface/10 ${
-              activeTab === "specs" ? "flex" : "hidden lg:flex"
-            }`}>
+            {/* Mobile Tab Switcher Bar */}
+            <div className="lg:hidden flex border-b border-signal/20 bg-surface/40 select-none">
+              <button
+                type="button"
+                onClick={() => setActiveTab("explorer")}
+                className={`flex-1 py-3 font-mono text-xs text-center border-r border-signal/15 uppercase tracking-widest font-bold transition-all ${
+                  activeTab === "explorer" ? "bg-signal/10 text-signal border-b-2 border-b-signal" : "text-ink/60 hover:text-ink"
+                }`}
+              >
+                [ 📂 explorer ]
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("telemetry")}
+                className={`flex-1 py-3 font-mono text-xs text-center border-r border-signal/15 uppercase tracking-widest font-bold transition-all ${
+                  activeTab === "telemetry" ? "bg-signal/10 text-signal border-b-2 border-b-signal" : "text-ink/60 hover:text-ink"
+                }`}
+              >
+                [ 👁️ telemetry ]
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("specs")}
+                className={`flex-1 py-3 font-mono text-xs text-center uppercase tracking-widest font-bold transition-all ${
+                  activeTab === "specs" ? "bg-signal/10 text-signal border-b-2 border-b-signal" : "text-ink/60 hover:text-ink"
+                }`}
+              >
+                [ 📝 specs ]
+              </button>
+            </div>
+
+            {/* Main workspace layout - Three-Column Developer IDE workstation */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[640px]">
               
-              <div>
-                <span className="text-[10px] text-signal uppercase tracking-widest block mb-2 font-mono">
-                  {"// SPECIFICATION METRICS"}
-                </span>
-                <h3 className="font-display font-black text-2xl lg:text-3xl text-white tracking-tight leading-none mb-1">
-                  {activeProject.title}
-                </h3>
-                <span className="text-xs text-white/50 block mb-4 font-mono">
-                  {activeProject.subtitle}
-                </span>
+              {/* Left Column: File Navigator Sidebar (lg:col-span-4) */}
+              <div className={`lg:col-span-4 border-b lg:border-b-0 lg:border-r border-signal/20 bg-surface/20 p-5 flex flex-col justify-between ${
+                activeTab === "explorer" ? "flex" : "hidden lg:flex"
+              }`}>
+                <div>
+                  <div className="font-mono text-xs text-ink/40 uppercase tracking-widest mb-6 pb-2 border-b border-subtle flex items-center justify-between">
+                    <span>PROJECT DIRECTORY</span>
+                    <span>v1.0.4</span>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="font-mono text-xs text-signal/60 flex items-center gap-2 select-none">
+                      <span>📁</span>
+                      <span>src/portfolio/projects/</span>
+                    </div>
+                    
+                    <nav className="pl-4 space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                      {PROJECTS.map((project, idx) => (
+                        <button
+                          key={project.title}
+                          onClick={() => {
+                            setActiveIndex(idx);
+                            setActiveTab("telemetry");
+                          }}
+                          className={`w-full text-left font-mono text-xs md:text-sm py-2.5 px-3.5 rounded flex items-center justify-between transition-all duration-300 border project-sidebar-btn ${
+                            activeIndex === idx ? "active" : ""
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] opacity-75">
+                              {activeIndex === idx ? "⚡" : "📄"}
+                            </span>
+                            <span className="truncate max-w-[140px] lg:max-w-none">
+                              {project.fileName}
+                            </span>
+                          </div>
+                          <span className={`text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded ${
+                            project.status === "MONITORING"
+                              ? "text-[#ff3333] bg-[#ff3333]/10"
+                              : project.status === "EXECUTING"
+                              ? "text-cyan-400 bg-cyan-400/10"
+                              : "text-green-400 bg-green-400/10"
+                          }`}>
+                            {project.status}
+                          </span>
+                        </button>
+                      ))}
+                    </nav>
+                  </div>
+                </div>
+   
+                {/* Bottom statistics panel */}
+                <div className="mt-8 pt-6 border-t border-subtle space-y-2.5 font-mono text-xs text-ink/50">
+                  <div className="flex items-center justify-between">
+                    <span>COMPILER:</span>
+                    <span className="text-ink">Clang 16.0.0-w64</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>CPU PROFILE:</span>
+                    <span className="text-ink">ARM Cortex-M/D1</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>SYSTEM PORT:</span>
+                    <span className="text-ink">Telemetry Dev0</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Center Column: Immersive 3D Simulation Viewport & Telemetry Output (lg:col-span-4) */}
+              <div className={`lg:col-span-4 border-b lg:border-b-0 lg:border-r border-signal/20 bg-black/15 p-6 flex flex-col justify-between gap-6 min-h-[450px] lg:min-h-none ${
+                activeTab === "telemetry" ? "flex" : "hidden lg:flex"
+              }`}>
+                <div className="font-mono text-xs text-ink/60 uppercase tracking-widest pb-2 border-b border-white/5 flex items-center justify-between">
+                  <span>SIMULATION WORKSPACE</span>
+                  <span>TELEMETRY_ON</span>
+                </div>
+
+                {/* 3D Visualizer block */}
+                <div className="flex-grow w-full relative min-h-[300px] lg:min-h-none border border-signal/15 rounded-lg overflow-hidden bg-black/45">
+                  {mounted ? (
+                    <ProjectVisualizer3D index={activeIndex} isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center font-mono text-xs text-signal/40 gap-2">
+                      <span className="animate-pulse">● SIMULATION SUSPENDED</span>
+                      <span className="text-[9px] opacity-60">SCROLL TO PROJECTS TO ACTIVATE</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Console Log Terminal */}
+                <div ref={consoleContainerRef} className="bg-black/95 border border-[#00ff66]/20 rounded-lg p-4 font-mono text-[11px] text-[#00ff66] min-h-[140px] max-h-[160px] overflow-y-auto flex flex-col justify-start relative shadow-[inset_0_0_20px_rgba(0,255,102,0.03)] select-none">
+                  
+                  {/* Flashing scanline effect for console */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00ff66]/1 to-transparent pointer-events-none animate-scanline" />
+                  
+                  <div className="flex-grow space-y-1">
+                    <div className="text-[#00ff66]/40 uppercase text-[9px] tracking-wider mb-2 border-b border-[#00ff66]/15 pb-1 flex items-center justify-between">
+                      <span>CONSOLE TELEMETRY OUTPUT</span>
+                      <span>STREAMING</span>
+                    </div>
+
+                    {terminalLogs.map((log, i) => (
+                      <div key={i} className="flex gap-2">
+                        <span className="text-[#00ff66]/50">&gt;</span>
+                        <p className="leading-4">{log}</p>
+                      </div>
+                    ))}
+                    
+                    {terminalLogs.length < activeProject.logs.length && (
+                      <div className="flex gap-2 items-center text-[#00ff66]/60">
+                        <span className="text-[#00ff66]/50">&gt;</span>
+                        <div className="w-1.5 h-3 bg-[#00ff66] animate-pulse" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Spec Metrics & Description details (lg:col-span-4) */}
+              <div className={`lg:col-span-4 p-6 md:p-8 flex flex-col justify-between gap-6 bg-surface/10 ${
+                activeTab === "specs" ? "flex" : "hidden lg:flex"
+              }`}>
                 
-                <div className="space-y-2 text-xs text-white/70 font-mono">
-                  <div className="flex justify-between py-1.5 border-b border-white/5">
-                    <span className="text-white/40">EST. SOURCE SIZE:</span>
-                    <span className="text-signal/90">{activeProject.size}</span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-b border-white/5">
-                    <span className="text-white/40">LINES OF CODE:</span>
-                    <span>{activeProject.lines}</span>
-                  </div>
-                  <div className="flex justify-between py-1.5">
-                    <span className="text-white/40">REPOS. STATUS:</span>
-                    <span className="text-green-400 font-bold">STABLE</span>
+                <div>
+                  <span className="text-[10px] text-signal uppercase tracking-widest block mb-2 font-mono">
+                    {"// SPECIFICATION METRICS"}
+                  </span>
+                  <h3 className="font-display font-black text-2xl lg:text-3xl text-white tracking-tight leading-none mb-1">
+                    {activeProject.title}
+                  </h3>
+                  <span className="text-xs text-white/50 block mb-4 font-mono">
+                    {activeProject.subtitle}
+                  </span>
+                  
+                  <div className="space-y-2 text-xs text-white/70 font-mono">
+                    <div className="flex justify-between py-1.5 border-b border-white/5">
+                      <span className="text-white/40">EST. SOURCE SIZE:</span>
+                      <span className="text-signal/90">{activeProject.size}</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-white/5">
+                      <span className="text-white/40">LINES OF CODE:</span>
+                      <span>{activeProject.lines}</span>
+                    </div>
+                    <div className="flex justify-between py-1.5">
+                      <span className="text-white/40">REPOS. STATUS:</span>
+                      <span className="text-green-400 font-bold">STABLE</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <span className="text-[10px] text-ink/60 uppercase tracking-widest block mb-2 font-mono">
-                  DEVELOPER STACK
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {activeProject.tech.map((t) => (
-                    <span key={t} className="text-[10px] uppercase text-signal border border-signal/20 rounded-md px-2.5 py-1 bg-signal/5 font-mono">
-                      {t}
-                    </span>
-                  ))}
+                <div>
+                  <span className="text-[10px] text-ink/60 uppercase tracking-widest block mb-2 font-mono">
+                    DEVELOPER STACK
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {activeProject.tech.map((t) => (
+                      <span key={t} className="text-[10px] uppercase text-signal border border-signal/20 rounded-md px-2.5 py-1 bg-signal/5 font-mono">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <div className="bg-black/20 p-5 rounded-lg border border-white/5">
-                <p className="text-white/80 text-sm leading-relaxed">
-                  {activeProject.description}
-                </p>
-              </div>
+                <div className="bg-black/20 p-5 rounded-lg border border-white/5">
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    {activeProject.description}
+                  </p>
+                </div>
 
-              <div className="flex flex-col gap-2 pt-2">
-                <p className="font-mono text-[10px] text-ink/60">
-                  ACCESS CODE STACK:
-                </p>
-                <MagneticButton href={activeProject.github} variant="primary" external>
-                  ACCESS REPOSITORY
-                </MagneticButton>
+                <div className="flex flex-col gap-2 pt-2">
+                  <p className="font-mono text-[10px] text-ink/60">
+                    ACCESS CODE STACK:
+                  </p>
+                  <MagneticButton href={activeProject.github} variant="primary" external>
+                    ACCESS REPOSITORY
+                  </MagneticButton>
+                </div>
+
               </div>
 
             </div>
 
           </div>
-
-        </div>
+        )}
       </div>
     </section>
   );
