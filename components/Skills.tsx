@@ -279,6 +279,13 @@ export default function Skills() {
 
           <div className="min-h-[520px] flex items-center justify-center p-6 bg-surface/5 relative">
             
+            {openBookIdx !== null && (
+              <div 
+                onClick={handleCloseBook}
+                className="absolute inset-0 z-10 cursor-pointer bg-black/40 backdrop-blur-[1px] transition-all duration-500 animate-fade-in"
+              />
+            )}
+
             {openBookIdx === null ? (
               // 1. HIGH-FIDELITY SKEUOMORPHIC BOOKSHELF VIEW
               <div className="flex flex-col items-center justify-center w-full max-w-3xl mt-4">
@@ -353,12 +360,12 @@ export default function Skills() {
               </div>
             ) : (
               // 2. DETAILED OPEN BOOK LEDGER SKEUOMORPHIC PAGE VIEW
-              <div className="w-full max-w-4xl animate-[fadeIn_0.4s_ease-out] relative">
+              <div className="w-full max-w-4xl relative z-20 animate-[scaleUpBook_0.6s_cubic-bezier(0.16,1,0.3,1)_forwards]">
                 
                 {/* Back to Shelf Navigation Link */}
                 <button
                   onClick={handleCloseBook}
-                  className={`absolute -top-10 left-0 font-mono text-[9px] border px-3 py-1.5 rounded bg-surface hover:bg-ink hover:text-surface transition-all cursor-pointer uppercase tracking-wider
+                  className={`absolute -top-10 left-0 font-mono text-[9px] border px-3 py-1.5 rounded bg-surface hover:bg-ink hover:text-surface transition-all cursor-pointer uppercase tracking-wider z-30
                     ${isLightMode ? "border-zinc-300 text-zinc-600" : "border-zinc-800 text-zinc-400"}
                   `}
                 >
@@ -371,10 +378,10 @@ export default function Skills() {
                 `}>
                   
                   {/* Two Page Spread Paper (Ivory / Vintage ledger texture) */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 bg-[#fcf9f2] rounded-lg overflow-hidden min-h-[440px] relative border border-black/15 shadow-[inset_0_0_40px_rgba(0,0,0,0.06)] text-zinc-900">
+                  <div className="grid grid-cols-1 md:grid-cols-2 bg-[#fcf9f2] rounded-lg overflow-hidden min-h-[440px] relative border border-black/15 shadow-[inset_0_0_40px_rgba(0,0,0,0.06)] text-zinc-900" style={{ perspective: "1500px" }}>
                     
                     {/* Left Page (Conceptual Sketches / Schematics) */}
-                    <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-zinc-300/60 flex flex-col justify-between relative min-h-[380px]">
+                    <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-zinc-300/60 flex flex-col justify-between relative min-h-[380px] origin-right transition-transform duration-[800ms] ease-out animate-[unfoldLeft_0.9s_cubic-bezier(0.16,1,0.3,1)_forwards]">
                       
                       {/* Left Page Header */}
                       <div className="border-b border-zinc-300/80 pb-3 flex justify-between items-end">
@@ -402,7 +409,7 @@ export default function Skills() {
                     <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-8 -translate-x-1/2 bg-[linear-gradient(90deg,rgba(0,0,0,0.05)_0%,rgba(0,0,0,0.18)_50%,rgba(0,0,0,0.05)_100%)] pointer-events-none z-10" />
 
                     {/* Right Page (Ledger Skills List) */}
-                    <div className="p-6 md:p-8 flex flex-col justify-between min-h-[380px]">
+                    <div className="p-6 md:p-8 flex flex-col justify-between min-h-[380px] origin-left transition-transform duration-[800ms] ease-out animate-[unfoldRight_0.9s_cubic-bezier(0.16,1,0.3,1)_forwards]">
                       
                       {/* Right Page Header */}
                       <div className="border-b border-zinc-300/80 pb-3 flex justify-between items-end">

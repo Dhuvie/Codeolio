@@ -112,6 +112,11 @@ export default function Experience() {
   // Pointer drag triggers (mouse + touch safe)
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>, id: number) => {
     if (activeId !== null || deskWidth < 850) return;
+    
+    // Only drag if clicking the front cover leaf, avoid input clicks
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest(".custom-scrollbar")) return;
+
     e.preventDefault();
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     setDraggingId(id);
@@ -166,8 +171,8 @@ export default function Experience() {
     setActiveId(id);
   };
 
-  const closeFolder = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const closeFolder = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setActiveId(null);
   };
 
@@ -200,6 +205,14 @@ export default function Experience() {
           <div className="absolute top-4 left-6 font-mono text-[9px] text-white/20 uppercase tracking-widest pointer-events-none z-10">
             DHOVIE_WORKSPACE // CLASSIFIED FILES {isMobileDesk ? "" : "(POINTER DRAGGABLE)"}
           </div>
+
+          {/* Intercept Clicks Outside the Open Dossier to Auto-Close */}
+          {activeId !== null && (
+            <div 
+              onClick={() => closeFolder()}
+              className="absolute inset-0 z-30 cursor-pointer bg-black/40 backdrop-blur-[1px] transition-opacity duration-500"
+            />
+          )}
 
           {/* Decorative Coffee Cup Ring Stain */}
           <div className="absolute bottom-12 left-16 w-32 h-32 rounded-full border border-yellow-800/10 pointer-events-none select-none z-0">
@@ -258,7 +271,7 @@ export default function Experience() {
                 {(() => {
                   const activeDossier = DOSSIERS.find((d) => d.id === activeId)!;
                   return (
-                    <div className="w-full max-w-[800px] min-h-[480px] bg-[#faf8f5] border border-[#dfdbd3] shadow-[0_35px_80px_rgba(0,0,0,0.85)] rounded-md p-5 flex flex-col justify-between relative overflow-hidden">
+                    <div className="w-full max-w-[800px] min-h-[480px] bg-[#faf8f5] border border-[#dfdbd3] shadow-[0_35px_80px_rgba(0,0,0,0.85)] rounded-md p-5 flex flex-col justify-between relative overflow-hidden z-40 animate-[scaleUpBook_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards]">
                       <div className="flex flex-col justify-between h-full relative z-10 font-sans text-black pl-5">
                         <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-red-600/20 pointer-events-none" />
                         
@@ -333,7 +346,7 @@ export default function Experience() {
               </div>
             )
           ) : (
-            /* ABSOLUTE POSITIONED DRAGGABLE LAYOUT FOR DESKTOP VIEWS */
+            /* ABSOLUTE POSITIONED DRAGGABLE LAYOUT FOR DESKTOP VIEWS (SKEUOMORPHIC 3D FLIP CONTAINER) */
             <>
               {DOSSIERS.map((d) => {
                 const isExpanded = activeId === d.id;
@@ -349,19 +362,65 @@ export default function Experience() {
                     style={{
                       left: isExpanded ? "50%" : `${pos.x}px`,
                       top: isExpanded ? "50%" : `${pos.y}px`,
+                      width: isExpanded ? "96%" : "14rem",
+                      maxWidth: isExpanded ? "860px" : "14rem",
+                      height: isExpanded ? "500px" : "18rem",
                       transform: isExpanded 
-                        ? "translate(-50%, -50%) scale(1.0)" 
+                        ? "translate(-50%, -50%) rotateY(180deg) scale(1.0)" 
                         : `rotate(${pos.rot}deg) scale(0.95)`,
                       zIndex: isExpanded ? 50 : 10 + d.id,
+                      transformStyle: "preserve-3d",
+                      perspective: "1200px"
                     }}
-                    className={`absolute transition-all duration-300 ease-out ${
-                      isExpanded 
-                        ? "w-[96%] max-w-[860px] h-[500px] bg-[#faf8f5] border border-[#dfdbd3] shadow-[0_40px_100px_rgba(0,0,0,0.95)]" 
-                        : "w-56 h-72 border border-[#d2ab5b]/35 bg-gradient-to-br from-[#e6c280] to-[#cba355] shadow-[0_15px_30px_rgba(0,0,0,0.5)] cursor-grab active:cursor-grabbing hover:border-white/50 hover:scale-100 hover:rotate-[3deg] hover:shadow-[0_22px_45px_rgba(0,0,0,0.7)]"
-                    } rounded-md p-6 flex flex-col justify-between overflow-hidden`}
+                    className="absolute transition-all duration-700 ease-out select-none cursor-pointer"
                   >
-                    {isExpanded ? (
-                      /* DECRYPTED DETAILED PAPER PAGE VIEW */
+                    
+                    {/* 1. FRONT SIDE: CLOSED MANILA FILE COVER */}
+                    <div className="absolute inset-0 backface-hidden rounded-md p-6 flex flex-col justify-between overflow-hidden border border-[#d2ab5b]/35 bg-gradient-to-br from-[#e6c280] to-[#cba355] shadow-[0_15px_30px_rgba(0,0,0,0.5)] cursor-grab active:cursor-grabbing hover:border-white/50 hover:scale-100 hover:rotate-[3deg] hover:shadow-[0_22px_45px_rgba(0,0,0,0.7)] transition-all duration-300">
+                      <div className="flex flex-col justify-between h-full font-mono text-[#4a3416] select-none pointer-events-none relative">
+                        {/* Folder spine binder columns */}
+                        <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-[#b38f45] to-[#cba355] border-r border-[#a8823b] -ml-6 -my-6 rounded-l" />
+
+                        {/* Horizontal creasing lines */}
+                        <div className="absolute left-2 right-2 top-1/4 h-[1px] bg-[#dfb96c] opacity-60" />
+                        <div className="absolute left-2 right-2 top-3/4 h-[1px] bg-[#dfb96c] opacity-60" />
+
+                        {/* Insignia Circular Watermark */}
+                        <div className="absolute bottom-12 right-0 w-16 h-16 rounded-full border border-[#4a3416]/12 flex items-center justify-center opacity-30 rotate-[22deg]">
+                          <span className="font-mono text-[6px] text-center uppercase tracking-widest font-black leading-none text-[#4a3416]/50">
+                            DEPT<br/>OF<br/>SYS
+                          </span>
+                        </div>
+
+                        <div>
+                          {/* Manila folder tab label */}
+                          <div className="w-16 h-4 bg-[#e6c280] rounded-t border-t border-x border-[#cba355] -mt-5 -ml-1 flex items-center justify-center relative">
+                            <span className="text-[7px] text-[#4a3416]/50 font-bold">FILE_{d.id + 1}</span>
+                            {/* Tab Paperclip */}
+                            <div className="absolute -top-1 right-2 w-[8px] h-[20px] border border-[#a6a6af] rounded-full opacity-80 rotate-[15deg]" />
+                          </div>
+                          <div className="w-full h-[1px] bg-[#cba355] mb-4" />
+                          
+                          <span className="text-[8px] text-[#3d2910]/60 tracking-widest uppercase block mb-1 font-bold">
+                            REGISTRY DOSSIER
+                          </span>
+                          <h4 className="text-sm font-bold text-white tracking-tight uppercase leading-snug drop-shadow-sm">
+                            {d.company}
+                          </h4>
+                        </div>
+
+                        <div className="border-t border-[#cba355] pt-3 flex items-center justify-between text-[9px] font-bold">
+                          <span className="text-[#3b270a]">{d.period.split(" ")[0]}</span>
+                          <span className="text-[#4a3416]/60 tracking-wider">[DECRYPT]</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. BACK SIDE: DETAILED DECRYPTED PAPER SHEET */}
+                    <div 
+                      className="absolute inset-0 backface-hidden rounded-md p-6 flex flex-col justify-between overflow-hidden bg-[#faf8f5] border border-[#dfdbd3] shadow-[0_40px_100px_rgba(0,0,0,0.95)]"
+                      style={{ transform: "rotateY(180deg)" }}
+                    >
                       <div className="flex flex-col justify-between h-full relative z-10 font-sans text-black pl-5">
                         <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-red-600/20 pointer-events-none" />
 
@@ -407,7 +466,7 @@ export default function Experience() {
                           </div>
                         </div>
 
-                        {/* Paper Document Body (Typewriter style) */}
+                        {/* Paper Document Body */}
                         <div className="flex-grow py-6 space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                           {d.bullets.map((bullet, idx) => (
                             <div key={idx} className="flex gap-3">
@@ -421,7 +480,6 @@ export default function Experience() {
 
                         {/* Paper Clip Tags and Red Ink Stamp */}
                         <div className="border-t border-black/15 pt-4 flex items-center justify-between">
-                          {/* Pinned tags */}
                           <div className="flex flex-wrap gap-2">
                             {d.tech.map((t) => (
                               <span 
@@ -433,53 +491,13 @@ export default function Experience() {
                             ))}
                           </div>
                           
-                          {/* Ink stamp */}
                           <span className={`font-mono text-xs font-black tracking-[0.25em] border-2 rounded px-3 py-1.5 uppercase rotate-[12deg] scale-110 shadow-sm ${d.stampColor}`}>
                             {d.stamp}
                           </span>
                         </div>
-
                       </div>
-                    ) : (
-                      /* CLOSED KRAFT PAPER MANILA COVER */
-                      <div className="flex flex-col justify-between h-full font-mono text-[#4a3416] select-none pointer-events-none relative">
-                        {/* Folder spine binder columns */}
-                        <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-[#b38f45] to-[#cba355] border-r border-[#a8823b] -ml-6 -my-6 rounded-l" />
+                    </div>
 
-                        {/* Horizontal creasing lines */}
-                        <div className="absolute left-2 right-2 top-1/4 h-[1px] bg-[#dfb96c] opacity-60" />
-                        <div className="absolute left-2 right-2 top-3/4 h-[1px] bg-[#dfb96c] opacity-60" />
-
-                        {/* Insignia Circular Watermark */}
-                        <div className="absolute bottom-12 right-0 w-16 h-16 rounded-full border border-[#4a3416]/12 flex items-center justify-center opacity-30 rotate-[22deg]">
-                          <span className="font-mono text-[6px] text-center uppercase tracking-widest font-black leading-none text-[#4a3416]/50">
-                            DEPT<br/>OF<br/>SYS
-                          </span>
-                        </div>
-
-                        <div>
-                          {/* Manila folder tab label */}
-                          <div className="w-16 h-4 bg-[#e6c280] rounded-t border-t border-x border-[#cba355] -mt-5 -ml-1 flex items-center justify-center relative">
-                            <span className="text-[7px] text-[#4a3416]/50 font-bold">FILE_{d.id + 1}</span>
-                            {/* Tab Paperclip */}
-                            <div className="absolute -top-1 right-2 w-[8px] h-[20px] border border-[#a6a6af] rounded-full opacity-80 rotate-[15deg]" />
-                          </div>
-                          <div className="w-full h-[1px] bg-[#cba355] mb-4" />
-                          
-                          <span className="text-[8px] text-[#3d2910]/60 tracking-widest uppercase block mb-1 font-bold">
-                            REGISTRY DOSSIER
-                          </span>
-                          <h4 className="text-sm font-bold text-white tracking-tight uppercase leading-snug drop-shadow-sm">
-                            {d.company}
-                          </h4>
-                        </div>
-
-                        <div className="border-t border-[#cba355] pt-3 flex items-center justify-between text-[9px] font-bold">
-                          <span className="text-[#3b270a]">{d.period.split(" ")[0]}</span>
-                          <span className="text-[#4a3416]/60 tracking-wider">[DECRYPT]</span>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 );
               })}
