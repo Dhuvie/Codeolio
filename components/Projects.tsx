@@ -1596,6 +1596,7 @@ const PROJECTS = [
 
 export default function Projects() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState<"explorer" | "telemetry" | "specs">("telemetry");
   const [isExpanded, setIsExpanded] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
@@ -1613,12 +1614,14 @@ export default function Projects() {
       const customEvent = e as CustomEvent;
       if (customEvent.detail?.activeSection === "projects") {
         setActiveIndex((prev) => Math.max(0, prev - 1));
+        setActiveTab("telemetry");
       }
     };
     const handleRight = (e: Event) => {
       const customEvent = e as CustomEvent;
       if (customEvent.detail?.activeSection === "projects") {
         setActiveIndex((prev) => Math.min(PROJECTS.length - 1, prev + 1));
+        setActiveTab("telemetry");
       }
     };
     const handleButtonA = (e: Event) => {
@@ -1726,11 +1729,44 @@ export default function Projects() {
             </div>
           </div>
 
+          {/* Mobile Tab Switcher Bar */}
+          <div className="lg:hidden flex border-b border-signal/20 bg-surface/40 select-none">
+            <button
+              type="button"
+              onClick={() => setActiveTab("explorer")}
+              className={`flex-1 py-3 font-mono text-xs text-center border-r border-signal/15 uppercase tracking-widest font-bold transition-all ${
+                activeTab === "explorer" ? "bg-signal/10 text-signal border-b-2 border-b-signal" : "text-ink/60 hover:text-ink"
+              }`}
+            >
+              [ 📂 explorer ]
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("telemetry")}
+              className={`flex-1 py-3 font-mono text-xs text-center border-r border-signal/15 uppercase tracking-widest font-bold transition-all ${
+                activeTab === "telemetry" ? "bg-signal/10 text-signal border-b-2 border-b-signal" : "text-ink/60 hover:text-ink"
+              }`}
+            >
+              [ 👁️ telemetry ]
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("specs")}
+              className={`flex-1 py-3 font-mono text-xs text-center uppercase tracking-widest font-bold transition-all ${
+                activeTab === "specs" ? "bg-signal/10 text-signal border-b-2 border-b-signal" : "text-ink/60 hover:text-ink"
+              }`}
+            >
+              [ 📝 specs ]
+            </button>
+          </div>
+
           {/* Main workspace layout - Three-Column Developer IDE workstation */}
           <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[640px]">
             
             {/* Left Column: File Navigator Sidebar (lg:col-span-4) */}
-            <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-signal/20 bg-surface/20 p-5 flex flex-col justify-between">
+            <div className={`lg:col-span-4 border-b lg:border-b-0 lg:border-r border-signal/20 bg-surface/20 p-5 flex flex-col justify-between ${
+              activeTab === "explorer" ? "flex" : "hidden lg:flex"
+            }`}>
               <div>
                 <div className="font-mono text-xs text-ink/40 uppercase tracking-widest mb-6 pb-2 border-b border-subtle flex items-center justify-between">
                   <span>PROJECT DIRECTORY</span>
@@ -1747,7 +1783,10 @@ export default function Projects() {
                     {PROJECTS.map((project, idx) => (
                       <button
                         key={project.title}
-                        onClick={() => setActiveIndex(idx)}
+                        onClick={() => {
+                          setActiveIndex(idx);
+                          setActiveTab("telemetry");
+                        }}
                         className={`w-full text-left font-mono text-xs md:text-sm py-2.5 px-3.5 rounded flex items-center justify-between transition-all duration-300 border project-sidebar-btn ${
                           activeIndex === idx ? "active" : ""
                         }`}
@@ -1793,7 +1832,9 @@ export default function Projects() {
             </div>
 
             {/* Center Column: Immersive 3D Simulation Viewport & Telemetry Output (lg:col-span-4) */}
-            <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-signal/20 bg-black/15 p-6 flex flex-col justify-between gap-6 min-h-[450px] lg:min-h-none">
+            <div className={`lg:col-span-4 border-b lg:border-b-0 lg:border-r border-signal/20 bg-black/15 p-6 flex flex-col justify-between gap-6 min-h-[450px] lg:min-h-none ${
+              activeTab === "telemetry" ? "flex" : "hidden lg:flex"
+            }`}>
               <div className="font-mono text-xs text-ink/60 uppercase tracking-widest pb-2 border-b border-white/5 flex items-center justify-between">
                 <span>SIMULATION WORKSPACE</span>
                 <span>TELEMETRY_ON</span>
@@ -1841,7 +1882,9 @@ export default function Projects() {
             </div>
 
             {/* Right Column: Spec Metrics & Description details (lg:col-span-4) */}
-            <div className="lg:col-span-4 p-6 md:p-8 flex flex-col justify-between gap-6 bg-surface/10">
+            <div className={`lg:col-span-4 p-6 md:p-8 flex flex-col justify-between gap-6 bg-surface/10 ${
+              activeTab === "specs" ? "flex" : "hidden lg:flex"
+            }`}>
               
               <div>
                 <span className="text-[10px] text-signal uppercase tracking-widest block mb-2 font-mono">
