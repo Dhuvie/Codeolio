@@ -1053,3 +1053,25 @@ h1, h2, h3, h4 {
     opacity: 1;
   }
 }
+
+/* ===================================================
+   AUGMENTED REALITY GYROSCOPE 3D TILT EFFECT
+   =================================================== */
+@media (max-width: 768px) {
+  html, body {
+    width: 100vw;
+    overflow-x: hidden;
+  }
+  main {
+    perspective: 1200px;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--gyro-rotate-x, 0deg)) rotateY(var(--gyro-rotate-y, 0deg));
+    transition: transform 0.12s ease-out;
+  }
+  /* Levitation depth effect on key skeuomorphic cards and console modules */
+  .cyber-window, .contact-item, [class*="card-glass"] {
+    transform: translateZ(12px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+    transition: transform 0.3s ease;
+  }
+}

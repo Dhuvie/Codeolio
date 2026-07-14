@@ -9,6 +9,7 @@ export default function MobileConsole() {
   const [isMuted, setIsMuted] = useState(false);
   const [batteryLevel, setBatteryLevel] = useState(100);
   const [ping, setPing] = useState(42);
+  const [isTiltEnabled, setIsTiltEnabled] = useState(true);
 
   const sections = ["hero", "about", "experience", "projects", "achievements", "certifications", "skills", "contact"];
 
@@ -48,13 +49,39 @@ export default function MobileConsole() {
   useEffect(() => {
     if (typeof window === "undefined" || !isMobile) return;
     const handleOrientation = (e: DeviceOrientationEvent) => {
-      const pitch = e.beta ? Math.round(e.beta) : 0; // x-axis tilt
-      const roll = e.gamma ? Math.round(e.gamma) : 0; // y-axis tilt
-      setGyro({ x: roll, y: pitch });
+      const rawPitch = e.beta ? e.beta : 0;
+      const rawRoll = e.gamma ? e.gamma : 0;
+      
+      setGyro({ x: Math.round(rawRoll), y: Math.round(rawPitch) });
+
+      if (isTiltEnabled) {
+        // Normalize: pitch neutral at 45deg holding angle on mobile
+        const pitch = rawPitch - 45;
+        const roll = rawRoll;
+        
+        // Clamp to max 8 degrees tilt
+        const clampX = Math.max(-8, Math.min(8, pitch * 0.25));
+        const clampY = Math.max(-8, Math.min(8, roll * 0.25));
+        
+        document.documentElement.style.setProperty("--gyro-rotate-x", `${-clampX}deg`);
+        document.documentElement.style.setProperty("--gyro-rotate-y", `${clampY}deg`);
+      }
     };
     window.addEventListener("deviceorientation", handleOrientation);
-    return () => window.removeEventListener("deviceorientation", handleOrientation);
-  }, [isMobile]);
+    return () => {
+      window.removeEventListener("deviceorientation", handleOrientation);
+      document.documentElement.style.setProperty("--gyro-rotate-x", "0deg");
+      document.documentElement.style.setProperty("--gyro-rotate-y", "0deg");
+    };
+  }, [isMobile, isTiltEnabled]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isTiltEnabled) {
+      document.documentElement.style.setProperty("--gyro-rotate-x", "0deg");
+      document.documentElement.style.setProperty("--gyro-rotate-y", "0deg");
+    }
+  }, [isTiltEnabled]);
 
   // Fetch simulated battery level and ping variations
   useEffect(() => {
@@ -173,6 +200,19 @@ export default function MobileConsole() {
           <span>GYRO_Y: {gyro.y}°</span>
           <span className="hidden xs:inline">PING: {ping}ms</span>
           <span>BAT: {batteryLevel}%</span>
+          
+          <button 
+            type="button"
+            onClick={() => {
+              triggerHaptic(10);
+              setIsTiltEnabled(!isTiltEnabled);
+            }} 
+            className={`border rounded px-1.5 py-0.5 tracking-wider uppercase font-bold font-mono transition-all ${
+              isTiltEnabled ? "border-[#f0a000]/30 text-[#f0a000] bg-[#f0a000]/5" : "border-zinc-500/40 text-zinc-500 bg-zinc-500/5"
+            }`}
+          >
+            {isTiltEnabled ? "TILT_ON" : "TILT_OFF"}
+          </button>
           
           <button 
             type="button"
